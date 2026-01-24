@@ -8,20 +8,45 @@
 }
 
 .page-header {
-  margin-bottom: 18px;
+  display: grid;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb; /* subtle separator */
 }
 
 .page-title {
   margin: 0;
+  font-size: clamp(28px, 3.6vw, 42px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: 0.2px;
+}
+.page-title::after {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 3px;
+  border-radius: 2px;
+  background: #00B2E3; /* accent underline */
+  margin-top: 6px;
 }
 
 .page-subtitle {
-  margin-top: 8px;
-  opacity: 0.8;
+  margin-top: 6px;
+  opacity: 0.85;
+  font-size: 15px;
 }
 
 .page-nav {
   margin-top: 10px;
+}
+.page-nav a {
+  color: #00B2E3; /* blue-600 */
+  text-decoration: none;
+}
+.page-nav a:hover {
+  text-decoration: underline;
 }
 
 /* Clinic list */
