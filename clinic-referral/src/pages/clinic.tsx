@@ -38,6 +38,7 @@ export default function ClinicPage({
 }) {
     const router = useRouter();
     const clinicRefs = useRef<Record<string, HTMLElement | null>>({});
+    const hasAutoScrolled = useRef(false);
     // openClinicId controls which clinic is expanded (accordion behavior)
     const [openClinicId, setOpenClinicId] = useState<string | null>(null);
 
@@ -48,15 +49,28 @@ export default function ClinicPage({
     }, [router.query.open]);
 
     useEffect(() => {
-        if (!openClinicId) return;
+        // Only auto-scroll if:
+        // 1) There is an ?open= param
+        // 2) We have not already auto-scrolled
+        if (hasAutoScrolled.current) return;
 
-        const el = clinicRefs.current[openClinicId];
+        const openFromQuery =
+            typeof router.query.open === "string" ? router.query.open : null;
+
+        if (!openFromQuery || openFromQuery !== openClinicId) return;
+
+        const el = clinicRefs.current[openFromQuery];
         if (!el) return;
 
+        hasAutoScrolled.current = true;
+
         requestAnimationFrame(() => {
-            el.scrollIntoView({ behavior: "smooth", block: "start" });
+            el.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
         });
-    }, [openClinicId]);
+    }, [openClinicId, router.query.open]);
 
     const specialtyNameById = useMemo(() => {
         const map: Record<string, string> = {};
