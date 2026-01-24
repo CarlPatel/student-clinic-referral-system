@@ -1,0 +1,57 @@
+[
+  {
+    "id": "primary-care",
+    "name": "Primary Care",
+    "description": "General medical care, chronic disease management, and basic preventive services."
+  },
+  {
+    "id": "dermatology",
+    "name": "Dermatology",
+    "description": "Skin concerns, rashes, acne, lesions, and related evaluations."
+  },
+  {
+    "id": "mental-health",
+    "name": "Mental Health",
+    "description": "Behavioral health support, counseling resources, and mental health services."
+  },
+  {
+    "id": "women’s-health",
+    "name": "Women’s Health",
+    "description": "Women’s health services and reproductive health-related care."
+  },
+  {
+    "id": "harm-reduction",
+    "name": "Harm Reduction",
+    "description": "Low-barrier services focused on safety, risk reduction, and supportive care."
+  },
+  {
+    "id": "behavioral-health",
+    "name": "Behavioral Health",
+    "description": "Behavioral health evaluation and support services."
+  },
+  {
+    "id": "dental",
+    "name": "Dental",
+    "description": "Oral health services and dental-related care."
+  },
+  {
+    "id": "ophthalmology",
+    "name": "Vision / Ophthalmology",
+    "description": "Vision screening and eye-related services."
+  },
+  {
+    "id": "pediatrics",
+    "name": "Pediatrics",
+    "description": "Healthcare services for children and adolescents."
+  },
+  {
+    "id": "preventative-care",
+    "name": "Preventive Care / Screenings",
+    "description": "Preventive health services and screenings (e.g., cancer screening programs)."
+  },
+  {
+    "id": "lgbtqia-care",
+    "name": "LGBTQIA+ Care",
+    "description": "LGBTQIA+ affirming services and gender-affirming healthcare resources."
+  }
+]

@@ -1,0 +1,246 @@
+[
+  {
+    "id": "paul-hom-asian-clinic",
+    "name": "Paul Hom Asian Clinic",
+    "affiliation": "UC Davis Student-Run Clinics",
+    "specialtyIds": ["primary-care"],
+    "location": {
+      "address": "6341 Folsom Blvd, Sacramento, CA 95819"
+    },
+    "contact": {
+      "website": "http://www.paulhomasianclinic.org"
+    },
+    "hours": "Saturdays, 8:00 AM – 1:00 PM (example)",
+    "eligibility": "Underserved, uninsured, all individuals welcome",
+    "referral": {
+      "acceptingReferrals": true,
+      "howToRefer": ["Contact clinic via website or phone"],
+      "notes": "Free culturally sensitive primary care." 
+    },
+    "lastVerifiedAt": "2026-01"
+  },
+  {
+    "id": "clinica-tepati",
+    "name": "Clinica Tepati",
+    "affiliation": "UC Davis Student-Run Clinics",
+    "specialtyIds": ["primary-care"],
+    "location": {
+      "address": "1820 J Street, Sacramento, CA 95814"
+    },
+    "contact": {
+      "website": "http://clinicatepati.com"
+    },
+    "hours": "Saturdays (varies)",
+    "eligibility": "Underserved, uninsured, uninsured Latino population",
+    "referral": {
+      "acceptingReferrals": true,
+      "howToRefer": ["Contact clinic via website or phone"]
+    },
+    "lastVerifiedAt": "2026-01"
+  },
+  {
+    "id": "imani-clinic",
+    "name": "Imani Clinic",
+    "affiliation": "UC Davis Student-Run Clinics",
+    "specialtyIds": ["primary-care"],
+    "location": {
+      "address": "2425 Alhambra Blvd, Sacramento, CA 95817"
+    },
+    "contact": {
+      "website": "http://www.imaniclinic.org"
+    },
+    "hours": "Saturdays, 9:00 AM – 1:00 PM (example)",
+    "eligibility": "All uninsured individuals",
+    "referral": {
+      "acceptingReferrals": true,
+      "howToRefer": ["Call or visit clinic during hours"]
+    },
+    "lastVerifiedAt": "2026-01"
+  },
+  {
+    "id": "shifa-clinic",
+    "name": "Shifa Clinic",
+    "affiliation": "UC Davis Student-Run Clinics",
+    "specialtyIds": ["primary-care", "women’s-health"],
+    "location": {
+      "address": "419 V Street, Suite A, Sacramento, CA 95818"
+    },
+    "contact": {
+      "website": "http://shifaclinic.org"
+    },
+    "hours": "Sundays, 8:30 AM – 2:00 PM (example)",
+    "eligibility": "Multilingual and diverse community",
+    "referral": {
+      "acceptingReferrals": true,
+      "howToRefer": ["Call or visit clinic"]
+    },
+    "lastVerifiedAt": "2026-01"
+  },
+  {
+    "id": "joan-viteri-memorial-clinic",
+    "name": "Joan Viteri Memorial Clinic",
+    "affiliation": "UC Davis Student-Run Clinics",
+    "specialtyIds": ["primary-care", "harm-reduction"],
+    "location": {
+      "address": "Sacramento, CA"
+    },
+    "contact": {
+      "website": "http://www.jvmclinic.com"
+    },
+    "hours": "Saturdays, 1:00 PM – 5:00 PM (example)",
+    "eligibility": "Individuals in Oak Park community",
+    "referral": {
+      "acceptingReferrals": true,
+      "howToRefer": ["Contact clinic directly"]
+    },
+    "lastVerifiedAt": "2026-01"
+  },
+  {
+    "id": "bayanihan-clinic",
+    "name": "Bayanihan Clinic",
+    "affiliation": "UC Davis Student-Run Clinics",
+    "specialtyIds": ["primary-care"],
+    "location": {
+      "address": "3030 Explorer Drive, Rancho Cordova, CA 95670"
+    },
+    "contact": {
+      "website": "http://www.bayanihanclinic.com"
+    },
+    "hours": "Saturdays, 8:00 AM – 12:00 PM (example)",
+    "eligibility": "Underserved Filipino and diverse communities",
+    "referral": {
+      "acceptingReferrals": true,
+      "howToRefer": ["Reach out via website"]
+    },
+    "lastVerifiedAt": "2026-01"
+  },
+  {
+    "id": "willow-clinic",
+    "name": "Willow Clinic",
+    "affiliation": "UC Davis Student-Run Clinics",
+    "specialtyIds": ["primary-care", "behavioral-health", "dental", "ophthalmology"],
+    "location": {
+      "address": "1400 North A Street, Sacramento, CA 95811"
+    },
+    "contact": {
+      "website": "http://www.willowclinic.org"
+    },
+    "hours": "Saturdays, 9:00 AM – 1:00 PM (example)",
+    "eligibility": "All individuals, homeless and underserved",
+    "referral": {
+      "acceptingReferrals": true,
+      "howToRefer": ["Visit clinic during hours"]
+    },
+    "lastVerifiedAt": "2026-01"
+  },
+  {
+    "id": "river-clinic",
+    "name": "RIVER Clinic",
+    "affiliation": "UC Davis Student-Run Clinics",
+    "specialtyIds": ["pediatrics"],
+    "location": {
+      "address": "3535 65th Street Bldg C, Sacramento, CA 95820"
+    },
+    "contact": {
+      "website": "http://www.riverpediatricclinic.org"
+    },
+    "hours": "1st & 3rd Saturdays, 9:00 AM – 1:00 PM (example)",
+    "eligibility": "Children and underserved families",
+    "referral": {
+      "acceptingReferrals": true,
+      "howToRefer": ["Contact clinic for schedule"]
+    },
+    "lastVerifiedAt": "2026-01"
+  },
+  {
+    "id": "vn-cares",
+    "name": "VN Cares",
+    "affiliation": "UC Davis Student-Run Clinics",
+    "specialtyIds": ["preventative-care"],
+    "location": {
+      "address": "6341 Folsom Blvd, Sacramento, CA 95819"
+    },
+    "contact": {},
+    "hours": "First Sunday of each month (example)",
+    "eligibility": "Preventative cancer screenings",
+    "referral": {
+      "acceptingReferrals": true,
+      "howToRefer": ["Contact clinic"]
+    },
+    "lastVerifiedAt": "2026-01"
+  },
+  {
+    "id": "knights-landing-one-health-center",
+    "name": "Knights Landing One Health Center",
+    "affiliation": "UC Davis Student-Run Clinics",
+    "specialtyIds": ["primary-care"],
+    "location": {
+      "address": "9586 Mill Street, Knights Landing, CA 95645"
+    },
+    "contact": {
+      "website": "http://knightslandingonehealth.com"
+    },
+    "hours": "1st & 3rd Sundays (example)",
+    "eligibility": "Women, adolescents & farmworkers",
+    "referral": {
+      "acceptingReferrals": true,
+      "howToRefer": ["Contact clinic"]
+    },
+    "lastVerifiedAt": "2026-01"
+  },
+  {
+    "id": "hlub-clinic",
+    "name": "HLUB (Hmong Lifting Underserved Barriers)",
+    "affiliation": "UC Davis Student-Run Clinics",
+    "specialtyIds": ["preventative-care"],
+    "location": {
+      "address": "6341 Folsom Blvd, Sacramento, CA 95819"
+    },
+    "contact": {},
+    "hours": "Monthly, 8:00 AM – 1:00 PM (example)",
+    "eligibility": "Hmong community screening & care",
+    "referral": {
+      "acceptingReferrals": true,
+      "howToRefer": ["Contact clinic"]
+    },
+    "lastVerifiedAt": "2026-01"
+  },
+  {
+    "id": "gender-health-clinic",
+    "name": "Gender Health Clinic",
+    "affiliation": "UC Davis Student-Run Clinics",
+    "specialtyIds": ["lgbtqia-care"],
+    "location": {
+      "address": "3823 V Street, Sacramento, CA 95817"
+    },
+    "contact": {
+      "website": "http://www.genderhealthcenter.org"
+    },
+    "hours": "First & 3rd Fridays, 6:00 PM – 9:00 PM (example)",
+    "eligibility": "LGBTQIA+ affirming care",
+    "referral": {
+      "acceptingReferrals": true,
+      "howToRefer": ["Contact clinic"]
+    },
+    "lastVerifiedAt": "2026-01"
+  },
+  {
+    "id": "nadezhda-clinic",
+    "name": "Nadezhda Clinic",
+    "affiliation": "UC Davis Student-Run Clinics",
+    "specialtyIds": ["primary-care"],
+    "location": {
+      "address": "1442 Ethan Way, Sacramento, CA 95825"
+    },
+    "contact": {
+      "website": "http://www.nadezhdaclinic.org"
+    },
+    "hours": "Monthly (example)",
+    "eligibility": "Russian-speaking underserved population",
+    "referral": {
+      "acceptingReferrals": true,
+      "howToRefer": ["Contact clinic"]
+    },
+    "lastVerifiedAt": "2026-01"
+  }
+]
