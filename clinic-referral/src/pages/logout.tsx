@@ -4,18 +4,11 @@ import { getSessionOptions } from "@/lib/auth/session";
 
 export const getServerSideProps: GetServerSideProps = withIronSessionSsr(
   async (context) => {
-    if (!context.req.session.isLoggedIn) {
-      return {
-        redirect: {
-          destination: "/login",
-          permanent: false
-        }
-      };
-    }
+    context.req.session.destroy();
 
     return {
       redirect: {
-        destination: "/specialty",
+        destination: "/login",
         permanent: false
       }
     };
@@ -23,6 +16,6 @@ export const getServerSideProps: GetServerSideProps = withIronSessionSsr(
   getSessionOptions()
 );
 
-export default function Home() {
+export default function LogoutPage() {
   return null;
 }

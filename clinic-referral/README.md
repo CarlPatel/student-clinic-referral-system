@@ -2,6 +2,33 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+## User Authentication
+
+This app uses individual user accounts with hashed passwords stored locally in `data/users.json`.
+
+### Setup
+
+1) Ensure `.env.local` has a strong session secret (32+ chars):
+
+```bash
+SESSION_PASSWORD="your-very-long-random-session-secret"
+```
+
+2) Users are stored in `data/users.json`. To add a new user, generate a salt + hash:
+
+```bash
+node -e "const crypto = require('crypto'); const salt = crypto.randomBytes(16).toString('hex'); const hash = crypto.scryptSync('password-here', salt, 64).toString('hex'); console.log(JSON.stringify({ id: 'unique-id', username: 'username', salt, passwordHash: hash }, null, 2));"
+```
+
+Add the JSON object to the `data/users.json` array.
+
+### Default Users
+
+The app ships with three demo users (all use password: `password123`):
+- alice
+- bob
+- charlie
+
 First, run the development server:
 
 ```bash

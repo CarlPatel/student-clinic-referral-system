@@ -1,13 +1,35 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState, useRef } from "react";
+import type { GetServerSideProps } from "next";
+import { withIronSessionSsr } from "iron-session/next";
 import { getClinics, getSpecialties } from "@/lib/dataSource/localJson";
+import { getSessionOptions } from "@/lib/auth/session";
 import type { Clinic, Specialty } from "@/lib/types";
 
-export async function getStaticProps() {
-    const [clinics, specialties] = await Promise.all([getClinics(), getSpecialties()]);
-    return { props: { clinics, specialties } };
-}
+type ClinicPageProps = {
+    clinics: Clinic[];
+    specialties: Specialty[];
+    username: string;
+};
+
+export const getServerSideProps = withIronSessionSsr<ClinicPageProps>(
+    async (context) => {
+        if (!context.req.session.isLoggedIn) {
+            const nextPath = context.resolvedUrl ?? "/clinic";
+            return {
+                redirect: {
+                    destination: `/login?next=${encodeURIComponent(nextPath)}`,
+                    permanent: false
+                }
+            };
+        }
+
+        const [clinics, specialties] = await Promise.all([getClinics(), getSpecialties()]);
+        return { props: { clinics, specialties, username: context.req.session.username || "User" } };
+    },
+    getSessionOptions()
+);
 
 function buildMailto(clinic: Clinic) {
     const email = clinic.contact?.email;
@@ -31,11 +53,9 @@ function Tag({ label }: { label: string }) {
 
 export default function ClinicPage({
     clinics,
-    specialties
-}: {
-    clinics: Clinic[];
-    specialties: Specialty[];
-}) {
+    specialties,
+    username
+}: ClinicPageProps) {
     const router = useRouter();
     const clinicRefs = useRef<Record<string, HTMLElement | null>>({});
     const hasAutoScrolled = useRef(false);
@@ -81,12 +101,18 @@ export default function ClinicPage({
     return (
         <main className="clinic-page">
             <header className="page-header">
-                <h1 className="page-title">Clinics</h1>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                        <h1 className="page-title">Clinics</h1>
+                        <p className="page-user-info">Signed in as: <strong>{username}</strong></p>
+                    </div>
+                </div>
                 <p className="page-subtitle">
                     Click a clinic to expand details. Directory only — do not include patient-identifying info.
                 </p>
                 <div className="page-nav">
                     <Link href="/specialty">← Back to Specialty Page</Link>
+                    <Link href="/logout">Sign out</Link>
                 </div>
             </header>
 

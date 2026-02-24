@@ -1,11 +1,33 @@
 import Link from "next/link";
+import type { GetServerSideProps } from "next";
+import { withIronSessionSsr } from "iron-session/next";
 import { getClinics, getSpecialties } from "@/lib/dataSource/localJson";
+import { getSessionOptions } from "@/lib/auth/session";
 import type { Clinic, Specialty } from "@/lib/types";
 
-export async function getStaticProps() {
-  const [specialties, clinics] = await Promise.all([getSpecialties(), getClinics()]);
-  return { props: { specialties, clinics } };
-}
+type SpecialtyPageProps = {
+  specialties: Specialty[];
+  clinics: Clinic[];
+  username: string;
+};
+
+export const getServerSideProps = withIronSessionSsr<SpecialtyPageProps>(
+  async (context) => {
+    if (!context.req.session.isLoggedIn) {
+      const nextPath = context.resolvedUrl ?? "/specialty";
+      return {
+        redirect: {
+          destination: `/login?next=${encodeURIComponent(nextPath)}`,
+          permanent: false
+        }
+      };
+    }
+
+    const [specialties, clinics] = await Promise.all([getSpecialties(), getClinics()]);
+    return { props: { specialties, clinics, username: context.req.session.username || "User" } };
+  },
+  getSessionOptions()
+);
 
 function groupClinicsBySpecialty(specialties: Specialty[], clinics: Clinic[]) {
   const map: Record<string, Clinic[]> = {};
@@ -24,22 +46,26 @@ function groupClinicsBySpecialty(specialties: Specialty[], clinics: Clinic[]) {
 
 export default function SpecialtyPage({
   specialties,
-  clinics
-}: {
-  specialties: Specialty[];
-  clinics: Clinic[];
-}) {
+  clinics,
+  username
+}: SpecialtyPageProps) {
   const grouped = groupClinicsBySpecialty(specialties, clinics);
 
   return (
     <main className="specialty-page">
       <header className="page-header">
-        <h1 className="page-title">Clinic Directory by Specialty</h1>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <h1 className="page-title">Clinic Directory by Specialty</h1>
+            <p className="page-user-info">Signed in as: <strong>{username}</strong></p>
+          </div>
+        </div>
         <p className="page-subtitle">
           Directory only — do not include patient-identifying info.
         </p>
         <div className="page-nav">
           <Link href="/clinic">Go to Clinic Page →</Link>
+          <Link href="/logout">Sign out</Link>
         </div>
       </header>
 
