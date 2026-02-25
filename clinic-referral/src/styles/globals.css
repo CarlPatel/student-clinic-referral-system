@@ -326,6 +326,7 @@
   opacity: 0.85;
   border-left: 3px solid #00B2E3;
   user-select: text;
+  color: #000;
 }
 
 .page-user-info {
