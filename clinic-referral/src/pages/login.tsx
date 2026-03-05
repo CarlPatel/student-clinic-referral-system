@@ -13,7 +13,7 @@ export const getServerSideProps = withIronSessionSsr<LoginPageProps>(
     if (context.req.session.isLoggedIn) {
       return {
         redirect: {
-          destination: "/specialty",
+          destination: "/app",
           permanent: false
         }
       };
@@ -22,8 +22,8 @@ export const getServerSideProps = withIronSessionSsr<LoginPageProps>(
     const rawNext =
       typeof context.query.next === "string" && context.query.next.trim().length > 0
         ? context.query.next
-        : "/specialty";
-    const nextPath = rawNext.startsWith("/") ? rawNext : "/specialty";
+        : "/app";
+    const nextPath = rawNext.startsWith("/") ? rawNext : "/app";
 
     return {
       props: {

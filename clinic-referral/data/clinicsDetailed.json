@@ -1,0 +1,122 @@
+{
+  "tepati": {
+    "name": "Clínica Tepati",
+    "location": "Downtown Sacramento",
+    "phone": "209-606-3076",
+    "contact": "Maria",
+    "founded": "1974",
+    "population": "Hispanic community",
+    "tags": ["In-house labs", "Retinal scans", "Hypertension team"],
+    "website": null
+  },
+  "klohc": {
+    "name": "Knights Landing One Health Clinic",
+    "location": "Knights Landing (~20 mi from Davis)",
+    "phone": "—",
+    "contact": "Ruben",
+    "founded": "2012",
+    "population": "Migrant farmworkers (Spanish-speaking)",
+    "tags": ["One Health model", "Medical + Dental + Vet"],
+    "website": null
+  },
+  "hlub": {
+    "name": "HLUB Clinic",
+    "location": "Sacramento (Folsom Blvd & 65th St)",
+    "phone": "—",
+    "contact": "Justin",
+    "founded": "2014",
+    "population": "Hmong & broader Asian community",
+    "tags": ["Tri-Org with PHAC & VN CARES"],
+    "website": null
+  },
+  "imani": {
+    "name": "Imani Clinic",
+    "location": "Oak Park, Sacramento (2425 Alhambra Blvd)",
+    "phone": "—",
+    "contact": "Evelyn, Michelle, Dillon",
+    "founded": "1994",
+    "population": "African Diaspora communities",
+    "tags": ["Barbershop Outreach", "Mobile Clinics", "Remote BP Monitoring"],
+    "website": null
+  },
+  "jvmc": {
+    "name": "Joan Viteri Memorial Clinic (JVMC)",
+    "location": "West Oak Park",
+    "phone": "—",
+    "contact": "Christine",
+    "founded": "1998",
+    "population": "LGBTQ+, people who use drugs, sex workers, unhoused & underinsured",
+    "tags": ["Harm-reduction model", "Walk-in primary care", "Gender Health Clinic"],
+    "website": null
+  },
+  "jcc": {
+    "name": "Juvenile Caduceus Clinic (JCC)",
+    "location": "Fairfield",
+    "phone": "510-365-0060",
+    "contact": "Josue, Emily",
+    "founded": "2022",
+    "population": "Youth, elderly, homeless, refugees",
+    "tags": ["ACEs framework", "Preventive care"],
+    "website": null
+  },
+  "nadezhda": {
+    "name": "Nadezhda Clinic",
+    "location": "Arden-Arcade (One Community Health)",
+    "phone": "—",
+    "contact": "Mike & Michelle",
+    "founded": "2019",
+    "population": "Slavic / Russian- & Ukrainian-speaking refugees",
+    "tags": ["Continuous primary care", "In-house blood work"],
+    "website": null
+  },
+  "phac": {
+    "name": "Paul Hom Asian Clinic (PHAC)",
+    "location": "Sacramento",
+    "phone": "—",
+    "contact": "David, Patrick",
+    "founded": "1971",
+    "population": "Asian community",
+    "tags": ["Tri-Org with VN CARES & HLUB", "FIT kits", "H. pylori testing"],
+    "website": "https://www.paulhomasianclinic.org"
+  },
+  "river": {
+    "name": "RIVER Pediatric Clinic",
+    "location": "WellSpace @ Hiram Johnson HS, Sacramento",
+    "phone": "—",
+    "contact": "Julia",
+    "founded": "2015",
+    "population": "Pediatric patients (Rancho Cordova & Sacramento)",
+    "tags": ["1st & 3rd Saturdays 9am–12pm", "Sports physicals", "Multilingual translation"],
+    "website": null
+  },
+  "willow": {
+    "name": "Willow Clinic",
+    "location": "First Step Communities, West Sacramento",
+    "phone": "—",
+    "contact": "Surya, Prag, Dani, Vedika",
+    "founded": "2009",
+    "population": "Unhoused community",
+    "tags": ["Smoking Cessation", "Public Health Outreach"],
+    "website": null
+  },
+  "bayanihan": {
+    "name": "Bayanihan Clinic",
+    "location": "Rancho Cordova",
+    "phone": "—",
+    "contact": "Muskan, Gwyn",
+    "founded": "2002",
+    "population": "Filipino community",
+    "tags": ["Tagalog & Spanish interpretation", "Diabetes Empowerment", "Telehealth available"],
+    "website": null
+  },
+  "vncares": {
+    "name": "VN CARES",
+    "location": "6341 Folsom Blvd, Sacramento",
+    "phone": "—",
+    "contact": "Allison, Chris, Will",
+    "founded": "2001",
+    "population": "Vietnamese & broader community",
+    "tags": ["Tri-Org with PHAC & HLUB", "Monthly cancer screening", "Annual Health Fair"],
+    "website": null
+  }
+}

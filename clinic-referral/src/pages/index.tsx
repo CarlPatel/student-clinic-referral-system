@@ -15,7 +15,7 @@ export const getServerSideProps: GetServerSideProps = withIronSessionSsr(
 
     return {
       redirect: {
-        destination: "/specialty",
+        destination: "/app",
         permanent: false
       }
     };
