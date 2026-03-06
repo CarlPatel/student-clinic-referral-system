@@ -11,7 +11,8 @@ const { Client } = require('pg');
 const fs = require('fs');
 const path = require('path');
 
-// Load JSON data
+// Load schema and JSON data
+const schema = fs.readFileSync(path.join(__dirname, './schema.sql'), 'utf8');
 const clinicsData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/clinics.json'), 'utf8'));
 const specialtiesData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/specialties.json'), 'utf8'));
 
@@ -40,16 +41,10 @@ async function importData() {
     await client.connect();
     console.log('✅ Connected successfully\n');
 
-    // Clear existing data (in reverse dependency order)
-    console.log('🧹 Clearing existing data...');
-    await client.query('DELETE FROM specialty_documents');
-    await client.query('DELETE FROM specialty_clinics');
-    await client.query('DELETE FROM clinic_specialties');
-    await client.query('DELETE FROM clinic_referral_methods');
-    await client.query('DELETE FROM clinic_tags');
-    await client.query('DELETE FROM specialties');
-    await client.query('DELETE FROM clinics');
-    console.log('✅ Cleared existing data\n');
+    // Run schema to create tables
+    console.log('🏗️  Creating database schema...');
+    await client.query(schema);
+    console.log('✅ Schema created/updated\n');
 
     // Import clinics
     console.log('📋 Importing clinics...');

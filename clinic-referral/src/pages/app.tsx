@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import type { GetServerSideProps } from "next";
 import { withIronSessionSsr } from "iron-session/next";
 import { getSessionOptions } from "@/lib/auth/session";
-import { getAppData } from "@/lib/dataSource/postgres";
+import { getAppData, getReferrals, saveReferral, type Referral } from "@/lib/dataSource/postgres";
 import Head from "next/head";
 
 // ─── TYPES ──────────────────────────────────────────────────────────────────
@@ -35,22 +35,11 @@ type SpecialtyData = {
   clinics: ClinicEntry[];
 };
 
-type Referral = {
-  id: number;
-  referringClinic: string;
-  receivingClinic: string;
-  date: string;
-  time: string;
-  specialty: string;
-  preceptor: string;
-  notes: string;
-  submittedAt: string;
-};
-
 type AppPageProps = {
   username: string;
   clinics: Record<string, ClinicInfo>;
   specialtiesData: Record<string, SpecialtyData>;
+  initialReferrals: Referral[];
 };
 
 // ─── SERVER SIDE PROPS ──────────────────────────────────────────────────────
@@ -66,13 +55,17 @@ export const getServerSideProps = withIronSessionSsr<AppPageProps>(
       };
     }
 
-    const appData = await getAppData();
+    const [appData, initialReferrals] = await Promise.all([
+      getAppData(),
+      getReferrals()
+    ]);
 
     return {
       props: {
         username: context.req.session.username || "User",
         clinics: appData.clinics,
-        specialtiesData: appData.specialtiesData
+        specialtiesData: appData.specialtiesData,
+        initialReferrals
       }
     };
   },
@@ -128,17 +121,19 @@ function DocIcon({ type }: { type: "form" | "auth" | "insurance" }) {
 // ─── REFERRAL TRACKER COMPONENT ────────────────────────────────────────────
 function ReferralTracker({
   clinics,
-  specialtiesData
+  specialtiesData,
+  initialReferrals
 }: {
   clinics: Record<string, ClinicInfo>;
   specialtiesData: Record<string, SpecialtyData>;
+  initialReferrals: Referral[];
 }) {
   const CLINICS = clinics;
   const SPECIALTIES_DATA = specialtiesData;
   const CLINIC_NAMES = Object.values(CLINICS).map((c) => c.name);
   const SPECIALTY_LIST = Object.keys(SPECIALTIES_DATA);
 
-  const [referrals, setReferrals] = useState<Referral[]>([]);
+  const [referrals, setReferrals] = useState<Referral[]>(initialReferrals);
   const [view, setView] = useState<"list" | "form" | "detail">("list");
   const [form, setForm] = useState(EMPTY_FORM);
   const [step, setStep] = useState(0);
@@ -147,18 +142,6 @@ function ReferralTracker({
   const [filterClinic, setFilterClinic] = useState("All");
   const [filterSpecialty, setFilterSpecialty] = useState("All");
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  // Load from localStorage on mount
-  useEffect(() => {
-    const stored = localStorage.getItem("referrals");
-    if (stored) {
-      try {
-        setReferrals(JSON.parse(stored));
-      } catch (e) {
-        console.error("Failed to load referrals", e);
-      }
-    }
-  }, []);
 
   const save = (updated: Referral[]) => {
     setReferrals(updated);
@@ -185,7 +168,7 @@ function ReferralTracker({
     setStep((s) => s - 1);
   };
 
-  const submit = () => {
+  const submit = async () => {
     const now = new Date();
     const entry: Referral = { 
       ...form, 
@@ -194,6 +177,19 @@ function ReferralTracker({
       time: now.toTimeString().split(' ')[0].substring(0, 5),
       submittedAt: now.toISOString() 
     } as Referral;
+    
+    // Save to database via API
+    try {
+      await fetch("/api/referrals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(entry)
+      });
+    } catch (error) {
+      console.error("Failed to save referral to database", error);
+    }
+    
+    // Save to state and localStorage
     const updated = [entry, ...referrals];
     save(updated);
     setSubmitted(true);
@@ -206,7 +202,17 @@ function ReferralTracker({
     setView("form");
   };
 
-  const deleteReferral = (id: number) => {
+  const deleteReferral = async (id: number) => {
+    // Delete from database via API
+    try {
+      await fetch(`/api/referrals?id=${id}`, {
+        method: "DELETE"
+      });
+    } catch (error) {
+      console.error("Failed to delete referral from database", error);
+    }
+    
+    // Remove from state and localStorage
     save(referrals.filter((r) => r.id !== id));
   };
 
@@ -1086,7 +1092,7 @@ function ReferralTracker({
 }
 
 // ─── MAIN APP COMPONENT ─────────────────────────────────────────────────────
-export default function ClinicReferralApp({ username, clinics, specialtiesData }: AppPageProps) {
+export default function ClinicReferralApp({ username, clinics, specialtiesData, initialReferrals }: AppPageProps) {
   const CLINICS = clinics;
   const SPECIALTIES_DATA = specialtiesData;
   const specialties = Object.keys(SPECIALTIES_DATA);
@@ -1426,7 +1432,7 @@ export default function ClinicReferralApp({ username, clinics, specialtiesData }
                 </div>
               </header>
               <div style={{ flex: 1, overflowY: "auto", padding: "24px 28px" }}>
-                <ReferralTracker clinics={CLINICS} specialtiesData={SPECIALTIES_DATA} />
+                <ReferralTracker clinics={CLINICS} specialtiesData={SPECIALTIES_DATA} initialReferrals={initialReferrals} />
               </div>
             </>
           )}

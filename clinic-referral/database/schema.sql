@@ -2,6 +2,7 @@
 -- Vercel Neon Database Setup
 
 -- Drop existing tables if they exist (in reverse dependency order)
+DROP TABLE IF EXISTS referrals CASCADE;
 DROP TABLE IF EXISTS specialty_documents CASCADE;
 DROP TABLE IF EXISTS specialty_clinics CASCADE;
 DROP TABLE IF EXISTS clinic_specialties CASCADE;
@@ -104,6 +105,21 @@ CREATE TABLE specialty_documents (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Referrals (universal referral tracking across all users/sessions)
+CREATE TABLE referrals (
+    id BIGINT PRIMARY KEY,
+    referring_clinic VARCHAR(255) NOT NULL,
+    receiving_clinic VARCHAR(255) NOT NULL,
+    date DATE NOT NULL,
+    time TIME NOT NULL,
+    specialty VARCHAR(255) NOT NULL,
+    preceptor VARCHAR(255) NOT NULL,
+    notes TEXT,
+    submitted_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- ============================================================================
 -- INDEXES FOR PERFORMANCE
 -- ============================================================================
@@ -134,6 +150,13 @@ CREATE INDEX idx_specialty_clinics_clinic_id ON specialty_clinics(clinic_id);
 -- Specialty documents indexes
 CREATE INDEX idx_specialty_documents_specialty_clinic_id ON specialty_documents(specialty_clinic_id);
 CREATE INDEX idx_specialty_documents_doc_type ON specialty_documents(doc_type);
+
+-- Referrals indexes
+CREATE INDEX idx_referrals_referring_clinic ON referrals(referring_clinic);
+CREATE INDEX idx_referrals_receiving_clinic ON referrals(receiving_clinic);
+CREATE INDEX idx_referrals_specialty ON referrals(specialty);
+CREATE INDEX idx_referrals_submitted_at ON referrals(submitted_at DESC);
+CREATE INDEX idx_referrals_date ON referrals(date);
 
 -- ============================================================================
 -- HELPFUL VIEWS (OPTIONAL)
@@ -184,6 +207,7 @@ COMMENT ON TABLE clinic_referral_methods IS 'How to make referrals to each clini
 COMMENT ON TABLE clinic_specialties IS 'Junction table: which specialties each clinic offers';
 COMMENT ON TABLE specialty_clinics IS 'Specialty-centric view with frequency and additional details';
 COMMENT ON TABLE specialty_documents IS 'Required documents for specialty-clinic pairings';
+COMMENT ON TABLE referrals IS 'Universal referral tracking — all referrals submitted through the system';
 
 -- ============================================================================
 -- SETUP COMPLETE

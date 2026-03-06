@@ -83,9 +83,14 @@ const globalForPool = globalThis as unknown as { __clinicPool?: Pool };
 function getPool(): Pool {
   if (globalForPool.__clinicPool) return globalForPool.__clinicPool;
 
-  const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+  let connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
   if (!connectionString) {
     throw new Error("DATABASE_URL (or POSTGRES_URL) is required to read clinic data from PostgreSQL.");
+  }
+
+  // Add uselibpqcompat flag to suppress SSL deprecation warning
+  if (connectionString.includes("sslmode=require") && !connectionString.includes("uselibpqcompat")) {
+    connectionString += "&uselibpqcompat=true";
   }
 
   const useSsl = !connectionString.includes("localhost");
@@ -345,3 +350,89 @@ export async function getAppData(): Promise<{
 
   return { clinics, specialtiesData };
 }
+
+// ============================================================================
+// REFERRAL FUNCTIONS
+// ============================================================================
+
+export type Referral = {
+  id: number;
+  referringClinic: string;
+  receivingClinic: string;
+  date: string;
+  time: string;
+  specialty: string;
+  preceptor: string;
+  notes: string;
+  submittedAt: string;
+};
+
+type DbReferralRow = {
+  id: bigint;
+  referring_clinic: string;
+  receiving_clinic: string;
+  date: string;
+  time: string;
+  specialty: string;
+  preceptor: string;
+  notes: string | null;
+  submitted_at: string;
+};
+
+export async function saveReferral(referral: Referral): Promise<void> {
+  const pool = getPool();
+  await pool.query(
+    `
+      INSERT INTO referrals (id, referring_clinic, receiving_clinic, date, time, specialty, preceptor, notes, submitted_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      ON CONFLICT (id) DO UPDATE SET
+        referring_clinic = EXCLUDED.referring_clinic,
+        receiving_clinic = EXCLUDED.receiving_clinic,
+        date = EXCLUDED.date,
+        time = EXCLUDED.time,
+        specialty = EXCLUDED.specialty,
+        preceptor = EXCLUDED.preceptor,
+        notes = EXCLUDED.notes,
+        submitted_at = EXCLUDED.submitted_at
+    `,
+    [
+      referral.id,
+      referral.referringClinic,
+      referral.receivingClinic,
+      referral.date,
+      referral.time,
+      referral.specialty,
+      referral.preceptor,
+      referral.notes || null,
+      referral.submittedAt
+    ]
+  );
+}
+
+export async function getReferrals(): Promise<Referral[]> {
+  const rows = await query<DbReferralRow>(
+    `
+      SELECT id, referring_clinic, receiving_clinic, date, time, specialty, preceptor, notes, submitted_at
+      FROM referrals
+      ORDER BY submitted_at DESC
+    `
+  );
+
+  return rows.map((row) => ({
+    id: Number(row.id),
+    referringClinic: row.referring_clinic,
+    receivingClinic: row.receiving_clinic,
+    date: typeof row.date === 'string' ? row.date : (row.date instanceof Date ? row.date.toISOString().split('T')[0] : String(row.date)),
+    time: row.time,
+    specialty: row.specialty,
+    preceptor: row.preceptor,
+    notes: row.notes || "",
+    submittedAt: typeof row.submitted_at === 'string' ? row.submitted_at : (row.submitted_at instanceof Date ? row.submitted_at.toISOString() : String(row.submitted_at))
+  }));
+}
+
+export async function deleteReferral(id: number): Promise<void> {
+  const pool = getPool();
+  await pool.query("DELETE FROM referrals WHERE id = $1", [id]);
+}
+
