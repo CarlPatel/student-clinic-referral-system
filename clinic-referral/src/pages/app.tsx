@@ -2,9 +2,8 @@ import { useState, useEffect } from "react";
 import type { GetServerSideProps } from "next";
 import { withIronSessionSsr } from "iron-session/next";
 import { getSessionOptions } from "@/lib/auth/session";
+import { getAppData } from "@/lib/dataSource/postgres";
 import Head from "next/head";
-import FLAT_CLINICS from "../../data/clinics.json";
-import FLAT_SPECIALTIES from "../../data/specialties.json";
 
 // ─── TYPES ──────────────────────────────────────────────────────────────────
 type ClinicInfo = {
@@ -26,7 +25,7 @@ type Document = {
 
 type ClinicEntry = {
   id: string;
-  clinicKey: keyof typeof CLINICS;
+  clinicKey: string;
   freq: string;
   docs: Document[];
 };
@@ -34,45 +33,6 @@ type ClinicEntry = {
 type SpecialtyData = {
   icon: string;
   clinics: ClinicEntry[];
-};
-
-type FlatClinicRow = {
-  clinic_id: string;
-  clinic_key: string;
-  name: string;
-  location_label: string | null;
-  phone: string | null;
-  contact_person: string | null;
-  founded: string | null;
-  population: string | null;
-  website: string | null;
-  directory_address: string | null;
-  directory_website: string | null;
-};
-
-type FlatClinicTagRow = {
-  clinic_id: string;
-  tag: string;
-};
-
-type FlatSpecialtyRow = {
-  specialty_id: string;
-  display_name: string;
-  icon: string;
-};
-
-type FlatSpecialtyClinicRow = {
-  specialty_clinic_id: string;
-  specialty_id: string;
-  clinic_id: string;
-  frequency: string | null;
-};
-
-type FlatSpecialtyDocumentRow = {
-  specialty_clinic_id: string;
-  doc_name: string;
-  doc_type: "form" | "auth" | "insurance";
-  doc_description: string;
 };
 
 type Referral = {
@@ -89,78 +49,9 @@ type Referral = {
 
 type AppPageProps = {
   username: string;
+  clinics: Record<string, ClinicInfo>;
+  specialtiesData: Record<string, SpecialtyData>;
 };
-
-const CLINIC_TAGS_BY_ID = new Map<string, string[]>();
-for (const row of (FLAT_CLINICS.clinic_tags as FlatClinicTagRow[])) {
-  const list = CLINIC_TAGS_BY_ID.get(row.clinic_id) ?? [];
-  list.push(row.tag);
-  CLINIC_TAGS_BY_ID.set(row.clinic_id, list);
-}
-
-const CLINIC_ID_TO_KEY = new Map<string, string>();
-for (const row of (FLAT_CLINICS.clinics as FlatClinicRow[])) {
-  CLINIC_ID_TO_KEY.set(row.clinic_id, row.clinic_key);
-}
-
-const CLINICS = Object.fromEntries(
-  (FLAT_CLINICS.clinics as FlatClinicRow[]).map((row) => [
-    row.clinic_key,
-    {
-      name: row.name,
-      location: row.location_label ?? row.directory_address ?? "Location not listed",
-      phone: row.phone ?? "—",
-      contact: row.contact_person ?? "",
-      founded: row.founded ?? "",
-      population: row.population ?? "",
-      tags: CLINIC_TAGS_BY_ID.get(row.clinic_id) ?? [],
-      website: row.website ?? row.directory_website ?? null
-    }
-  ])
-) as Record<string, ClinicInfo>;
-
-const SPECIALTY_DOCS_BY_ENTRY_ID = new Map<string, Document[]>();
-for (const row of (FLAT_SPECIALTIES.specialty_documents as FlatSpecialtyDocumentRow[])) {
-  const list = SPECIALTY_DOCS_BY_ENTRY_ID.get(row.specialty_clinic_id) ?? [];
-  list.push({
-    name: row.doc_name,
-    type: row.doc_type,
-    desc: row.doc_description
-  });
-  SPECIALTY_DOCS_BY_ENTRY_ID.set(row.specialty_clinic_id, list);
-}
-
-const SPECIALTY_CLINICS_BY_ID = new Map<string, FlatSpecialtyClinicRow[]>();
-for (const row of (FLAT_SPECIALTIES.specialty_clinics as FlatSpecialtyClinicRow[])) {
-  const list = SPECIALTY_CLINICS_BY_ID.get(row.specialty_id) ?? [];
-  list.push(row);
-  SPECIALTY_CLINICS_BY_ID.set(row.specialty_id, list);
-}
-
-const SPECIALTIES_DATA = Object.fromEntries(
-  (FLAT_SPECIALTIES.specialties as FlatSpecialtyRow[]).map((specialty) => {
-    const clinicEntries: ClinicEntry[] = (SPECIALTY_CLINICS_BY_ID.get(specialty.specialty_id) ?? [])
-      .map((row) => {
-        const clinicKey = CLINIC_ID_TO_KEY.get(row.clinic_id);
-        if (!clinicKey) return null;
-        return {
-          id: row.specialty_clinic_id,
-          clinicKey: clinicKey as keyof typeof CLINICS,
-          freq: row.frequency ?? "",
-          docs: SPECIALTY_DOCS_BY_ENTRY_ID.get(row.specialty_clinic_id) ?? []
-        };
-      })
-      .filter((entry): entry is ClinicEntry => entry !== null);
-
-    return [
-      specialty.display_name,
-      {
-        icon: specialty.icon,
-        clinics: clinicEntries
-      }
-    ];
-  })
-) as Record<string, SpecialtyData>;
 
 // ─── SERVER SIDE PROPS ──────────────────────────────────────────────────────
 export const getServerSideProps = withIronSessionSsr<AppPageProps>(
@@ -175,15 +66,20 @@ export const getServerSideProps = withIronSessionSsr<AppPageProps>(
       };
     }
 
-    return { props: { username: context.req.session.username || "User" } };
+    const appData = await getAppData();
+
+    return {
+      props: {
+        username: context.req.session.username || "User",
+        clinics: appData.clinics,
+        specialtiesData: appData.specialtiesData
+      }
+    };
   },
   getSessionOptions()
 );
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
-const CLINIC_NAMES = Object.values(CLINICS).map((c) => c.name);
-const SPECIALTY_LIST = Object.keys(SPECIALTIES_DATA);
-
 const docTypeStyles = {
   form: { bg: "#EFF6FF", color: "#2563EB", label: "Form" },
   auth: { bg: "#FFF7ED", color: "#C2410C", label: "Authorization" },
@@ -230,7 +126,18 @@ function DocIcon({ type }: { type: "form" | "auth" | "insurance" }) {
 }
 
 // ─── REFERRAL TRACKER COMPONENT ────────────────────────────────────────────
-function ReferralTracker() {
+function ReferralTracker({
+  clinics,
+  specialtiesData
+}: {
+  clinics: Record<string, ClinicInfo>;
+  specialtiesData: Record<string, SpecialtyData>;
+}) {
+  const CLINICS = clinics;
+  const SPECIALTIES_DATA = specialtiesData;
+  const CLINIC_NAMES = Object.values(CLINICS).map((c) => c.name);
+  const SPECIALTY_LIST = Object.keys(SPECIALTIES_DATA);
+
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [view, setView] = useState<"list" | "form" | "detail">("list");
   const [form, setForm] = useState(EMPTY_FORM);
@@ -1179,7 +1086,9 @@ function ReferralTracker() {
 }
 
 // ─── MAIN APP COMPONENT ─────────────────────────────────────────────────────
-export default function ClinicReferralApp({ username }: AppPageProps) {
+export default function ClinicReferralApp({ username, clinics, specialtiesData }: AppPageProps) {
+  const CLINICS = clinics;
+  const SPECIALTIES_DATA = specialtiesData;
   const specialties = Object.keys(SPECIALTIES_DATA);
   const [section, setSection] = useState<"specialties" | "tracker">("specialties");
   const [activeSpecialty, setActiveSpecialty] = useState(specialties[0]);
@@ -1517,7 +1426,7 @@ export default function ClinicReferralApp({ username }: AppPageProps) {
                 </div>
               </header>
               <div style={{ flex: 1, overflowY: "auto", padding: "24px 28px" }}>
-                <ReferralTracker />
+                <ReferralTracker clinics={CLINICS} specialtiesData={SPECIALTIES_DATA} />
               </div>
             </>
           )}
