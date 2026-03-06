@@ -3,8 +3,8 @@ import type { GetServerSideProps } from "next";
 import { withIronSessionSsr } from "iron-session/next";
 import { getSessionOptions } from "@/lib/auth/session";
 import Head from "next/head";
-import CLINICS from "../../data/clinicsDetailed.json";
-import SPECIALTIES_DATA from "../../data/specialtiesDetailed.json";
+import CLINICS from "../../data/clinics.json";
+import SPECIALTIES_DATA from "../../data/specialties.json";
 
 // ─── TYPES ──────────────────────────────────────────────────────────────────
 type ClinicInfo = {
