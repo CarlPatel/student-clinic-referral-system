@@ -371,12 +371,12 @@ type DbReferralRow = {
   id: bigint;
   referring_clinic: string;
   receiving_clinic: string;
-  date: string;
+  date: Date | string;
   time: string;
   specialty: string;
   preceptor: string;
   notes: string | null;
-  submitted_at: string;
+  submitted_at: Date | string;
 };
 
 export async function saveReferral(referral: Referral): Promise<void> {
@@ -422,12 +422,12 @@ export async function getReferrals(): Promise<Referral[]> {
     id: Number(row.id),
     referringClinic: row.referring_clinic,
     receivingClinic: row.receiving_clinic,
-    date: typeof row.date === 'string' ? row.date : (row.date instanceof Date ? row.date.toISOString().split('T')[0] : String(row.date)),
+    date: row.date instanceof Date ? row.date.toISOString().split('T')[0] : row.date,
     time: row.time,
     specialty: row.specialty,
     preceptor: row.preceptor,
     notes: row.notes || "",
-    submittedAt: typeof row.submitted_at === 'string' ? row.submitted_at : (row.submitted_at instanceof Date ? row.submitted_at.toISOString() : String(row.submitted_at))
+    submittedAt: row.submitted_at instanceof Date ? row.submitted_at.toISOString() : row.submitted_at
   }));
 }
 
