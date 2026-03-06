@@ -1,502 +1,816 @@
 {
-  "tepati": {
-    "id": "clinica-tepati",
-    "name": "Clínica Tepati",
-    "specialtyIds": [
-      "cardiology",
-      "dermatology",
-      "diabetes-endocrinology",
-      "ent",
-      "gi-gastroenterology",
-      "gynecology-women-s-health",
-      "mental-health",
-      "neurology",
-      "podiatry",
-      "primary-care"
-    ],
-    "location": "Downtown Sacramento",
-    "phone": "209-606-3076",
-    "contact": "Maria",
-    "founded": "1974",
-    "population": "Hispanic community",
-    "tags": [
-      "In-house labs",
-      "Retinal scans",
-      "Hypertension team"
-    ],
-    "website": "http://clinicatepati.com",
-    "affiliation": "UC Davis Student-Run Clinics",
-    "directoryLocation": {
-      "address": "1820 J Street, Sacramento, CA 95814"
+  "clinics": [
+    {
+      "clinic_id": "clinica-tepati",
+      "clinic_key": "tepati",
+      "name": "Clínica Tepati",
+      "affiliation": "UC Davis Student-Run Clinics",
+      "location_label": "Downtown Sacramento",
+      "phone": "209-606-3076",
+      "contact_person": "Maria",
+      "founded": "1974",
+      "population": "Hispanic community",
+      "website": "http://clinicatepati.com",
+      "directory_address": "1820 J Street, Sacramento, CA 95814",
+      "directory_city": null,
+      "directory_state": null,
+      "directory_zip": null,
+      "directory_map_url": null,
+      "directory_email": null,
+      "directory_phone": null,
+      "directory_website": "http://clinicatepati.com",
+      "hours": "Saturdays (varies)",
+      "eligibility": "Underserved, uninsured, uninsured Latino population",
+      "accepting_referrals": true,
+      "referral_notes": null,
+      "last_verified_at": "2026-01"
     },
-    "directoryContact": {
-      "website": "http://clinicatepati.com"
+    {
+      "clinic_id": "knights-landing-one-health-center",
+      "clinic_key": "klohc",
+      "name": "Knights Landing One Health Clinic",
+      "affiliation": "UC Davis Student-Run Clinics",
+      "location_label": "Knights Landing (~20 mi from Davis)",
+      "phone": "—",
+      "contact_person": "Ruben",
+      "founded": "2012",
+      "population": "Migrant farmworkers (Spanish-speaking)",
+      "website": "http://knightslandingonehealth.com",
+      "directory_address": "9586 Mill Street, Knights Landing, CA 95645",
+      "directory_city": null,
+      "directory_state": null,
+      "directory_zip": null,
+      "directory_map_url": null,
+      "directory_email": null,
+      "directory_phone": null,
+      "directory_website": "http://knightslandingonehealth.com",
+      "hours": "1st & 3rd Sundays (example)",
+      "eligibility": "Women, adolescents & farmworkers",
+      "accepting_referrals": true,
+      "referral_notes": null,
+      "last_verified_at": "2026-01"
     },
-    "hours": "Saturdays (varies)",
-    "eligibility": "Underserved, uninsured, uninsured Latino population",
-    "referral": {
-      "acceptingReferrals": true,
-      "howToRefer": [
-        "Contact clinic via website or phone"
-      ]
+    {
+      "clinic_id": "hlub-clinic",
+      "clinic_key": "hlub",
+      "name": "HLUB Clinic",
+      "affiliation": "UC Davis Student-Run Clinics",
+      "location_label": "Sacramento (Folsom Blvd & 65th St)",
+      "phone": "—",
+      "contact_person": "Justin",
+      "founded": "2014",
+      "population": "Hmong & broader Asian community",
+      "website": null,
+      "directory_address": "6341 Folsom Blvd, Sacramento, CA 95819",
+      "directory_city": null,
+      "directory_state": null,
+      "directory_zip": null,
+      "directory_map_url": null,
+      "directory_email": null,
+      "directory_phone": null,
+      "directory_website": null,
+      "hours": "Monthly, 8:00 AM – 1:00 PM (example)",
+      "eligibility": "Hmong community screening & care",
+      "accepting_referrals": true,
+      "referral_notes": null,
+      "last_verified_at": "2026-01"
     },
-    "lastVerifiedAt": "2026-01"
-  },
-  "klohc": {
-    "id": "knights-landing-one-health-center",
-    "name": "Knights Landing One Health Clinic",
-    "specialtyIds": [
-      "dermatology",
-      "immigration-medical-exams",
-      "mental-health",
-      "primary-care"
-    ],
-    "location": "Knights Landing (~20 mi from Davis)",
-    "phone": "—",
-    "contact": "Ruben",
-    "founded": "2012",
-    "population": "Migrant farmworkers (Spanish-speaking)",
-    "tags": [
-      "One Health model",
-      "Medical + Dental + Vet"
-    ],
-    "website": "http://knightslandingonehealth.com",
-    "affiliation": "UC Davis Student-Run Clinics",
-    "directoryLocation": {
-      "address": "9586 Mill Street, Knights Landing, CA 95645"
+    {
+      "clinic_id": "imani-clinic",
+      "clinic_key": "imani",
+      "name": "Imani Clinic",
+      "affiliation": "UC Davis Student-Run Clinics",
+      "location_label": "Oak Park, Sacramento (2425 Alhambra Blvd)",
+      "phone": "—",
+      "contact_person": "Evelyn, Michelle, Dillon",
+      "founded": "1994",
+      "population": "African Diaspora communities",
+      "website": "http://www.imaniclinic.org",
+      "directory_address": "2425 Alhambra Blvd, Sacramento, CA 95817",
+      "directory_city": null,
+      "directory_state": null,
+      "directory_zip": null,
+      "directory_map_url": null,
+      "directory_email": null,
+      "directory_phone": null,
+      "directory_website": "http://www.imaniclinic.org",
+      "hours": "Saturdays, 9:00 AM – 1:00 PM (example)",
+      "eligibility": "All uninsured individuals",
+      "accepting_referrals": true,
+      "referral_notes": null,
+      "last_verified_at": "2026-01"
     },
-    "directoryContact": {
-      "website": "http://knightslandingonehealth.com"
+    {
+      "clinic_id": "joan-viteri-memorial-clinic",
+      "clinic_key": "jvmc",
+      "name": "Joan Viteri Memorial Clinic (JVMC)",
+      "affiliation": "UC Davis Student-Run Clinics",
+      "location_label": "West Oak Park",
+      "phone": "—",
+      "contact_person": "Christine",
+      "founded": "1998",
+      "population": "LGBTQ+, people who use drugs, sex workers, unhoused & underinsured",
+      "website": "http://www.jvmclinic.com",
+      "directory_address": "Sacramento, CA",
+      "directory_city": null,
+      "directory_state": null,
+      "directory_zip": null,
+      "directory_map_url": null,
+      "directory_email": null,
+      "directory_phone": null,
+      "directory_website": "http://www.jvmclinic.com",
+      "hours": "Saturdays, 1:00 PM – 5:00 PM (example)",
+      "eligibility": "Individuals in Oak Park community",
+      "accepting_referrals": true,
+      "referral_notes": null,
+      "last_verified_at": "2026-01"
     },
-    "hours": "1st & 3rd Sundays (example)",
-    "eligibility": "Women, adolescents & farmworkers",
-    "referral": {
-      "acceptingReferrals": true,
-      "howToRefer": [
-        "Contact clinic"
-      ]
+    {
+      "clinic_id": "juvenile-caduceus-clinic-jcc",
+      "clinic_key": "jcc",
+      "name": "Juvenile Caduceus Clinic (JCC)",
+      "affiliation": null,
+      "location_label": "Fairfield",
+      "phone": "510-365-0060",
+      "contact_person": "Josue, Emily",
+      "founded": "2022",
+      "population": "Youth, elderly, homeless, refugees",
+      "website": null,
+      "directory_address": null,
+      "directory_city": null,
+      "directory_state": null,
+      "directory_zip": null,
+      "directory_map_url": null,
+      "directory_email": null,
+      "directory_phone": null,
+      "directory_website": null,
+      "hours": null,
+      "eligibility": null,
+      "accepting_referrals": null,
+      "referral_notes": null,
+      "last_verified_at": null
     },
-    "lastVerifiedAt": "2026-01"
-  },
-  "hlub": {
-    "id": "hlub-clinic",
-    "name": "HLUB Clinic",
-    "specialtyIds": [
-      "cardiology",
-      "diabetes-endocrinology",
-      "hepatitis",
-      "neurology",
-      "ophthalmology",
-      "preventative-care",
-      "psychiatry"
-    ],
-    "location": "Sacramento (Folsom Blvd & 65th St)",
-    "phone": "—",
-    "contact": "Justin",
-    "founded": "2014",
-    "population": "Hmong & broader Asian community",
-    "tags": [
-      "Tri-Org with PHAC & VN CARES"
-    ],
-    "website": null,
-    "affiliation": "UC Davis Student-Run Clinics",
-    "directoryLocation": {
-      "address": "6341 Folsom Blvd, Sacramento, CA 95819"
+    {
+      "clinic_id": "nadezhda-clinic",
+      "clinic_key": "nadezhda",
+      "name": "Nadezhda Clinic",
+      "affiliation": "UC Davis Student-Run Clinics",
+      "location_label": "Arden-Arcade (One Community Health)",
+      "phone": "—",
+      "contact_person": "Mike & Michelle",
+      "founded": "2019",
+      "population": "Slavic / Russian- & Ukrainian-speaking refugees",
+      "website": "http://www.nadezhdaclinic.org",
+      "directory_address": "1442 Ethan Way, Sacramento, CA 95825",
+      "directory_city": null,
+      "directory_state": null,
+      "directory_zip": null,
+      "directory_map_url": null,
+      "directory_email": null,
+      "directory_phone": null,
+      "directory_website": "http://www.nadezhdaclinic.org",
+      "hours": "Monthly (example)",
+      "eligibility": "Russian-speaking underserved population",
+      "accepting_referrals": true,
+      "referral_notes": null,
+      "last_verified_at": "2026-01"
     },
-    "directoryContact": {},
-    "hours": "Monthly, 8:00 AM – 1:00 PM (example)",
-    "eligibility": "Hmong community screening & care",
-    "referral": {
-      "acceptingReferrals": true,
-      "howToRefer": [
-        "Contact clinic"
-      ]
+    {
+      "clinic_id": "paul-hom-asian-clinic",
+      "clinic_key": "phac",
+      "name": "Paul Hom Asian Clinic (PHAC)",
+      "affiliation": "UC Davis Student-Run Clinics",
+      "location_label": "Sacramento",
+      "phone": "—",
+      "contact_person": "David, Patrick",
+      "founded": "1971",
+      "population": "Asian community",
+      "website": "https://www.paulhomasianclinic.org",
+      "directory_address": "6341 Folsom Blvd, Sacramento, CA 95819",
+      "directory_city": null,
+      "directory_state": null,
+      "directory_zip": null,
+      "directory_map_url": null,
+      "directory_email": null,
+      "directory_phone": null,
+      "directory_website": "http://www.paulhomasianclinic.org",
+      "hours": "Saturdays, 8:00 AM – 1:00 PM (example)",
+      "eligibility": "Underserved, uninsured, all individuals welcome",
+      "accepting_referrals": true,
+      "referral_notes": "Free culturally sensitive primary care.",
+      "last_verified_at": "2026-01"
     },
-    "lastVerifiedAt": "2026-01"
-  },
-  "imani": {
-    "id": "imani-clinic",
-    "name": "Imani Clinic",
-    "specialtyIds": [
-      "cardiology",
-      "diabetes-endocrinology",
-      "mental-health",
-      "neurology",
-      "ophthalmology",
-      "pediatrics",
-      "primary-care"
-    ],
-    "location": "Oak Park, Sacramento (2425 Alhambra Blvd)",
-    "phone": "—",
-    "contact": "Evelyn, Michelle, Dillon",
-    "founded": "1994",
-    "population": "African Diaspora communities",
-    "tags": [
-      "Barbershop Outreach",
-      "Mobile Clinics",
-      "Remote BP Monitoring"
-    ],
-    "website": "http://www.imaniclinic.org",
-    "affiliation": "UC Davis Student-Run Clinics",
-    "directoryLocation": {
-      "address": "2425 Alhambra Blvd, Sacramento, CA 95817"
+    {
+      "clinic_id": "river-clinic",
+      "clinic_key": "river",
+      "name": "RIVER Pediatric Clinic",
+      "affiliation": "UC Davis Student-Run Clinics",
+      "location_label": "WellSpace @ Hiram Johnson HS, Sacramento",
+      "phone": "—",
+      "contact_person": "Julia",
+      "founded": "2015",
+      "population": "Pediatric patients (Rancho Cordova & Sacramento)",
+      "website": "http://www.riverpediatricclinic.org",
+      "directory_address": "3535 65th Street Bldg C, Sacramento, CA 95820",
+      "directory_city": null,
+      "directory_state": null,
+      "directory_zip": null,
+      "directory_map_url": null,
+      "directory_email": null,
+      "directory_phone": null,
+      "directory_website": "http://www.riverpediatricclinic.org",
+      "hours": "1st & 3rd Saturdays, 9:00 AM – 1:00 PM (example)",
+      "eligibility": "Children and underserved families",
+      "accepting_referrals": true,
+      "referral_notes": null,
+      "last_verified_at": "2026-01"
     },
-    "directoryContact": {
-      "website": "http://www.imaniclinic.org"
+    {
+      "clinic_id": "willow-clinic",
+      "clinic_key": "willow",
+      "name": "Willow Clinic",
+      "affiliation": "UC Davis Student-Run Clinics",
+      "location_label": "First Step Communities, West Sacramento",
+      "phone": "—",
+      "contact_person": "Surya, Prag, Dani, Vedika",
+      "founded": "2009",
+      "population": "Unhoused community",
+      "website": "http://www.willowclinic.org",
+      "directory_address": "1400 North A Street, Sacramento, CA 95811",
+      "directory_city": null,
+      "directory_state": null,
+      "directory_zip": null,
+      "directory_map_url": null,
+      "directory_email": null,
+      "directory_phone": null,
+      "directory_website": "http://www.willowclinic.org",
+      "hours": "Saturdays, 9:00 AM – 1:00 PM (example)",
+      "eligibility": "All individuals, homeless and underserved",
+      "accepting_referrals": true,
+      "referral_notes": null,
+      "last_verified_at": "2026-01"
     },
-    "hours": "Saturdays, 9:00 AM – 1:00 PM (example)",
-    "eligibility": "All uninsured individuals",
-    "referral": {
-      "acceptingReferrals": true,
-      "howToRefer": [
-        "Call or visit clinic during hours"
-      ]
+    {
+      "clinic_id": "bayanihan-clinic",
+      "clinic_key": "bayanihan",
+      "name": "Bayanihan Clinic",
+      "affiliation": "UC Davis Student-Run Clinics",
+      "location_label": "Rancho Cordova",
+      "phone": "—",
+      "contact_person": "Muskan, Gwyn",
+      "founded": "2002",
+      "population": "Filipino community",
+      "website": "http://www.bayanihanclinic.com",
+      "directory_address": "3030 Explorer Drive, Rancho Cordova, CA 95670",
+      "directory_city": null,
+      "directory_state": null,
+      "directory_zip": null,
+      "directory_map_url": null,
+      "directory_email": null,
+      "directory_phone": null,
+      "directory_website": "http://www.bayanihanclinic.com",
+      "hours": "Saturdays, 8:00 AM – 12:00 PM (example)",
+      "eligibility": "Underserved Filipino and diverse communities",
+      "accepting_referrals": true,
+      "referral_notes": null,
+      "last_verified_at": "2026-01"
     },
-    "lastVerifiedAt": "2026-01"
-  },
-  "jvmc": {
-    "id": "joan-viteri-memorial-clinic",
-    "name": "Joan Viteri Memorial Clinic (JVMC)",
-    "specialtyIds": [
-      "gynecology-women-s-health",
-      "harm-reduction",
-      "mental-health",
-      "primary-care"
-    ],
-    "location": "West Oak Park",
-    "phone": "—",
-    "contact": "Christine",
-    "founded": "1998",
-    "population": "LGBTQ+, people who use drugs, sex workers, unhoused & underinsured",
-    "tags": [
-      "Harm-reduction model",
-      "Walk-in primary care",
-      "Gender Health Clinic"
-    ],
-    "website": "http://www.jvmclinic.com",
-    "affiliation": "UC Davis Student-Run Clinics",
-    "directoryLocation": {
-      "address": "Sacramento, CA"
+    {
+      "clinic_id": "vn-cares",
+      "clinic_key": "vncares",
+      "name": "VN CARES",
+      "affiliation": "UC Davis Student-Run Clinics",
+      "location_label": "6341 Folsom Blvd, Sacramento",
+      "phone": "—",
+      "contact_person": "Allison, Chris, Will",
+      "founded": "2001",
+      "population": "Vietnamese & broader community",
+      "website": null,
+      "directory_address": "6341 Folsom Blvd, Sacramento, CA 95819",
+      "directory_city": null,
+      "directory_state": null,
+      "directory_zip": null,
+      "directory_map_url": null,
+      "directory_email": null,
+      "directory_phone": null,
+      "directory_website": null,
+      "hours": "First Sunday of each month (example)",
+      "eligibility": "Preventative cancer screenings",
+      "accepting_referrals": true,
+      "referral_notes": null,
+      "last_verified_at": "2026-01"
     },
-    "directoryContact": {
-      "website": "http://www.jvmclinic.com"
+    {
+      "clinic_id": "shifa-clinic",
+      "clinic_key": "shifa",
+      "name": "Shifa Clinic",
+      "affiliation": "UC Davis Student-Run Clinics",
+      "location_label": "419 V Street, Suite A, Sacramento, CA 95818",
+      "phone": "—",
+      "contact_person": "",
+      "founded": "",
+      "population": "Multilingual and diverse community",
+      "website": "http://shifaclinic.org",
+      "directory_address": "419 V Street, Suite A, Sacramento, CA 95818",
+      "directory_city": null,
+      "directory_state": null,
+      "directory_zip": null,
+      "directory_map_url": null,
+      "directory_email": null,
+      "directory_phone": null,
+      "directory_website": "http://shifaclinic.org",
+      "hours": "Sundays, 8:30 AM – 2:00 PM (example)",
+      "eligibility": "Multilingual and diverse community",
+      "accepting_referrals": true,
+      "referral_notes": null,
+      "last_verified_at": "2026-01"
     },
-    "hours": "Saturdays, 1:00 PM – 5:00 PM (example)",
-    "eligibility": "Individuals in Oak Park community",
-    "referral": {
-      "acceptingReferrals": true,
-      "howToRefer": [
-        "Contact clinic directly"
-      ]
+    {
+      "clinic_id": "gender-health-clinic",
+      "clinic_key": "gender-health",
+      "name": "Gender Health Clinic",
+      "affiliation": "UC Davis Student-Run Clinics",
+      "location_label": "3823 V Street, Sacramento, CA 95817",
+      "phone": "—",
+      "contact_person": "",
+      "founded": "",
+      "population": "LGBTQIA+ affirming care",
+      "website": "http://www.genderhealthcenter.org",
+      "directory_address": "3823 V Street, Sacramento, CA 95817",
+      "directory_city": null,
+      "directory_state": null,
+      "directory_zip": null,
+      "directory_map_url": null,
+      "directory_email": null,
+      "directory_phone": null,
+      "directory_website": "http://www.genderhealthcenter.org",
+      "hours": "First & 3rd Fridays, 6:00 PM – 9:00 PM (example)",
+      "eligibility": "LGBTQIA+ affirming care",
+      "accepting_referrals": true,
+      "referral_notes": null,
+      "last_verified_at": "2026-01"
+    }
+  ],
+  "clinic_tags": [
+    {
+      "clinic_id": "clinica-tepati",
+      "tag": "In-house labs"
     },
-    "lastVerifiedAt": "2026-01"
-  },
-  "jcc": {
-    "id": "juvenile-caduceus-clinic-jcc",
-    "name": "Juvenile Caduceus Clinic (JCC)",
-    "specialtyIds": [
-      "gynecology-women-s-health",
-      "mental-health",
-      "pediatrics"
-    ],
-    "location": "Fairfield",
-    "phone": "510-365-0060",
-    "contact": "Josue, Emily",
-    "founded": "2022",
-    "population": "Youth, elderly, homeless, refugees",
-    "tags": [
-      "ACEs framework",
-      "Preventive care"
-    ],
-    "website": null
-  },
-  "nadezhda": {
-    "id": "nadezhda-clinic",
-    "name": "Nadezhda Clinic",
-    "specialtyIds": [
-      "diabetes-endocrinology",
-      "gynecology-women-s-health",
-      "ophthalmology",
-      "primary-care"
-    ],
-    "location": "Arden-Arcade (One Community Health)",
-    "phone": "—",
-    "contact": "Mike & Michelle",
-    "founded": "2019",
-    "population": "Slavic / Russian- & Ukrainian-speaking refugees",
-    "tags": [
-      "Continuous primary care",
-      "In-house blood work"
-    ],
-    "website": "http://www.nadezhdaclinic.org",
-    "affiliation": "UC Davis Student-Run Clinics",
-    "directoryLocation": {
-      "address": "1442 Ethan Way, Sacramento, CA 95825"
+    {
+      "clinic_id": "clinica-tepati",
+      "tag": "Retinal scans"
     },
-    "directoryContact": {
-      "website": "http://www.nadezhdaclinic.org"
+    {
+      "clinic_id": "clinica-tepati",
+      "tag": "Hypertension team"
     },
-    "hours": "Monthly (example)",
-    "eligibility": "Russian-speaking underserved population",
-    "referral": {
-      "acceptingReferrals": true,
-      "howToRefer": [
-        "Contact clinic"
-      ]
+    {
+      "clinic_id": "knights-landing-one-health-center",
+      "tag": "One Health model"
     },
-    "lastVerifiedAt": "2026-01"
-  },
-  "phac": {
-    "id": "paul-hom-asian-clinic",
-    "name": "Paul Hom Asian Clinic (PHAC)",
-    "specialtyIds": [
-      "cardiology",
-      "dermatology",
-      "diabetes-endocrinology",
-      "gi-gastroenterology",
-      "gynecology-women-s-health",
-      "hepatitis",
-      "neurology",
-      "ophthalmology",
-      "primary-care",
-      "psychiatry"
-    ],
-    "location": "Sacramento",
-    "phone": "—",
-    "contact": "David, Patrick",
-    "founded": "1971",
-    "population": "Asian community",
-    "tags": [
-      "Tri-Org with VN CARES & HLUB",
-      "FIT kits",
-      "H. pylori testing"
-    ],
-    "website": "https://www.paulhomasianclinic.org",
-    "affiliation": "UC Davis Student-Run Clinics",
-    "directoryLocation": {
-      "address": "6341 Folsom Blvd, Sacramento, CA 95819"
+    {
+      "clinic_id": "knights-landing-one-health-center",
+      "tag": "Medical + Dental + Vet"
     },
-    "directoryContact": {
-      "website": "http://www.paulhomasianclinic.org"
+    {
+      "clinic_id": "hlub-clinic",
+      "tag": "Tri-Org with PHAC & VN CARES"
     },
-    "hours": "Saturdays, 8:00 AM – 1:00 PM (example)",
-    "eligibility": "Underserved, uninsured, all individuals welcome",
-    "referral": {
-      "acceptingReferrals": true,
-      "howToRefer": [
-        "Contact clinic via website or phone"
-      ],
-      "notes": "Free culturally sensitive primary care."
+    {
+      "clinic_id": "imani-clinic",
+      "tag": "Barbershop Outreach"
     },
-    "lastVerifiedAt": "2026-01"
-  },
-  "river": {
-    "id": "river-clinic",
-    "name": "RIVER Pediatric Clinic",
-    "specialtyIds": [
-      "pediatrics"
-    ],
-    "location": "WellSpace @ Hiram Johnson HS, Sacramento",
-    "phone": "—",
-    "contact": "Julia",
-    "founded": "2015",
-    "population": "Pediatric patients (Rancho Cordova & Sacramento)",
-    "tags": [
-      "1st & 3rd Saturdays 9am–12pm",
-      "Sports physicals",
-      "Multilingual translation"
-    ],
-    "website": "http://www.riverpediatricclinic.org",
-    "affiliation": "UC Davis Student-Run Clinics",
-    "directoryLocation": {
-      "address": "3535 65th Street Bldg C, Sacramento, CA 95820"
+    {
+      "clinic_id": "imani-clinic",
+      "tag": "Mobile Clinics"
     },
-    "directoryContact": {
-      "website": "http://www.riverpediatricclinic.org"
+    {
+      "clinic_id": "imani-clinic",
+      "tag": "Remote BP Monitoring"
     },
-    "hours": "1st & 3rd Saturdays, 9:00 AM – 1:00 PM (example)",
-    "eligibility": "Children and underserved families",
-    "referral": {
-      "acceptingReferrals": true,
-      "howToRefer": [
-        "Contact clinic for schedule"
-      ]
+    {
+      "clinic_id": "joan-viteri-memorial-clinic",
+      "tag": "Harm-reduction model"
     },
-    "lastVerifiedAt": "2026-01"
-  },
-  "willow": {
-    "id": "willow-clinic",
-    "name": "Willow Clinic",
-    "specialtyIds": [
-      "behavioral-health",
-      "dental",
-      "gynecology-women-s-health",
-      "mental-health",
-      "ophthalmology",
-      "primary-care"
-    ],
-    "location": "First Step Communities, West Sacramento",
-    "phone": "—",
-    "contact": "Surya, Prag, Dani, Vedika",
-    "founded": "2009",
-    "population": "Unhoused community",
-    "tags": [
-      "Smoking Cessation",
-      "Public Health Outreach"
-    ],
-    "website": "http://www.willowclinic.org",
-    "affiliation": "UC Davis Student-Run Clinics",
-    "directoryLocation": {
-      "address": "1400 North A Street, Sacramento, CA 95811"
+    {
+      "clinic_id": "joan-viteri-memorial-clinic",
+      "tag": "Walk-in primary care"
     },
-    "directoryContact": {
-      "website": "http://www.willowclinic.org"
+    {
+      "clinic_id": "joan-viteri-memorial-clinic",
+      "tag": "Gender Health Clinic"
     },
-    "hours": "Saturdays, 9:00 AM – 1:00 PM (example)",
-    "eligibility": "All individuals, homeless and underserved",
-    "referral": {
-      "acceptingReferrals": true,
-      "howToRefer": [
-        "Visit clinic during hours"
-      ]
+    {
+      "clinic_id": "juvenile-caduceus-clinic-jcc",
+      "tag": "ACEs framework"
     },
-    "lastVerifiedAt": "2026-01"
-  },
-  "bayanihan": {
-    "id": "bayanihan-clinic",
-    "name": "Bayanihan Clinic",
-    "specialtyIds": [
-      "cardiology",
-      "diabetes-endocrinology",
-      "gynecology-women-s-health",
-      "ophthalmology",
-      "pediatrics",
-      "podiatry",
-      "primary-care",
-      "psychiatry"
-    ],
-    "location": "Rancho Cordova",
-    "phone": "—",
-    "contact": "Muskan, Gwyn",
-    "founded": "2002",
-    "population": "Filipino community",
-    "tags": [
-      "Tagalog & Spanish interpretation",
-      "Diabetes Empowerment",
-      "Telehealth available"
-    ],
-    "website": "http://www.bayanihanclinic.com",
-    "affiliation": "UC Davis Student-Run Clinics",
-    "directoryLocation": {
-      "address": "3030 Explorer Drive, Rancho Cordova, CA 95670"
+    {
+      "clinic_id": "juvenile-caduceus-clinic-jcc",
+      "tag": "Preventive care"
     },
-    "directoryContact": {
-      "website": "http://www.bayanihanclinic.com"
+    {
+      "clinic_id": "nadezhda-clinic",
+      "tag": "Continuous primary care"
     },
-    "hours": "Saturdays, 8:00 AM – 12:00 PM (example)",
-    "eligibility": "Underserved Filipino and diverse communities",
-    "referral": {
-      "acceptingReferrals": true,
-      "howToRefer": [
-        "Reach out via website"
-      ]
+    {
+      "clinic_id": "nadezhda-clinic",
+      "tag": "In-house blood work"
     },
-    "lastVerifiedAt": "2026-01"
-  },
-  "vncares": {
-    "id": "vn-cares",
-    "name": "VN CARES",
-    "specialtyIds": [
-      "gi-gastroenterology",
-      "gynecology-women-s-health",
-      "hepatitis",
-      "preventative-care"
-    ],
-    "location": "6341 Folsom Blvd, Sacramento",
-    "phone": "—",
-    "contact": "Allison, Chris, Will",
-    "founded": "2001",
-    "population": "Vietnamese & broader community",
-    "tags": [
-      "Tri-Org with PHAC & HLUB",
-      "Monthly cancer screening",
-      "Annual Health Fair"
-    ],
-    "website": null,
-    "affiliation": "UC Davis Student-Run Clinics",
-    "directoryLocation": {
-      "address": "6341 Folsom Blvd, Sacramento, CA 95819"
+    {
+      "clinic_id": "paul-hom-asian-clinic",
+      "tag": "Tri-Org with VN CARES & HLUB"
     },
-    "directoryContact": {},
-    "hours": "First Sunday of each month (example)",
-    "eligibility": "Preventative cancer screenings",
-    "referral": {
-      "acceptingReferrals": true,
-      "howToRefer": [
-        "Contact clinic"
-      ]
+    {
+      "clinic_id": "paul-hom-asian-clinic",
+      "tag": "FIT kits"
     },
-    "lastVerifiedAt": "2026-01"
-  },
-  "shifa": {
-    "id": "shifa-clinic",
-    "name": "Shifa Clinic",
-    "specialtyIds": [
-      "primary-care",
-      "women’s-health"
-    ],
-    "location": "419 V Street, Suite A, Sacramento, CA 95818",
-    "phone": "—",
-    "contact": "",
-    "founded": "",
-    "population": "Multilingual and diverse community",
-    "tags": [],
-    "website": "http://shifaclinic.org",
-    "affiliation": "UC Davis Student-Run Clinics",
-    "directoryLocation": {
-      "address": "419 V Street, Suite A, Sacramento, CA 95818"
+    {
+      "clinic_id": "paul-hom-asian-clinic",
+      "tag": "H. pylori testing"
     },
-    "directoryContact": {
-      "website": "http://shifaclinic.org"
+    {
+      "clinic_id": "river-clinic",
+      "tag": "1st & 3rd Saturdays 9am–12pm"
     },
-    "hours": "Sundays, 8:30 AM – 2:00 PM (example)",
-    "eligibility": "Multilingual and diverse community",
-    "referral": {
-      "acceptingReferrals": true,
-      "howToRefer": [
-        "Call or visit clinic"
-      ]
+    {
+      "clinic_id": "river-clinic",
+      "tag": "Sports physicals"
     },
-    "lastVerifiedAt": "2026-01"
-  },
-  "gender-health": {
-    "id": "gender-health-clinic",
-    "name": "Gender Health Clinic",
-    "specialtyIds": [
-      "lgbtqia-care"
-    ],
-    "location": "3823 V Street, Sacramento, CA 95817",
-    "phone": "—",
-    "contact": "",
-    "founded": "",
-    "population": "LGBTQIA+ affirming care",
-    "tags": [],
-    "website": "http://www.genderhealthcenter.org",
-    "affiliation": "UC Davis Student-Run Clinics",
-    "directoryLocation": {
-      "address": "3823 V Street, Sacramento, CA 95817"
+    {
+      "clinic_id": "river-clinic",
+      "tag": "Multilingual translation"
     },
-    "directoryContact": {
-      "website": "http://www.genderhealthcenter.org"
+    {
+      "clinic_id": "willow-clinic",
+      "tag": "Smoking Cessation"
     },
-    "hours": "First & 3rd Fridays, 6:00 PM – 9:00 PM (example)",
-    "eligibility": "LGBTQIA+ affirming care",
-    "referral": {
-      "acceptingReferrals": true,
-      "howToRefer": [
-        "Contact clinic"
-      ]
+    {
+      "clinic_id": "willow-clinic",
+      "tag": "Public Health Outreach"
     },
-    "lastVerifiedAt": "2026-01"
-  }
+    {
+      "clinic_id": "bayanihan-clinic",
+      "tag": "Tagalog & Spanish interpretation"
+    },
+    {
+      "clinic_id": "bayanihan-clinic",
+      "tag": "Diabetes Empowerment"
+    },
+    {
+      "clinic_id": "bayanihan-clinic",
+      "tag": "Telehealth available"
+    },
+    {
+      "clinic_id": "vn-cares",
+      "tag": "Tri-Org with PHAC & HLUB"
+    },
+    {
+      "clinic_id": "vn-cares",
+      "tag": "Monthly cancer screening"
+    },
+    {
+      "clinic_id": "vn-cares",
+      "tag": "Annual Health Fair"
+    }
+  ],
+  "clinic_referral_methods": [
+    {
+      "clinic_id": "clinica-tepati",
+      "method": "Contact clinic via website or phone"
+    },
+    {
+      "clinic_id": "knights-landing-one-health-center",
+      "method": "Contact clinic"
+    },
+    {
+      "clinic_id": "hlub-clinic",
+      "method": "Contact clinic"
+    },
+    {
+      "clinic_id": "imani-clinic",
+      "method": "Call or visit clinic during hours"
+    },
+    {
+      "clinic_id": "joan-viteri-memorial-clinic",
+      "method": "Contact clinic directly"
+    },
+    {
+      "clinic_id": "nadezhda-clinic",
+      "method": "Contact clinic"
+    },
+    {
+      "clinic_id": "paul-hom-asian-clinic",
+      "method": "Contact clinic via website or phone"
+    },
+    {
+      "clinic_id": "river-clinic",
+      "method": "Contact clinic for schedule"
+    },
+    {
+      "clinic_id": "willow-clinic",
+      "method": "Visit clinic during hours"
+    },
+    {
+      "clinic_id": "bayanihan-clinic",
+      "method": "Reach out via website"
+    },
+    {
+      "clinic_id": "vn-cares",
+      "method": "Contact clinic"
+    },
+    {
+      "clinic_id": "shifa-clinic",
+      "method": "Call or visit clinic"
+    },
+    {
+      "clinic_id": "gender-health-clinic",
+      "method": "Contact clinic"
+    }
+  ],
+  "clinic_specialties": [
+    {
+      "clinic_id": "clinica-tepati",
+      "specialty_id": "cardiology"
+    },
+    {
+      "clinic_id": "clinica-tepati",
+      "specialty_id": "dermatology"
+    },
+    {
+      "clinic_id": "clinica-tepati",
+      "specialty_id": "diabetes-endocrinology"
+    },
+    {
+      "clinic_id": "clinica-tepati",
+      "specialty_id": "ent"
+    },
+    {
+      "clinic_id": "clinica-tepati",
+      "specialty_id": "gi-gastroenterology"
+    },
+    {
+      "clinic_id": "clinica-tepati",
+      "specialty_id": "gynecology-women-s-health"
+    },
+    {
+      "clinic_id": "clinica-tepati",
+      "specialty_id": "mental-health"
+    },
+    {
+      "clinic_id": "clinica-tepati",
+      "specialty_id": "neurology"
+    },
+    {
+      "clinic_id": "clinica-tepati",
+      "specialty_id": "podiatry"
+    },
+    {
+      "clinic_id": "clinica-tepati",
+      "specialty_id": "primary-care"
+    },
+    {
+      "clinic_id": "knights-landing-one-health-center",
+      "specialty_id": "dermatology"
+    },
+    {
+      "clinic_id": "knights-landing-one-health-center",
+      "specialty_id": "immigration-medical-exams"
+    },
+    {
+      "clinic_id": "knights-landing-one-health-center",
+      "specialty_id": "mental-health"
+    },
+    {
+      "clinic_id": "knights-landing-one-health-center",
+      "specialty_id": "primary-care"
+    },
+    {
+      "clinic_id": "hlub-clinic",
+      "specialty_id": "cardiology"
+    },
+    {
+      "clinic_id": "hlub-clinic",
+      "specialty_id": "diabetes-endocrinology"
+    },
+    {
+      "clinic_id": "hlub-clinic",
+      "specialty_id": "hepatitis"
+    },
+    {
+      "clinic_id": "hlub-clinic",
+      "specialty_id": "neurology"
+    },
+    {
+      "clinic_id": "hlub-clinic",
+      "specialty_id": "ophthalmology"
+    },
+    {
+      "clinic_id": "hlub-clinic",
+      "specialty_id": "preventative-care"
+    },
+    {
+      "clinic_id": "hlub-clinic",
+      "specialty_id": "psychiatry"
+    },
+    {
+      "clinic_id": "imani-clinic",
+      "specialty_id": "cardiology"
+    },
+    {
+      "clinic_id": "imani-clinic",
+      "specialty_id": "diabetes-endocrinology"
+    },
+    {
+      "clinic_id": "imani-clinic",
+      "specialty_id": "mental-health"
+    },
+    {
+      "clinic_id": "imani-clinic",
+      "specialty_id": "neurology"
+    },
+    {
+      "clinic_id": "imani-clinic",
+      "specialty_id": "ophthalmology"
+    },
+    {
+      "clinic_id": "imani-clinic",
+      "specialty_id": "pediatrics"
+    },
+    {
+      "clinic_id": "imani-clinic",
+      "specialty_id": "primary-care"
+    },
+    {
+      "clinic_id": "joan-viteri-memorial-clinic",
+      "specialty_id": "gynecology-women-s-health"
+    },
+    {
+      "clinic_id": "joan-viteri-memorial-clinic",
+      "specialty_id": "harm-reduction"
+    },
+    {
+      "clinic_id": "joan-viteri-memorial-clinic",
+      "specialty_id": "mental-health"
+    },
+    {
+      "clinic_id": "joan-viteri-memorial-clinic",
+      "specialty_id": "primary-care"
+    },
+    {
+      "clinic_id": "juvenile-caduceus-clinic-jcc",
+      "specialty_id": "gynecology-women-s-health"
+    },
+    {
+      "clinic_id": "juvenile-caduceus-clinic-jcc",
+      "specialty_id": "mental-health"
+    },
+    {
+      "clinic_id": "juvenile-caduceus-clinic-jcc",
+      "specialty_id": "pediatrics"
+    },
+    {
+      "clinic_id": "nadezhda-clinic",
+      "specialty_id": "diabetes-endocrinology"
+    },
+    {
+      "clinic_id": "nadezhda-clinic",
+      "specialty_id": "gynecology-women-s-health"
+    },
+    {
+      "clinic_id": "nadezhda-clinic",
+      "specialty_id": "ophthalmology"
+    },
+    {
+      "clinic_id": "nadezhda-clinic",
+      "specialty_id": "primary-care"
+    },
+    {
+      "clinic_id": "paul-hom-asian-clinic",
+      "specialty_id": "cardiology"
+    },
+    {
+      "clinic_id": "paul-hom-asian-clinic",
+      "specialty_id": "dermatology"
+    },
+    {
+      "clinic_id": "paul-hom-asian-clinic",
+      "specialty_id": "diabetes-endocrinology"
+    },
+    {
+      "clinic_id": "paul-hom-asian-clinic",
+      "specialty_id": "gi-gastroenterology"
+    },
+    {
+      "clinic_id": "paul-hom-asian-clinic",
+      "specialty_id": "gynecology-women-s-health"
+    },
+    {
+      "clinic_id": "paul-hom-asian-clinic",
+      "specialty_id": "hepatitis"
+    },
+    {
+      "clinic_id": "paul-hom-asian-clinic",
+      "specialty_id": "neurology"
+    },
+    {
+      "clinic_id": "paul-hom-asian-clinic",
+      "specialty_id": "ophthalmology"
+    },
+    {
+      "clinic_id": "paul-hom-asian-clinic",
+      "specialty_id": "primary-care"
+    },
+    {
+      "clinic_id": "paul-hom-asian-clinic",
+      "specialty_id": "psychiatry"
+    },
+    {
+      "clinic_id": "river-clinic",
+      "specialty_id": "pediatrics"
+    },
+    {
+      "clinic_id": "willow-clinic",
+      "specialty_id": "behavioral-health"
+    },
+    {
+      "clinic_id": "willow-clinic",
+      "specialty_id": "dental"
+    },
+    {
+      "clinic_id": "willow-clinic",
+      "specialty_id": "gynecology-women-s-health"
+    },
+    {
+      "clinic_id": "willow-clinic",
+      "specialty_id": "mental-health"
+    },
+    {
+      "clinic_id": "willow-clinic",
+      "specialty_id": "ophthalmology"
+    },
+    {
+      "clinic_id": "willow-clinic",
+      "specialty_id": "primary-care"
+    },
+    {
+      "clinic_id": "bayanihan-clinic",
+      "specialty_id": "cardiology"
+    },
+    {
+      "clinic_id": "bayanihan-clinic",
+      "specialty_id": "diabetes-endocrinology"
+    },
+    {
+      "clinic_id": "bayanihan-clinic",
+      "specialty_id": "gynecology-women-s-health"
+    },
+    {
+      "clinic_id": "bayanihan-clinic",
+      "specialty_id": "ophthalmology"
+    },
+    {
+      "clinic_id": "bayanihan-clinic",
+      "specialty_id": "pediatrics"
+    },
+    {
+      "clinic_id": "bayanihan-clinic",
+      "specialty_id": "podiatry"
+    },
+    {
+      "clinic_id": "bayanihan-clinic",
+      "specialty_id": "primary-care"
+    },
+    {
+      "clinic_id": "bayanihan-clinic",
+      "specialty_id": "psychiatry"
+    },
+    {
+      "clinic_id": "vn-cares",
+      "specialty_id": "gi-gastroenterology"
+    },
+    {
+      "clinic_id": "vn-cares",
+      "specialty_id": "gynecology-women-s-health"
+    },
+    {
+      "clinic_id": "vn-cares",
+      "specialty_id": "hepatitis"
+    },
+    {
+      "clinic_id": "vn-cares",
+      "specialty_id": "preventative-care"
+    },
+    {
+      "clinic_id": "shifa-clinic",
+      "specialty_id": "primary-care"
+    },
+    {
+      "clinic_id": "shifa-clinic",
+      "specialty_id": "women’s-health"
+    },
+    {
+      "clinic_id": "gender-health-clinic",
+      "specialty_id": "lgbtqia-care"
+    }
+  ]
 }

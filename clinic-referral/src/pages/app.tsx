@@ -3,8 +3,8 @@ import type { GetServerSideProps } from "next";
 import { withIronSessionSsr } from "iron-session/next";
 import { getSessionOptions } from "@/lib/auth/session";
 import Head from "next/head";
-import CLINICS from "../../data/clinics.json";
-import SPECIALTIES_DATA from "../../data/specialties.json";
+import FLAT_CLINICS from "../../data/clinics.json";
+import FLAT_SPECIALTIES from "../../data/specialties.json";
 
 // ─── TYPES ──────────────────────────────────────────────────────────────────
 type ClinicInfo = {
@@ -36,6 +36,45 @@ type SpecialtyData = {
   clinics: ClinicEntry[];
 };
 
+type FlatClinicRow = {
+  clinic_id: string;
+  clinic_key: string;
+  name: string;
+  location_label: string | null;
+  phone: string | null;
+  contact_person: string | null;
+  founded: string | null;
+  population: string | null;
+  website: string | null;
+  directory_address: string | null;
+  directory_website: string | null;
+};
+
+type FlatClinicTagRow = {
+  clinic_id: string;
+  tag: string;
+};
+
+type FlatSpecialtyRow = {
+  specialty_id: string;
+  display_name: string;
+  icon: string;
+};
+
+type FlatSpecialtyClinicRow = {
+  specialty_clinic_id: string;
+  specialty_id: string;
+  clinic_id: string;
+  frequency: string | null;
+};
+
+type FlatSpecialtyDocumentRow = {
+  specialty_clinic_id: string;
+  doc_name: string;
+  doc_type: "form" | "auth" | "insurance";
+  doc_description: string;
+};
+
 type Referral = {
   id: number;
   referringClinic: string;
@@ -51,6 +90,77 @@ type Referral = {
 type AppPageProps = {
   username: string;
 };
+
+const CLINIC_TAGS_BY_ID = new Map<string, string[]>();
+for (const row of (FLAT_CLINICS.clinic_tags as FlatClinicTagRow[])) {
+  const list = CLINIC_TAGS_BY_ID.get(row.clinic_id) ?? [];
+  list.push(row.tag);
+  CLINIC_TAGS_BY_ID.set(row.clinic_id, list);
+}
+
+const CLINIC_ID_TO_KEY = new Map<string, string>();
+for (const row of (FLAT_CLINICS.clinics as FlatClinicRow[])) {
+  CLINIC_ID_TO_KEY.set(row.clinic_id, row.clinic_key);
+}
+
+const CLINICS = Object.fromEntries(
+  (FLAT_CLINICS.clinics as FlatClinicRow[]).map((row) => [
+    row.clinic_key,
+    {
+      name: row.name,
+      location: row.location_label ?? row.directory_address ?? "Location not listed",
+      phone: row.phone ?? "—",
+      contact: row.contact_person ?? "",
+      founded: row.founded ?? "",
+      population: row.population ?? "",
+      tags: CLINIC_TAGS_BY_ID.get(row.clinic_id) ?? [],
+      website: row.website ?? row.directory_website ?? null
+    }
+  ])
+) as Record<string, ClinicInfo>;
+
+const SPECIALTY_DOCS_BY_ENTRY_ID = new Map<string, Document[]>();
+for (const row of (FLAT_SPECIALTIES.specialty_documents as FlatSpecialtyDocumentRow[])) {
+  const list = SPECIALTY_DOCS_BY_ENTRY_ID.get(row.specialty_clinic_id) ?? [];
+  list.push({
+    name: row.doc_name,
+    type: row.doc_type,
+    desc: row.doc_description
+  });
+  SPECIALTY_DOCS_BY_ENTRY_ID.set(row.specialty_clinic_id, list);
+}
+
+const SPECIALTY_CLINICS_BY_ID = new Map<string, FlatSpecialtyClinicRow[]>();
+for (const row of (FLAT_SPECIALTIES.specialty_clinics as FlatSpecialtyClinicRow[])) {
+  const list = SPECIALTY_CLINICS_BY_ID.get(row.specialty_id) ?? [];
+  list.push(row);
+  SPECIALTY_CLINICS_BY_ID.set(row.specialty_id, list);
+}
+
+const SPECIALTIES_DATA = Object.fromEntries(
+  (FLAT_SPECIALTIES.specialties as FlatSpecialtyRow[]).map((specialty) => {
+    const clinicEntries: ClinicEntry[] = (SPECIALTY_CLINICS_BY_ID.get(specialty.specialty_id) ?? [])
+      .map((row) => {
+        const clinicKey = CLINIC_ID_TO_KEY.get(row.clinic_id);
+        if (!clinicKey) return null;
+        return {
+          id: row.specialty_clinic_id,
+          clinicKey: clinicKey as keyof typeof CLINICS,
+          freq: row.frequency ?? "",
+          docs: SPECIALTY_DOCS_BY_ENTRY_ID.get(row.specialty_clinic_id) ?? []
+        };
+      })
+      .filter((entry): entry is ClinicEntry => entry !== null);
+
+    return [
+      specialty.display_name,
+      {
+        icon: specialty.icon,
+        clinics: clinicEntries
+      }
+    ];
+  })
+) as Record<string, SpecialtyData>;
 
 // ─── SERVER SIDE PROPS ──────────────────────────────────────────────────────
 export const getServerSideProps = withIronSessionSsr<AppPageProps>(

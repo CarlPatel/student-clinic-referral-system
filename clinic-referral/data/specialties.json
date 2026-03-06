@@ -1,2179 +1,2480 @@
 {
-  "Cardiology": {
-    "id": "cardiology",
-    "name": "Cardiology",
-    "description": "",
-    "icon": "🫀",
-    "clinics": [
-      {
-        "id": "tepati-cardio",
-        "clinicKey": "tepati",
-        "freq": "Monthly specialty clinic",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Cardiology Referral Form",
-            "type": "form",
-            "desc": "Tepati-specific cardiology intake form"
-          },
-          {
-            "name": "EKG / Echo Authorization",
-            "type": "auth",
-            "desc": "Pre-authorization if cardiac imaging is anticipated"
-          }
-        ]
-      },
-      {
-        "id": "hlub-cardio",
-        "clinicKey": "hlub",
-        "freq": "Cardiopulmonary committee",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Cardiopulmonary Intake Form",
-            "type": "form",
-            "desc": "HLUB-specific cardiac intake — Hmong version available"
-          },
-          {
-            "name": "Hypertension Monitoring Log",
-            "type": "form",
-            "desc": "BP readings from the past 2 weeks"
-          }
-        ]
-      },
-      {
-        "id": "imani-cardio",
-        "clinicKey": "imani",
-        "freq": "Regular specialty clinic",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Cardiac Referral Authorization",
-            "type": "auth",
-            "desc": "Required for Imani cardiology patients"
-          },
-          {
-            "name": "Remote BP Monitoring Enrollment",
-            "type": "form",
-            "desc": "Enroll in HTN remote monitoring if applicable"
-          }
-        ]
-      },
-      {
-        "id": "phac-cardio",
-        "clinicKey": "phac",
-        "freq": "Cardiopulmonary committee",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "PHAC Cardiopulmonary Form",
-            "type": "form",
-            "desc": "Paul Hom Asian Clinic cardiac intake"
-          },
-          {
-            "name": "MSK / Cardio Cross-Referral Note",
-            "type": "form",
-            "desc": "If musculoskeletal concerns co-present"
-          }
-        ]
-      },
-      {
-        "id": "bayanihan-cardio",
-        "clinicKey": "bayanihan",
-        "freq": "Regular specialty clinic",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Bayanihan Cardiology Intake",
-            "type": "form",
-            "desc": "Tagalog version available — telehealth option"
-          },
-          {
-            "name": "Telehealth Consent Form",
-            "type": "auth",
-            "desc": "Required if attending via telehealth"
-          }
-        ]
-      }
-    ]
-  },
-  "Dermatology": {
-    "id": "dermatology",
-    "name": "Dermatology",
-    "description": "Skin concerns, rashes, acne, lesions, and related evaluations.",
-    "icon": "🩺",
-    "clinics": [
-      {
-        "id": "tepati-derm",
-        "clinicKey": "tepati",
-        "freq": "Monthly specialty clinic",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Dermatology Referral Form",
-            "type": "form",
-            "desc": "Tepati-specific skin referral form"
-          },
-          {
-            "name": "Skin Lesion Photo Consent",
-            "type": "auth",
-            "desc": "Consent for clinical photography"
-          }
-        ]
-      },
-      {
-        "id": "klohc-derm",
-        "clinicKey": "klohc",
-        "freq": "Regular service",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "KLOHC Dermatology Intake",
-            "type": "form",
-            "desc": "Available in Spanish — ask for the Spanish version"
-          },
-          {
-            "name": "Prior Treatment History",
-            "type": "form",
-            "desc": "List all previous skin treatments and medications"
-          }
-        ]
-      },
-      {
-        "id": "phac-derm",
-        "clinicKey": "phac",
-        "freq": "Jointly with Clínica Tepati",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Tri-Org Dermatology Referral",
-            "type": "form",
-            "desc": "Shared form used across PHAC and Tepati"
-          },
-          {
-            "name": "Allergy & Medication List",
-            "type": "form",
-            "desc": "Current medications and known allergies"
-          }
-        ]
-      }
-    ]
-  },
-  "Mental Health": {
-    "id": "mental-health",
-    "name": "Mental Health",
-    "description": "Behavioral health support, counseling resources, and mental health services.",
-    "icon": "🧘",
-    "clinics": [
-      {
-        "id": "tepati-mh",
-        "clinicKey": "tepati",
-        "freq": "Mental Health committee",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Mental Health Intake Form",
-            "type": "form",
-            "desc": "Tepati mental health intake"
-          },
-          {
-            "name": "Release of Information",
-            "type": "auth",
-            "desc": "Allows communication with primary care provider"
-          }
-        ]
-      },
-      {
-        "id": "klohc-mh",
-        "clinicKey": "klohc",
-        "freq": "Mental Health Clinic",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "KLOHC Mental Health Referral",
-            "type": "form",
-            "desc": "Available in Spanish"
-          },
-          {
-            "name": "Cultural Support Needs Form",
-            "type": "form",
-            "desc": "Language/cultural accommodation requests"
-          }
-        ]
-      },
-      {
-        "id": "imani-mh",
-        "clinicKey": "imani",
-        "freq": "Behavioral Health program",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Behavioral Health Consent Form",
-            "type": "auth",
-            "desc": "Consent for behavioral health services"
-          },
-          {
-            "name": "IHEOP Health Education Enrollment",
-            "type": "form",
-            "desc": "Optional: enroll in health education outreach"
-          }
-        ]
-      },
-      {
-        "id": "jvmc-mh",
-        "clinicKey": "jvmc",
-        "freq": "Walk-in available",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "JVMC Harm-Reduction Intake",
-            "type": "form",
-            "desc": "Walk-in friendly — no prior appointment needed"
-          },
-          {
-            "name": "Gender Affirming Care Flag",
-            "type": "form",
-            "desc": "Indicate if gender-affirming considerations are needed"
-          }
-        ]
-      },
-      {
-        "id": "jcc-mh",
-        "clinicKey": "jcc",
-        "freq": "Mental Health & Wellness committee",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "JCC Mental Health Intake",
-            "type": "form",
-            "desc": "ACEs-informed mental health screening"
-          },
-          {
-            "name": "Youth/Guardian Consent Form",
-            "type": "auth",
-            "desc": "Required if patient is under 18"
-          }
-        ]
-      },
-      {
-        "id": "willow-mh",
-        "clinicKey": "willow",
-        "freq": "Behavioral Health program",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Willow Behavioral Health Form",
-            "type": "form",
-            "desc": "For unhoused patients — ID not required"
-          },
-          {
-            "name": "Case Management Referral",
-            "type": "form",
-            "desc": "Connect to case management services"
-          }
-        ]
-      }
-    ]
-  },
-  "Neurology": {
-    "id": "neurology",
-    "name": "Neurology",
-    "description": "",
-    "icon": "🧠",
-    "clinics": [
-      {
-        "id": "tepati-neuro",
-        "clinicKey": "tepati",
-        "freq": "Monthly specialty clinic",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Neurology Referral Form",
-            "type": "form",
-            "desc": "Tepati-specific neurology intake"
-          },
-          {
-            "name": "Symptom & Headache Diary",
-            "type": "form",
-            "desc": "Track neurological symptoms for 2 weeks prior"
-          },
-          {
-            "name": "MRI / Imaging Pre-Authorization",
-            "type": "auth",
-            "desc": "Required if brain or spine imaging is anticipated"
-          }
-        ]
-      },
-      {
-        "id": "hlub-neuro",
-        "clinicKey": "hlub",
-        "freq": "Neurology committee",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "HLUB Neurology Intake Form",
-            "type": "form",
-            "desc": "Hmong-language version available on request"
-          },
-          {
-            "name": "Medication List",
-            "type": "form",
-            "desc": "All current neurological medications and dosages"
-          }
-        ]
-      },
-      {
-        "id": "imani-neuro",
-        "clinicKey": "imani",
-        "freq": "Annual specialty clinic",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Imani Neurology Referral",
-            "type": "form",
-            "desc": "Annual clinic — verify next date with Imani"
-          },
-          {
-            "name": "EEG Authorization",
-            "type": "auth",
-            "desc": "If seizure evaluation is anticipated"
-          }
-        ]
-      },
-      {
-        "id": "phac-neuro",
-        "clinicKey": "phac",
-        "freq": "Neurology committee",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "PHAC Neurology Form",
-            "type": "form",
-            "desc": "Paul Hom Asian Clinic neurology intake"
-          }
-        ]
-      }
-    ]
-  },
-  "Ophthalmology": {
-    "id": "ophthalmology",
-    "name": "Ophthalmology",
-    "description": "",
-    "icon": "👁️",
-    "clinics": [
-      {
-        "id": "hlub-ophtho",
-        "clinicKey": "hlub",
-        "freq": "Ophthalmology committee",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "HLUB Ophthalmology Intake",
-            "type": "form",
-            "desc": "Hmong-language version available"
-          },
-          {
-            "name": "Vision Insurance Authorization",
-            "type": "insurance",
-            "desc": "Separate from medical — note if uninsured"
-          },
-          {
-            "name": "Prior Vision Prescription",
-            "type": "form",
-            "desc": "Last known prescription if available"
-          }
-        ]
-      },
-      {
-        "id": "phac-ophtho",
-        "clinicKey": "phac",
-        "freq": "Ophthalmology committee",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "PHAC Eye Clinic Intake",
-            "type": "form",
-            "desc": "Paul Hom Asian Clinic eye care form"
-          },
-          {
-            "name": "Retinal Exam Consent",
-            "type": "auth",
-            "desc": "Consent for retinal imaging or dilation"
-          }
-        ]
-      },
-      {
-        "id": "nadezhda-ophtho",
-        "clinicKey": "nadezhda",
-        "freq": "New service",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Nadezhda Ophthalmology Intake",
-            "type": "form",
-            "desc": "Russian/Ukrainian version available — ask coordinator"
-          },
-          {
-            "name": "Dilation Consent Form",
-            "type": "auth",
-            "desc": "Consent for pupil dilation"
-          }
-        ]
-      },
-      {
-        "id": "willow-ophtho",
-        "clinicKey": "willow",
-        "freq": "Regular service",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Willow Eye Care Form",
-            "type": "form",
-            "desc": "For unhoused patients — ID not required"
-          }
-        ]
-      },
-      {
-        "id": "bayanihan-ophtho",
-        "clinicKey": "bayanihan",
-        "freq": "Regular specialty clinic",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Bayanihan Ophthalmology Intake",
-            "type": "form",
-            "desc": "Tagalog version available on request"
-          },
-          {
-            "name": "Telehealth Consent Form",
-            "type": "auth",
-            "desc": "If attending remotely"
-          }
-        ]
-      },
-      {
-        "id": "imani-optom",
-        "clinicKey": "imani",
-        "freq": "Quarterly specialty clinic",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Imani Optometry Referral",
-            "type": "form",
-            "desc": "Quarterly clinic — verify next date with Imani"
-          }
-        ]
-      }
-    ]
-  },
-  "Gastroenterology": {
-    "id": "gi-gastroenterology",
-    "name": "Gastroenterology",
-    "description": "",
-    "icon": "🫁",
-    "clinics": [
-      {
-        "id": "tepati-gi",
-        "clinicKey": "tepati",
-        "freq": "Monthly specialty clinic",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "GI Referral Form",
-            "type": "form",
-            "desc": "Tepati-specific gastroenterology intake"
-          },
-          {
-            "name": "Dietary History & Symptom Log",
-            "type": "form",
-            "desc": "3-day food diary and GI symptom log"
-          },
-          {
-            "name": "Colonoscopy Pre-Authorization",
-            "type": "auth",
-            "desc": "Only if colonoscopy is anticipated"
-          }
-        ]
-      },
-      {
-        "id": "phac-gi",
-        "clinicKey": "phac",
-        "freq": "H. pylori & colon screening",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "FIT Kit Request Form",
-            "type": "form",
-            "desc": "Fecal immunochemical test for colon screening"
-          },
-          {
-            "name": "H. pylori Testing Authorization",
-            "type": "auth",
-            "desc": "Required for H. pylori breath or stool test"
-          }
-        ]
-      },
-      {
-        "id": "vncares-gi",
-        "clinicKey": "vncares",
-        "freq": "Monthly colon cancer screening",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "VN CARES Colon Screening Form",
-            "type": "form",
-            "desc": "Monthly cancer screening day form"
-          },
-          {
-            "name": "Liver Cancer Screening Consent",
-            "type": "auth",
-            "desc": "For liver cancer screening at monthly event"
-          }
-        ]
-      }
-    ]
-  },
-  "ENT": {
-    "id": "ent",
-    "name": "ENT",
-    "description": "",
-    "icon": "👂",
-    "clinics": [
-      {
-        "id": "tepati-ent",
-        "clinicKey": "tepati",
-        "freq": "Monthly specialty clinic",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "ENT Referral Form",
-            "type": "form",
-            "desc": "Tepati ENT specialty clinic intake"
-          },
-          {
-            "name": "Audiogram Authorization",
-            "type": "auth",
-            "desc": "For hearing evaluation referrals"
-          },
-          {
-            "name": "Symptom Duration History",
-            "type": "form",
-            "desc": "Describe onset and progression of ENT symptoms"
-          }
-        ]
-      }
-    ]
-  },
-  "Gynecology / Women's Health": {
-    "id": "gynecology-women-s-health",
-    "name": "Gynecology / Women's Health",
-    "description": "",
-    "icon": "🌸",
-    "clinics": [
-      {
-        "id": "tepati-gyn",
-        "clinicKey": "tepati",
-        "freq": "Monthly specialty clinic",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Gynecology Referral Form",
-            "type": "form",
-            "desc": "Tepati women's health specialty intake"
-          },
-          {
-            "name": "Reproductive Health History",
-            "type": "form",
-            "desc": "Complete obstetric and gynecologic history"
-          }
-        ]
-      },
-      {
-        "id": "jvmc-repro",
-        "clinicKey": "jvmc",
-        "freq": "Monthly reproductive health clinic",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "JVMC Reproductive Health Intake",
-            "type": "form",
-            "desc": "Covers IUDs, emergency contraception, medication abortion"
-          },
-          {
-            "name": "STI/HIV Testing Consent",
-            "type": "auth",
-            "desc": "Consent for STI and HIV screening"
-          },
-          {
-            "name": "Gender Affirming Care Flag",
-            "type": "form",
-            "desc": "Indicate gender-affirming considerations if needed"
-          }
-        ]
-      },
-      {
-        "id": "jcc-srh",
-        "clinicKey": "jcc",
-        "freq": "Sexual & Reproductive Health committee",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "JCC SRH Intake Form",
-            "type": "form",
-            "desc": "Youth-friendly, confidential intake"
-          },
-          {
-            "name": "Youth Consent Form",
-            "type": "auth",
-            "desc": "Required if patient is under 18"
-          }
-        ]
-      },
-      {
-        "id": "nadezhda-wh",
-        "clinicKey": "nadezhda",
-        "freq": "New service",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Nadezhda Women's Health Intake",
-            "type": "form",
-            "desc": "Russian/Ukrainian language version available"
-          }
-        ]
-      },
-      {
-        "id": "phac-wh",
-        "clinicKey": "phac",
-        "freq": "Women's Health committee",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "PHAC PAP / Women's Health Form",
-            "type": "form",
-            "desc": "Includes PAP smear screening intake"
-          },
-          {
-            "name": "Mammogram Referral Form",
-            "type": "form",
-            "desc": "UMI imaging referral for mammography"
-          },
-          {
-            "name": "Cervical Cancer Screening Consent",
-            "type": "auth",
-            "desc": "Monthly screening event"
-          }
-        ]
-      },
-      {
-        "id": "bayanihan-wh",
-        "clinicKey": "bayanihan",
-        "freq": "PAPs; mammograms on hold",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Bayanihan PAP Intake Form",
-            "type": "form",
-            "desc": "Women's health intake — mammograms currently paused"
-          }
-        ]
-      },
-      {
-        "id": "willow-obgyn",
-        "clinicKey": "willow",
-        "freq": "OB/GYN program",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Willow OB/GYN Intake Form",
-            "type": "form",
-            "desc": "For unhoused patients — ID not required"
-          },
-          {
-            "name": "Case Management Referral",
-            "type": "form",
-            "desc": "Connect to additional support services"
-          }
-        ]
-      },
-      {
-        "id": "vncares-cerv",
-        "clinicKey": "vncares",
-        "freq": "Monthly cervical & breast screening",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "VN CARES Women's Screening Form",
-            "type": "form",
-            "desc": "Cervical and breast cancer monthly screening"
-          },
-          {
-            "name": "Breast Cancer Screening Consent",
-            "type": "auth",
-            "desc": "Monthly cancer screening event consent"
-          }
-        ]
-      }
-    ]
-  },
-  "Podiatry": {
-    "id": "podiatry",
-    "name": "Podiatry",
-    "description": "",
-    "icon": "🦶",
-    "clinics": [
-      {
-        "id": "tepati-pod",
-        "clinicKey": "tepati",
-        "freq": "Monthly specialty clinic",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Podiatry Referral Form",
-            "type": "form",
-            "desc": "Tepati podiatry specialty intake"
-          },
-          {
-            "name": "Diabetes Foot Care Form",
-            "type": "form",
-            "desc": "Required for diabetic patients — includes foot exam checklist"
-          },
-          {
-            "name": "X-Ray Authorization",
-            "type": "auth",
-            "desc": "Pre-authorization if foot imaging is needed"
-          }
-        ]
-      },
-      {
-        "id": "bayanihan-pod",
-        "clinicKey": "bayanihan",
-        "freq": "Currently being established",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Bayanihan Podiatry Intake",
-            "type": "form",
-            "desc": "New service — contact clinic for availability"
-          }
-        ]
-      }
-    ]
-  },
-  "Psychiatry": {
-    "id": "psychiatry",
-    "name": "Psychiatry",
-    "description": "",
-    "icon": "💬",
-    "clinics": [
-      {
-        "id": "hlub-psych",
-        "clinicKey": "hlub",
-        "freq": "Psychiatry committee",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Psychiatric Evaluation Request",
-            "type": "auth",
-            "desc": "For medication management referrals"
-          },
-          {
-            "name": "HLUB Psychiatry Intake Form",
-            "type": "form",
-            "desc": "Hmong/Asian-language version available"
-          },
-          {
-            "name": "Prior Mental Health Records",
-            "type": "form",
-            "desc": "Previous diagnoses and medications"
-          }
-        ]
-      },
-      {
-        "id": "phac-psych",
-        "clinicKey": "phac",
-        "freq": "Psychiatry committee",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "PHAC Psychiatry Intake",
-            "type": "form",
-            "desc": "Paul Hom Asian Clinic psychiatric intake"
-          },
-          {
-            "name": "Insurance Mental Health Auth",
-            "type": "insurance",
-            "desc": "Pre-authorization for psychiatric services"
-          }
-        ]
-      },
-      {
-        "id": "bayanihan-psych",
-        "clinicKey": "bayanihan",
-        "freq": "Regular specialty clinic",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Bayanihan Psychiatry Form",
-            "type": "form",
-            "desc": "Tagalog version available — telehealth option"
-          },
-          {
-            "name": "Telehealth Consent Form",
-            "type": "auth",
-            "desc": "Required if attending via telehealth"
-          },
-          {
-            "name": "HIPAA Consent Form",
-            "type": "auth",
-            "desc": "Privacy acknowledgment for mental health records"
-          }
-        ]
-      }
-    ]
-  },
-  "Pediatrics": {
-    "id": "pediatrics",
-    "name": "Pediatrics",
-    "description": "Healthcare services for children and adolescents.",
-    "icon": "👶",
-    "clinics": [
-      {
-        "id": "river-peds",
-        "clinicKey": "river",
-        "freq": "1st & 3rd Saturdays, 9am–12pm",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "RIVER Pediatric Intake Form",
-            "type": "form",
-            "desc": "Primary intake for pediatric patients"
-          },
-          {
-            "name": "Parent / Guardian Consent",
-            "type": "auth",
-            "desc": "Required for all patients under 18"
-          },
-          {
-            "name": "School / Sports Physical Form",
-            "type": "form",
-            "desc": "For school enrollment or sports clearance"
-          },
-          {
-            "name": "Developmental Screening Form",
-            "type": "form",
-            "desc": "Age-appropriate milestone checklist"
-          },
-          {
-            "name": "Immunization Records",
-            "type": "form",
-            "desc": "Bring current vaccination history if available"
-          }
-        ]
-      },
-      {
-        "id": "imani-peds",
-        "clinicKey": "imani",
-        "freq": "Regular specialty clinic",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Imani Pediatric Referral",
-            "type": "form",
-            "desc": "Pediatric intake for Imani Clinic"
-          },
-          {
-            "name": "Parent / Guardian Consent",
-            "type": "auth",
-            "desc": "Required for patients under 18"
-          }
-        ]
-      },
-      {
-        "id": "bayanihan-peds",
-        "clinicKey": "bayanihan",
-        "freq": "Currently being established",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Bayanihan Pediatric Intake",
-            "type": "form",
-            "desc": "New service — contact clinic for availability"
-          },
-          {
-            "name": "Parent / Guardian Consent",
-            "type": "auth",
-            "desc": "Required for patients under 18"
-          }
-        ]
-      },
-      {
-        "id": "jcc-peds",
-        "clinicKey": "jcc",
-        "freq": "Youth focus",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "JCC Youth Health Intake",
-            "type": "form",
-            "desc": "ACEs-informed pediatric and youth intake"
-          },
-          {
-            "name": "School / Community Outreach Form",
-            "type": "form",
-            "desc": "For Dixon Community Schools and school pop-ups"
-          },
-          {
-            "name": "Parent / Guardian Consent",
-            "type": "auth",
-            "desc": "Required for patients under 18"
-          }
-        ]
-      }
-    ]
-  },
-  "Diabetes / Endocrinology": {
-    "id": "diabetes-endocrinology",
-    "name": "Diabetes / Endocrinology",
-    "description": "",
-    "icon": "🩸",
-    "clinics": [
-      {
-        "id": "tepati-dm",
-        "clinicKey": "tepati",
-        "freq": "CGM team on-site",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Diabetes Management Intake",
-            "type": "form",
-            "desc": "Includes CGM evaluation"
-          },
-          {
-            "name": "A1C / Lab Results Release",
-            "type": "auth",
-            "desc": "Provide recent bloodwork if available"
-          },
-          {
-            "name": "Medication & Insulin Log",
-            "type": "form",
-            "desc": "All current diabetes medications and dosages"
-          }
-        ]
-      },
-      {
-        "id": "hlub-dm",
-        "clinicKey": "hlub",
-        "freq": "Diabetes committee",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "HLUB Diabetes Intake Form",
-            "type": "form",
-            "desc": "Hmong-language version available"
-          },
-          {
-            "name": "Blood Glucose Log",
-            "type": "form",
-            "desc": "Daily glucose readings for 2 weeks"
-          }
-        ]
-      },
-      {
-        "id": "imani-endo",
-        "clinicKey": "imani",
-        "freq": "Endocrinology specialty clinic",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Imani Endocrinology Referral",
-            "type": "form",
-            "desc": "Endocrinology and diabetes specialty intake"
-          },
-          {
-            "name": "Lab Work Authorization",
-            "type": "auth",
-            "desc": "For thyroid, A1C, or other endocrine labs"
-          }
-        ]
-      },
-      {
-        "id": "phac-dm",
-        "clinicKey": "phac",
-        "freq": "Diabetes committee",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "PHAC Diabetes Screening Form",
-            "type": "form",
-            "desc": "Paul Hom Asian Clinic diabetes intake"
-          },
-          {
-            "name": "Covered California Enrollment",
-            "type": "insurance",
-            "desc": "Insurance enrollment assistance available"
-          }
-        ]
-      },
-      {
-        "id": "nadezhda-dm",
-        "clinicKey": "nadezhda",
-        "freq": "Diabetes education program",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Nadezhda Diabetes Education Enrollment",
-            "type": "form",
-            "desc": "Russian/Ukrainian version available"
-          }
-        ]
-      },
-      {
-        "id": "bayanihan-dm",
-        "clinicKey": "bayanihan",
-        "freq": "Diabetes Empowerment program",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Bayanihan Diabetes Empowerment Form",
-            "type": "form",
-            "desc": "Includes GoodRx medication cost assistance"
-          }
-        ]
-      }
-    ]
-  },
-  "Hepatitis": {
-    "id": "hepatitis",
-    "name": "Hepatitis",
-    "description": "",
-    "icon": "🧬",
-    "clinics": [
-      {
-        "id": "hlub-hep",
-        "clinicKey": "hlub",
-        "freq": "Hepatitis committee",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "Hepatitis Screening Consent",
-            "type": "auth",
-            "desc": "Consent for Hep B / Hep C screening"
-          },
-          {
-            "name": "Liver Function Lab Authorization",
-            "type": "auth",
-            "desc": "Pre-authorization for liver function tests"
-          },
-          {
-            "name": "HLUB Hepatitis Intake Form",
-            "type": "form",
-            "desc": "Hmong-language version available"
-          }
-        ]
-      },
-      {
-        "id": "phac-hep",
-        "clinicKey": "phac",
-        "freq": "Hepatitis committee",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "PHAC Hepatitis Screening Form",
-            "type": "form",
-            "desc": "Hep B / Hep C screening intake"
-          },
-          {
-            "name": "Liver Cancer Screening Consent",
-            "type": "auth",
-            "desc": "Monthly liver cancer screening event"
-          }
-        ]
-      },
-      {
-        "id": "vncares-hep",
-        "clinicKey": "vncares",
-        "freq": "Monthly liver cancer screening",
-        "docs": [
-          {
-            "name": "General Referral Form",
-            "type": "form",
-            "desc": "Standard referral required for all specialty visits"
-          },
-          {
-            "name": "Patient Consent Form",
-            "type": "auth",
-            "desc": "Authorization for treatment and information sharing"
-          },
-          {
-            "name": "Insurance / Medi-Cal Card Copy",
-            "type": "insurance",
-            "desc": "Front and back — or note if uninsured"
-          },
-          {
-            "name": "Medical History Questionnaire",
-            "type": "form",
-            "desc": "Complete prior to your appointment"
-          },
-          {
-            "name": "VN CARES Liver Screening Form",
-            "type": "form",
-            "desc": "Monthly cancer screening event"
-          },
-          {
-            "name": "Hepatitis Screening Consent",
-            "type": "auth",
-            "desc": "For Hep B / Hep C testing"
-          }
-        ]
-      }
-    ]
-  },
-  "Immigration Medical Exams": {
-    "id": "immigration-medical-exams",
-    "name": "Immigration Medical Exams",
-    "description": "",
-    "icon": "📋",
-    "clinics": [
-      {
-        "id": "klohc-ime",
-        "clinicKey": "klohc",
-        "freq": "IME committee",
-        "docs": [
-          {
-            "name": "USCIS Form I-693",
-            "type": "form",
-            "desc": "Official immigration medical exam form — completed by a USCIS Civil Surgeon"
-          },
-          {
-            "name": "Vaccination Records",
-            "type": "form",
-            "desc": "Bring all available immunization records"
-          },
-          {
-            "name": "Government-Issued ID or Passport",
-            "type": "auth",
-            "desc": "Required for USCIS examination"
-          },
-          {
-            "name": "Medical History Summary",
-            "type": "form",
-            "desc": "Complete medical and psychiatric history"
-          },
-          {
-            "name": "Medi-Cal / Insurance Status",
-            "type": "insurance",
-            "desc": "Sliding scale fees may apply if uninsured"
-          }
-        ]
-      }
-    ]
-  }
+  "specialties": [
+    {
+      "specialty_id": "cardiology",
+      "display_name": "Cardiology",
+      "description": "",
+      "icon": "🫀"
+    },
+    {
+      "specialty_id": "dermatology",
+      "display_name": "Dermatology",
+      "description": "Skin concerns, rashes, acne, lesions, and related evaluations.",
+      "icon": "🩺"
+    },
+    {
+      "specialty_id": "mental-health",
+      "display_name": "Mental Health",
+      "description": "Behavioral health support, counseling resources, and mental health services.",
+      "icon": "🧘"
+    },
+    {
+      "specialty_id": "neurology",
+      "display_name": "Neurology",
+      "description": "",
+      "icon": "🧠"
+    },
+    {
+      "specialty_id": "ophthalmology",
+      "display_name": "Ophthalmology",
+      "description": "",
+      "icon": "👁️"
+    },
+    {
+      "specialty_id": "gi-gastroenterology",
+      "display_name": "Gastroenterology",
+      "description": "",
+      "icon": "🫁"
+    },
+    {
+      "specialty_id": "ent",
+      "display_name": "ENT",
+      "description": "",
+      "icon": "👂"
+    },
+    {
+      "specialty_id": "gynecology-women-s-health",
+      "display_name": "Gynecology / Women's Health",
+      "description": "",
+      "icon": "🌸"
+    },
+    {
+      "specialty_id": "podiatry",
+      "display_name": "Podiatry",
+      "description": "",
+      "icon": "🦶"
+    },
+    {
+      "specialty_id": "psychiatry",
+      "display_name": "Psychiatry",
+      "description": "",
+      "icon": "💬"
+    },
+    {
+      "specialty_id": "pediatrics",
+      "display_name": "Pediatrics",
+      "description": "Healthcare services for children and adolescents.",
+      "icon": "👶"
+    },
+    {
+      "specialty_id": "diabetes-endocrinology",
+      "display_name": "Diabetes / Endocrinology",
+      "description": "",
+      "icon": "🩸"
+    },
+    {
+      "specialty_id": "hepatitis",
+      "display_name": "Hepatitis",
+      "description": "",
+      "icon": "🧬"
+    },
+    {
+      "specialty_id": "immigration-medical-exams",
+      "display_name": "Immigration Medical Exams",
+      "description": "",
+      "icon": "📋"
+    },
+    {
+      "specialty_id": "primary-care",
+      "display_name": "Primary Care",
+      "description": "General medical care and health maintenance.",
+      "icon": "🏥"
+    },
+    {
+      "specialty_id": "dental",
+      "display_name": "Dental",
+      "description": "Oral health, dental care, and dental procedures.",
+      "icon": "🦷"
+    },
+    {
+      "specialty_id": "behavioral-health",
+      "display_name": "Behavioral Health",
+      "description": "Mental health and behavioral support services.",
+      "icon": "🧘‍♀️"
+    },
+    {
+      "specialty_id": "harm-reduction",
+      "display_name": "Harm Reduction",
+      "description": "Substance use disorder support and harm reduction services.",
+      "icon": "🛡️"
+    },
+    {
+      "specialty_id": "lgbtqia-care",
+      "display_name": "LGBTQIA+ Care",
+      "description": "Healthcare services specialized for LGBTQIA+ individuals.",
+      "icon": "🏳️‍🌈"
+    },
+    {
+      "specialty_id": "preventative-care",
+      "display_name": "Preventative Care",
+      "description": "Preventative health services and screenings.",
+      "icon": "💉"
+    },
+    {
+      "specialty_id": "women’s-health",
+      "display_name": "Women's Health",
+      "description": "Women's health services and reproductive care.",
+      "icon": "💐"
+    }
+  ],
+  "specialty_clinics": [
+    {
+      "specialty_clinic_id": "tepati-cardio",
+      "specialty_id": "cardiology",
+      "clinic_id": "clinica-tepati",
+      "frequency": "Monthly specialty clinic"
+    },
+    {
+      "specialty_clinic_id": "hlub-cardio",
+      "specialty_id": "cardiology",
+      "clinic_id": "hlub-clinic",
+      "frequency": "Cardiopulmonary committee"
+    },
+    {
+      "specialty_clinic_id": "imani-cardio",
+      "specialty_id": "cardiology",
+      "clinic_id": "imani-clinic",
+      "frequency": "Regular specialty clinic"
+    },
+    {
+      "specialty_clinic_id": "phac-cardio",
+      "specialty_id": "cardiology",
+      "clinic_id": "paul-hom-asian-clinic",
+      "frequency": "Cardiopulmonary committee"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-cardio",
+      "specialty_id": "cardiology",
+      "clinic_id": "bayanihan-clinic",
+      "frequency": "Regular specialty clinic"
+    },
+    {
+      "specialty_clinic_id": "tepati-derm",
+      "specialty_id": "dermatology",
+      "clinic_id": "clinica-tepati",
+      "frequency": "Monthly specialty clinic"
+    },
+    {
+      "specialty_clinic_id": "klohc-derm",
+      "specialty_id": "dermatology",
+      "clinic_id": "knights-landing-one-health-center",
+      "frequency": "Regular service"
+    },
+    {
+      "specialty_clinic_id": "phac-derm",
+      "specialty_id": "dermatology",
+      "clinic_id": "paul-hom-asian-clinic",
+      "frequency": "Jointly with Clínica Tepati"
+    },
+    {
+      "specialty_clinic_id": "tepati-mh",
+      "specialty_id": "mental-health",
+      "clinic_id": "clinica-tepati",
+      "frequency": "Mental Health committee"
+    },
+    {
+      "specialty_clinic_id": "klohc-mh",
+      "specialty_id": "mental-health",
+      "clinic_id": "knights-landing-one-health-center",
+      "frequency": "Mental Health Clinic"
+    },
+    {
+      "specialty_clinic_id": "imani-mh",
+      "specialty_id": "mental-health",
+      "clinic_id": "imani-clinic",
+      "frequency": "Behavioral Health program"
+    },
+    {
+      "specialty_clinic_id": "jvmc-mh",
+      "specialty_id": "mental-health",
+      "clinic_id": "joan-viteri-memorial-clinic",
+      "frequency": "Walk-in available"
+    },
+    {
+      "specialty_clinic_id": "jcc-mh",
+      "specialty_id": "mental-health",
+      "clinic_id": "juvenile-caduceus-clinic-jcc",
+      "frequency": "Mental Health & Wellness committee"
+    },
+    {
+      "specialty_clinic_id": "willow-mh",
+      "specialty_id": "mental-health",
+      "clinic_id": "willow-clinic",
+      "frequency": "Behavioral Health program"
+    },
+    {
+      "specialty_clinic_id": "tepati-neuro",
+      "specialty_id": "neurology",
+      "clinic_id": "clinica-tepati",
+      "frequency": "Monthly specialty clinic"
+    },
+    {
+      "specialty_clinic_id": "hlub-neuro",
+      "specialty_id": "neurology",
+      "clinic_id": "hlub-clinic",
+      "frequency": "Neurology committee"
+    },
+    {
+      "specialty_clinic_id": "imani-neuro",
+      "specialty_id": "neurology",
+      "clinic_id": "imani-clinic",
+      "frequency": "Annual specialty clinic"
+    },
+    {
+      "specialty_clinic_id": "phac-neuro",
+      "specialty_id": "neurology",
+      "clinic_id": "paul-hom-asian-clinic",
+      "frequency": "Neurology committee"
+    },
+    {
+      "specialty_clinic_id": "hlub-ophtho",
+      "specialty_id": "ophthalmology",
+      "clinic_id": "hlub-clinic",
+      "frequency": "Ophthalmology committee"
+    },
+    {
+      "specialty_clinic_id": "phac-ophtho",
+      "specialty_id": "ophthalmology",
+      "clinic_id": "paul-hom-asian-clinic",
+      "frequency": "Ophthalmology committee"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-ophtho",
+      "specialty_id": "ophthalmology",
+      "clinic_id": "nadezhda-clinic",
+      "frequency": "New service"
+    },
+    {
+      "specialty_clinic_id": "willow-ophtho",
+      "specialty_id": "ophthalmology",
+      "clinic_id": "willow-clinic",
+      "frequency": "Regular service"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-ophtho",
+      "specialty_id": "ophthalmology",
+      "clinic_id": "bayanihan-clinic",
+      "frequency": "Regular specialty clinic"
+    },
+    {
+      "specialty_clinic_id": "imani-optom",
+      "specialty_id": "ophthalmology",
+      "clinic_id": "imani-clinic",
+      "frequency": "Quarterly specialty clinic"
+    },
+    {
+      "specialty_clinic_id": "tepati-gi",
+      "specialty_id": "gi-gastroenterology",
+      "clinic_id": "clinica-tepati",
+      "frequency": "Monthly specialty clinic"
+    },
+    {
+      "specialty_clinic_id": "phac-gi",
+      "specialty_id": "gi-gastroenterology",
+      "clinic_id": "paul-hom-asian-clinic",
+      "frequency": "H. pylori & colon screening"
+    },
+    {
+      "specialty_clinic_id": "vncares-gi",
+      "specialty_id": "gi-gastroenterology",
+      "clinic_id": "vn-cares",
+      "frequency": "Monthly colon cancer screening"
+    },
+    {
+      "specialty_clinic_id": "tepati-ent",
+      "specialty_id": "ent",
+      "clinic_id": "clinica-tepati",
+      "frequency": "Monthly specialty clinic"
+    },
+    {
+      "specialty_clinic_id": "tepati-gyn",
+      "specialty_id": "gynecology-women-s-health",
+      "clinic_id": "clinica-tepati",
+      "frequency": "Monthly specialty clinic"
+    },
+    {
+      "specialty_clinic_id": "jvmc-repro",
+      "specialty_id": "gynecology-women-s-health",
+      "clinic_id": "joan-viteri-memorial-clinic",
+      "frequency": "Monthly reproductive health clinic"
+    },
+    {
+      "specialty_clinic_id": "jcc-srh",
+      "specialty_id": "gynecology-women-s-health",
+      "clinic_id": "juvenile-caduceus-clinic-jcc",
+      "frequency": "Sexual & Reproductive Health committee"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-wh",
+      "specialty_id": "gynecology-women-s-health",
+      "clinic_id": "nadezhda-clinic",
+      "frequency": "New service"
+    },
+    {
+      "specialty_clinic_id": "phac-wh",
+      "specialty_id": "gynecology-women-s-health",
+      "clinic_id": "paul-hom-asian-clinic",
+      "frequency": "Women's Health committee"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-wh",
+      "specialty_id": "gynecology-women-s-health",
+      "clinic_id": "bayanihan-clinic",
+      "frequency": "PAPs; mammograms on hold"
+    },
+    {
+      "specialty_clinic_id": "willow-obgyn",
+      "specialty_id": "gynecology-women-s-health",
+      "clinic_id": "willow-clinic",
+      "frequency": "OB/GYN program"
+    },
+    {
+      "specialty_clinic_id": "vncares-cerv",
+      "specialty_id": "gynecology-women-s-health",
+      "clinic_id": "vn-cares",
+      "frequency": "Monthly cervical & breast screening"
+    },
+    {
+      "specialty_clinic_id": "tepati-pod",
+      "specialty_id": "podiatry",
+      "clinic_id": "clinica-tepati",
+      "frequency": "Monthly specialty clinic"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-pod",
+      "specialty_id": "podiatry",
+      "clinic_id": "bayanihan-clinic",
+      "frequency": "Currently being established"
+    },
+    {
+      "specialty_clinic_id": "hlub-psych",
+      "specialty_id": "psychiatry",
+      "clinic_id": "hlub-clinic",
+      "frequency": "Psychiatry committee"
+    },
+    {
+      "specialty_clinic_id": "phac-psych",
+      "specialty_id": "psychiatry",
+      "clinic_id": "paul-hom-asian-clinic",
+      "frequency": "Psychiatry committee"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-psych",
+      "specialty_id": "psychiatry",
+      "clinic_id": "bayanihan-clinic",
+      "frequency": "Regular specialty clinic"
+    },
+    {
+      "specialty_clinic_id": "river-peds",
+      "specialty_id": "pediatrics",
+      "clinic_id": "river-clinic",
+      "frequency": "1st & 3rd Saturdays, 9am–12pm"
+    },
+    {
+      "specialty_clinic_id": "imani-peds",
+      "specialty_id": "pediatrics",
+      "clinic_id": "imani-clinic",
+      "frequency": "Regular specialty clinic"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-peds",
+      "specialty_id": "pediatrics",
+      "clinic_id": "bayanihan-clinic",
+      "frequency": "Currently being established"
+    },
+    {
+      "specialty_clinic_id": "jcc-peds",
+      "specialty_id": "pediatrics",
+      "clinic_id": "juvenile-caduceus-clinic-jcc",
+      "frequency": "Youth focus"
+    },
+    {
+      "specialty_clinic_id": "tepati-dm",
+      "specialty_id": "diabetes-endocrinology",
+      "clinic_id": "clinica-tepati",
+      "frequency": "CGM team on-site"
+    },
+    {
+      "specialty_clinic_id": "hlub-dm",
+      "specialty_id": "diabetes-endocrinology",
+      "clinic_id": "hlub-clinic",
+      "frequency": "Diabetes committee"
+    },
+    {
+      "specialty_clinic_id": "imani-endo",
+      "specialty_id": "diabetes-endocrinology",
+      "clinic_id": "imani-clinic",
+      "frequency": "Endocrinology specialty clinic"
+    },
+    {
+      "specialty_clinic_id": "phac-dm",
+      "specialty_id": "diabetes-endocrinology",
+      "clinic_id": "paul-hom-asian-clinic",
+      "frequency": "Diabetes committee"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-dm",
+      "specialty_id": "diabetes-endocrinology",
+      "clinic_id": "nadezhda-clinic",
+      "frequency": "Diabetes education program"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-dm",
+      "specialty_id": "diabetes-endocrinology",
+      "clinic_id": "bayanihan-clinic",
+      "frequency": "Diabetes Empowerment program"
+    },
+    {
+      "specialty_clinic_id": "hlub-hep",
+      "specialty_id": "hepatitis",
+      "clinic_id": "hlub-clinic",
+      "frequency": "Hepatitis committee"
+    },
+    {
+      "specialty_clinic_id": "phac-hep",
+      "specialty_id": "hepatitis",
+      "clinic_id": "paul-hom-asian-clinic",
+      "frequency": "Hepatitis committee"
+    },
+    {
+      "specialty_clinic_id": "vncares-hep",
+      "specialty_id": "hepatitis",
+      "clinic_id": "vn-cares",
+      "frequency": "Monthly liver cancer screening"
+    },
+    {
+      "specialty_clinic_id": "klohc-ime",
+      "specialty_id": "immigration-medical-exams",
+      "clinic_id": "knights-landing-one-health-center",
+      "frequency": "IME committee"
+    }
+  ],
+  "specialty_documents": [
+    {
+      "specialty_clinic_id": "tepati-cardio",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "tepati-cardio",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "tepati-cardio",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "tepati-cardio",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "tepati-cardio",
+      "doc_name": "Cardiology Referral Form",
+      "doc_type": "form",
+      "doc_description": "Tepati-specific cardiology intake form"
+    },
+    {
+      "specialty_clinic_id": "tepati-cardio",
+      "doc_name": "EKG / Echo Authorization",
+      "doc_type": "auth",
+      "doc_description": "Pre-authorization if cardiac imaging is anticipated"
+    },
+    {
+      "specialty_clinic_id": "hlub-cardio",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "hlub-cardio",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "hlub-cardio",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "hlub-cardio",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "hlub-cardio",
+      "doc_name": "Cardiopulmonary Intake Form",
+      "doc_type": "form",
+      "doc_description": "HLUB-specific cardiac intake — Hmong version available"
+    },
+    {
+      "specialty_clinic_id": "hlub-cardio",
+      "doc_name": "Hypertension Monitoring Log",
+      "doc_type": "form",
+      "doc_description": "BP readings from the past 2 weeks"
+    },
+    {
+      "specialty_clinic_id": "imani-cardio",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "imani-cardio",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "imani-cardio",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "imani-cardio",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "imani-cardio",
+      "doc_name": "Cardiac Referral Authorization",
+      "doc_type": "auth",
+      "doc_description": "Required for Imani cardiology patients"
+    },
+    {
+      "specialty_clinic_id": "imani-cardio",
+      "doc_name": "Remote BP Monitoring Enrollment",
+      "doc_type": "form",
+      "doc_description": "Enroll in HTN remote monitoring if applicable"
+    },
+    {
+      "specialty_clinic_id": "phac-cardio",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "phac-cardio",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "phac-cardio",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "phac-cardio",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "phac-cardio",
+      "doc_name": "PHAC Cardiopulmonary Form",
+      "doc_type": "form",
+      "doc_description": "Paul Hom Asian Clinic cardiac intake"
+    },
+    {
+      "specialty_clinic_id": "phac-cardio",
+      "doc_name": "MSK / Cardio Cross-Referral Note",
+      "doc_type": "form",
+      "doc_description": "If musculoskeletal concerns co-present"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-cardio",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-cardio",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-cardio",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-cardio",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-cardio",
+      "doc_name": "Bayanihan Cardiology Intake",
+      "doc_type": "form",
+      "doc_description": "Tagalog version available — telehealth option"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-cardio",
+      "doc_name": "Telehealth Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Required if attending via telehealth"
+    },
+    {
+      "specialty_clinic_id": "tepati-derm",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "tepati-derm",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "tepati-derm",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "tepati-derm",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "tepati-derm",
+      "doc_name": "Dermatology Referral Form",
+      "doc_type": "form",
+      "doc_description": "Tepati-specific skin referral form"
+    },
+    {
+      "specialty_clinic_id": "tepati-derm",
+      "doc_name": "Skin Lesion Photo Consent",
+      "doc_type": "auth",
+      "doc_description": "Consent for clinical photography"
+    },
+    {
+      "specialty_clinic_id": "klohc-derm",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "klohc-derm",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "klohc-derm",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "klohc-derm",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "klohc-derm",
+      "doc_name": "KLOHC Dermatology Intake",
+      "doc_type": "form",
+      "doc_description": "Available in Spanish — ask for the Spanish version"
+    },
+    {
+      "specialty_clinic_id": "klohc-derm",
+      "doc_name": "Prior Treatment History",
+      "doc_type": "form",
+      "doc_description": "List all previous skin treatments and medications"
+    },
+    {
+      "specialty_clinic_id": "phac-derm",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "phac-derm",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "phac-derm",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "phac-derm",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "phac-derm",
+      "doc_name": "Tri-Org Dermatology Referral",
+      "doc_type": "form",
+      "doc_description": "Shared form used across PHAC and Tepati"
+    },
+    {
+      "specialty_clinic_id": "phac-derm",
+      "doc_name": "Allergy & Medication List",
+      "doc_type": "form",
+      "doc_description": "Current medications and known allergies"
+    },
+    {
+      "specialty_clinic_id": "tepati-mh",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "tepati-mh",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "tepati-mh",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "tepati-mh",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "tepati-mh",
+      "doc_name": "Mental Health Intake Form",
+      "doc_type": "form",
+      "doc_description": "Tepati mental health intake"
+    },
+    {
+      "specialty_clinic_id": "tepati-mh",
+      "doc_name": "Release of Information",
+      "doc_type": "auth",
+      "doc_description": "Allows communication with primary care provider"
+    },
+    {
+      "specialty_clinic_id": "klohc-mh",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "klohc-mh",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "klohc-mh",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "klohc-mh",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "klohc-mh",
+      "doc_name": "KLOHC Mental Health Referral",
+      "doc_type": "form",
+      "doc_description": "Available in Spanish"
+    },
+    {
+      "specialty_clinic_id": "klohc-mh",
+      "doc_name": "Cultural Support Needs Form",
+      "doc_type": "form",
+      "doc_description": "Language/cultural accommodation requests"
+    },
+    {
+      "specialty_clinic_id": "imani-mh",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "imani-mh",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "imani-mh",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "imani-mh",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "imani-mh",
+      "doc_name": "Behavioral Health Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Consent for behavioral health services"
+    },
+    {
+      "specialty_clinic_id": "imani-mh",
+      "doc_name": "IHEOP Health Education Enrollment",
+      "doc_type": "form",
+      "doc_description": "Optional: enroll in health education outreach"
+    },
+    {
+      "specialty_clinic_id": "jvmc-mh",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "jvmc-mh",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "jvmc-mh",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "jvmc-mh",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "jvmc-mh",
+      "doc_name": "JVMC Harm-Reduction Intake",
+      "doc_type": "form",
+      "doc_description": "Walk-in friendly — no prior appointment needed"
+    },
+    {
+      "specialty_clinic_id": "jvmc-mh",
+      "doc_name": "Gender Affirming Care Flag",
+      "doc_type": "form",
+      "doc_description": "Indicate if gender-affirming considerations are needed"
+    },
+    {
+      "specialty_clinic_id": "jcc-mh",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "jcc-mh",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "jcc-mh",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "jcc-mh",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "jcc-mh",
+      "doc_name": "JCC Mental Health Intake",
+      "doc_type": "form",
+      "doc_description": "ACEs-informed mental health screening"
+    },
+    {
+      "specialty_clinic_id": "jcc-mh",
+      "doc_name": "Youth/Guardian Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Required if patient is under 18"
+    },
+    {
+      "specialty_clinic_id": "willow-mh",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "willow-mh",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "willow-mh",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "willow-mh",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "willow-mh",
+      "doc_name": "Willow Behavioral Health Form",
+      "doc_type": "form",
+      "doc_description": "For unhoused patients — ID not required"
+    },
+    {
+      "specialty_clinic_id": "willow-mh",
+      "doc_name": "Case Management Referral",
+      "doc_type": "form",
+      "doc_description": "Connect to case management services"
+    },
+    {
+      "specialty_clinic_id": "tepati-neuro",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "tepati-neuro",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "tepati-neuro",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "tepati-neuro",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "tepati-neuro",
+      "doc_name": "Neurology Referral Form",
+      "doc_type": "form",
+      "doc_description": "Tepati-specific neurology intake"
+    },
+    {
+      "specialty_clinic_id": "tepati-neuro",
+      "doc_name": "Symptom & Headache Diary",
+      "doc_type": "form",
+      "doc_description": "Track neurological symptoms for 2 weeks prior"
+    },
+    {
+      "specialty_clinic_id": "tepati-neuro",
+      "doc_name": "MRI / Imaging Pre-Authorization",
+      "doc_type": "auth",
+      "doc_description": "Required if brain or spine imaging is anticipated"
+    },
+    {
+      "specialty_clinic_id": "hlub-neuro",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "hlub-neuro",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "hlub-neuro",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "hlub-neuro",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "hlub-neuro",
+      "doc_name": "HLUB Neurology Intake Form",
+      "doc_type": "form",
+      "doc_description": "Hmong-language version available on request"
+    },
+    {
+      "specialty_clinic_id": "hlub-neuro",
+      "doc_name": "Medication List",
+      "doc_type": "form",
+      "doc_description": "All current neurological medications and dosages"
+    },
+    {
+      "specialty_clinic_id": "imani-neuro",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "imani-neuro",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "imani-neuro",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "imani-neuro",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "imani-neuro",
+      "doc_name": "Imani Neurology Referral",
+      "doc_type": "form",
+      "doc_description": "Annual clinic — verify next date with Imani"
+    },
+    {
+      "specialty_clinic_id": "imani-neuro",
+      "doc_name": "EEG Authorization",
+      "doc_type": "auth",
+      "doc_description": "If seizure evaluation is anticipated"
+    },
+    {
+      "specialty_clinic_id": "phac-neuro",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "phac-neuro",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "phac-neuro",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "phac-neuro",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "phac-neuro",
+      "doc_name": "PHAC Neurology Form",
+      "doc_type": "form",
+      "doc_description": "Paul Hom Asian Clinic neurology intake"
+    },
+    {
+      "specialty_clinic_id": "hlub-ophtho",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "hlub-ophtho",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "hlub-ophtho",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "hlub-ophtho",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "hlub-ophtho",
+      "doc_name": "HLUB Ophthalmology Intake",
+      "doc_type": "form",
+      "doc_description": "Hmong-language version available"
+    },
+    {
+      "specialty_clinic_id": "hlub-ophtho",
+      "doc_name": "Vision Insurance Authorization",
+      "doc_type": "insurance",
+      "doc_description": "Separate from medical — note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "hlub-ophtho",
+      "doc_name": "Prior Vision Prescription",
+      "doc_type": "form",
+      "doc_description": "Last known prescription if available"
+    },
+    {
+      "specialty_clinic_id": "phac-ophtho",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "phac-ophtho",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "phac-ophtho",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "phac-ophtho",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "phac-ophtho",
+      "doc_name": "PHAC Eye Clinic Intake",
+      "doc_type": "form",
+      "doc_description": "Paul Hom Asian Clinic eye care form"
+    },
+    {
+      "specialty_clinic_id": "phac-ophtho",
+      "doc_name": "Retinal Exam Consent",
+      "doc_type": "auth",
+      "doc_description": "Consent for retinal imaging or dilation"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-ophtho",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-ophtho",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-ophtho",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-ophtho",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-ophtho",
+      "doc_name": "Nadezhda Ophthalmology Intake",
+      "doc_type": "form",
+      "doc_description": "Russian/Ukrainian version available — ask coordinator"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-ophtho",
+      "doc_name": "Dilation Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Consent for pupil dilation"
+    },
+    {
+      "specialty_clinic_id": "willow-ophtho",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "willow-ophtho",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "willow-ophtho",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "willow-ophtho",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "willow-ophtho",
+      "doc_name": "Willow Eye Care Form",
+      "doc_type": "form",
+      "doc_description": "For unhoused patients — ID not required"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-ophtho",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-ophtho",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-ophtho",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-ophtho",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-ophtho",
+      "doc_name": "Bayanihan Ophthalmology Intake",
+      "doc_type": "form",
+      "doc_description": "Tagalog version available on request"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-ophtho",
+      "doc_name": "Telehealth Consent Form",
+      "doc_type": "auth",
+      "doc_description": "If attending remotely"
+    },
+    {
+      "specialty_clinic_id": "imani-optom",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "imani-optom",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "imani-optom",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "imani-optom",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "imani-optom",
+      "doc_name": "Imani Optometry Referral",
+      "doc_type": "form",
+      "doc_description": "Quarterly clinic — verify next date with Imani"
+    },
+    {
+      "specialty_clinic_id": "tepati-gi",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "tepati-gi",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "tepati-gi",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "tepati-gi",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "tepati-gi",
+      "doc_name": "GI Referral Form",
+      "doc_type": "form",
+      "doc_description": "Tepati-specific gastroenterology intake"
+    },
+    {
+      "specialty_clinic_id": "tepati-gi",
+      "doc_name": "Dietary History & Symptom Log",
+      "doc_type": "form",
+      "doc_description": "3-day food diary and GI symptom log"
+    },
+    {
+      "specialty_clinic_id": "tepati-gi",
+      "doc_name": "Colonoscopy Pre-Authorization",
+      "doc_type": "auth",
+      "doc_description": "Only if colonoscopy is anticipated"
+    },
+    {
+      "specialty_clinic_id": "phac-gi",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "phac-gi",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "phac-gi",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "phac-gi",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "phac-gi",
+      "doc_name": "FIT Kit Request Form",
+      "doc_type": "form",
+      "doc_description": "Fecal immunochemical test for colon screening"
+    },
+    {
+      "specialty_clinic_id": "phac-gi",
+      "doc_name": "H. pylori Testing Authorization",
+      "doc_type": "auth",
+      "doc_description": "Required for H. pylori breath or stool test"
+    },
+    {
+      "specialty_clinic_id": "vncares-gi",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "vncares-gi",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "vncares-gi",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "vncares-gi",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "vncares-gi",
+      "doc_name": "VN CARES Colon Screening Form",
+      "doc_type": "form",
+      "doc_description": "Monthly cancer screening day form"
+    },
+    {
+      "specialty_clinic_id": "vncares-gi",
+      "doc_name": "Liver Cancer Screening Consent",
+      "doc_type": "auth",
+      "doc_description": "For liver cancer screening at monthly event"
+    },
+    {
+      "specialty_clinic_id": "tepati-ent",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "tepati-ent",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "tepati-ent",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "tepati-ent",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "tepati-ent",
+      "doc_name": "ENT Referral Form",
+      "doc_type": "form",
+      "doc_description": "Tepati ENT specialty clinic intake"
+    },
+    {
+      "specialty_clinic_id": "tepati-ent",
+      "doc_name": "Audiogram Authorization",
+      "doc_type": "auth",
+      "doc_description": "For hearing evaluation referrals"
+    },
+    {
+      "specialty_clinic_id": "tepati-ent",
+      "doc_name": "Symptom Duration History",
+      "doc_type": "form",
+      "doc_description": "Describe onset and progression of ENT symptoms"
+    },
+    {
+      "specialty_clinic_id": "tepati-gyn",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "tepati-gyn",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "tepati-gyn",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "tepati-gyn",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "tepati-gyn",
+      "doc_name": "Gynecology Referral Form",
+      "doc_type": "form",
+      "doc_description": "Tepati women's health specialty intake"
+    },
+    {
+      "specialty_clinic_id": "tepati-gyn",
+      "doc_name": "Reproductive Health History",
+      "doc_type": "form",
+      "doc_description": "Complete obstetric and gynecologic history"
+    },
+    {
+      "specialty_clinic_id": "jvmc-repro",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "jvmc-repro",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "jvmc-repro",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "jvmc-repro",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "jvmc-repro",
+      "doc_name": "JVMC Reproductive Health Intake",
+      "doc_type": "form",
+      "doc_description": "Covers IUDs, emergency contraception, medication abortion"
+    },
+    {
+      "specialty_clinic_id": "jvmc-repro",
+      "doc_name": "STI/HIV Testing Consent",
+      "doc_type": "auth",
+      "doc_description": "Consent for STI and HIV screening"
+    },
+    {
+      "specialty_clinic_id": "jvmc-repro",
+      "doc_name": "Gender Affirming Care Flag",
+      "doc_type": "form",
+      "doc_description": "Indicate gender-affirming considerations if needed"
+    },
+    {
+      "specialty_clinic_id": "jcc-srh",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "jcc-srh",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "jcc-srh",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "jcc-srh",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "jcc-srh",
+      "doc_name": "JCC SRH Intake Form",
+      "doc_type": "form",
+      "doc_description": "Youth-friendly, confidential intake"
+    },
+    {
+      "specialty_clinic_id": "jcc-srh",
+      "doc_name": "Youth Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Required if patient is under 18"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-wh",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-wh",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-wh",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-wh",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-wh",
+      "doc_name": "Nadezhda Women's Health Intake",
+      "doc_type": "form",
+      "doc_description": "Russian/Ukrainian language version available"
+    },
+    {
+      "specialty_clinic_id": "phac-wh",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "phac-wh",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "phac-wh",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "phac-wh",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "phac-wh",
+      "doc_name": "PHAC PAP / Women's Health Form",
+      "doc_type": "form",
+      "doc_description": "Includes PAP smear screening intake"
+    },
+    {
+      "specialty_clinic_id": "phac-wh",
+      "doc_name": "Mammogram Referral Form",
+      "doc_type": "form",
+      "doc_description": "UMI imaging referral for mammography"
+    },
+    {
+      "specialty_clinic_id": "phac-wh",
+      "doc_name": "Cervical Cancer Screening Consent",
+      "doc_type": "auth",
+      "doc_description": "Monthly screening event"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-wh",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-wh",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-wh",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-wh",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-wh",
+      "doc_name": "Bayanihan PAP Intake Form",
+      "doc_type": "form",
+      "doc_description": "Women's health intake — mammograms currently paused"
+    },
+    {
+      "specialty_clinic_id": "willow-obgyn",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "willow-obgyn",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "willow-obgyn",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "willow-obgyn",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "willow-obgyn",
+      "doc_name": "Willow OB/GYN Intake Form",
+      "doc_type": "form",
+      "doc_description": "For unhoused patients — ID not required"
+    },
+    {
+      "specialty_clinic_id": "willow-obgyn",
+      "doc_name": "Case Management Referral",
+      "doc_type": "form",
+      "doc_description": "Connect to additional support services"
+    },
+    {
+      "specialty_clinic_id": "vncares-cerv",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "vncares-cerv",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "vncares-cerv",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "vncares-cerv",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "vncares-cerv",
+      "doc_name": "VN CARES Women's Screening Form",
+      "doc_type": "form",
+      "doc_description": "Cervical and breast cancer monthly screening"
+    },
+    {
+      "specialty_clinic_id": "vncares-cerv",
+      "doc_name": "Breast Cancer Screening Consent",
+      "doc_type": "auth",
+      "doc_description": "Monthly cancer screening event consent"
+    },
+    {
+      "specialty_clinic_id": "tepati-pod",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "tepati-pod",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "tepati-pod",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "tepati-pod",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "tepati-pod",
+      "doc_name": "Podiatry Referral Form",
+      "doc_type": "form",
+      "doc_description": "Tepati podiatry specialty intake"
+    },
+    {
+      "specialty_clinic_id": "tepati-pod",
+      "doc_name": "Diabetes Foot Care Form",
+      "doc_type": "form",
+      "doc_description": "Required for diabetic patients — includes foot exam checklist"
+    },
+    {
+      "specialty_clinic_id": "tepati-pod",
+      "doc_name": "X-Ray Authorization",
+      "doc_type": "auth",
+      "doc_description": "Pre-authorization if foot imaging is needed"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-pod",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-pod",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-pod",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-pod",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-pod",
+      "doc_name": "Bayanihan Podiatry Intake",
+      "doc_type": "form",
+      "doc_description": "New service — contact clinic for availability"
+    },
+    {
+      "specialty_clinic_id": "hlub-psych",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "hlub-psych",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "hlub-psych",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "hlub-psych",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "hlub-psych",
+      "doc_name": "Psychiatric Evaluation Request",
+      "doc_type": "auth",
+      "doc_description": "For medication management referrals"
+    },
+    {
+      "specialty_clinic_id": "hlub-psych",
+      "doc_name": "HLUB Psychiatry Intake Form",
+      "doc_type": "form",
+      "doc_description": "Hmong/Asian-language version available"
+    },
+    {
+      "specialty_clinic_id": "hlub-psych",
+      "doc_name": "Prior Mental Health Records",
+      "doc_type": "form",
+      "doc_description": "Previous diagnoses and medications"
+    },
+    {
+      "specialty_clinic_id": "phac-psych",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "phac-psych",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "phac-psych",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "phac-psych",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "phac-psych",
+      "doc_name": "PHAC Psychiatry Intake",
+      "doc_type": "form",
+      "doc_description": "Paul Hom Asian Clinic psychiatric intake"
+    },
+    {
+      "specialty_clinic_id": "phac-psych",
+      "doc_name": "Insurance Mental Health Auth",
+      "doc_type": "insurance",
+      "doc_description": "Pre-authorization for psychiatric services"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-psych",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-psych",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-psych",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-psych",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-psych",
+      "doc_name": "Bayanihan Psychiatry Form",
+      "doc_type": "form",
+      "doc_description": "Tagalog version available — telehealth option"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-psych",
+      "doc_name": "Telehealth Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Required if attending via telehealth"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-psych",
+      "doc_name": "HIPAA Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Privacy acknowledgment for mental health records"
+    },
+    {
+      "specialty_clinic_id": "river-peds",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "river-peds",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "river-peds",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "river-peds",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "river-peds",
+      "doc_name": "RIVER Pediatric Intake Form",
+      "doc_type": "form",
+      "doc_description": "Primary intake for pediatric patients"
+    },
+    {
+      "specialty_clinic_id": "river-peds",
+      "doc_name": "Parent / Guardian Consent",
+      "doc_type": "auth",
+      "doc_description": "Required for all patients under 18"
+    },
+    {
+      "specialty_clinic_id": "river-peds",
+      "doc_name": "School / Sports Physical Form",
+      "doc_type": "form",
+      "doc_description": "For school enrollment or sports clearance"
+    },
+    {
+      "specialty_clinic_id": "river-peds",
+      "doc_name": "Developmental Screening Form",
+      "doc_type": "form",
+      "doc_description": "Age-appropriate milestone checklist"
+    },
+    {
+      "specialty_clinic_id": "river-peds",
+      "doc_name": "Immunization Records",
+      "doc_type": "form",
+      "doc_description": "Bring current vaccination history if available"
+    },
+    {
+      "specialty_clinic_id": "imani-peds",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "imani-peds",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "imani-peds",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "imani-peds",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "imani-peds",
+      "doc_name": "Imani Pediatric Referral",
+      "doc_type": "form",
+      "doc_description": "Pediatric intake for Imani Clinic"
+    },
+    {
+      "specialty_clinic_id": "imani-peds",
+      "doc_name": "Parent / Guardian Consent",
+      "doc_type": "auth",
+      "doc_description": "Required for patients under 18"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-peds",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-peds",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-peds",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-peds",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-peds",
+      "doc_name": "Bayanihan Pediatric Intake",
+      "doc_type": "form",
+      "doc_description": "New service — contact clinic for availability"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-peds",
+      "doc_name": "Parent / Guardian Consent",
+      "doc_type": "auth",
+      "doc_description": "Required for patients under 18"
+    },
+    {
+      "specialty_clinic_id": "jcc-peds",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "jcc-peds",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "jcc-peds",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "jcc-peds",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "jcc-peds",
+      "doc_name": "JCC Youth Health Intake",
+      "doc_type": "form",
+      "doc_description": "ACEs-informed pediatric and youth intake"
+    },
+    {
+      "specialty_clinic_id": "jcc-peds",
+      "doc_name": "School / Community Outreach Form",
+      "doc_type": "form",
+      "doc_description": "For Dixon Community Schools and school pop-ups"
+    },
+    {
+      "specialty_clinic_id": "jcc-peds",
+      "doc_name": "Parent / Guardian Consent",
+      "doc_type": "auth",
+      "doc_description": "Required for patients under 18"
+    },
+    {
+      "specialty_clinic_id": "tepati-dm",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "tepati-dm",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "tepati-dm",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "tepati-dm",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "tepati-dm",
+      "doc_name": "Diabetes Management Intake",
+      "doc_type": "form",
+      "doc_description": "Includes CGM evaluation"
+    },
+    {
+      "specialty_clinic_id": "tepati-dm",
+      "doc_name": "A1C / Lab Results Release",
+      "doc_type": "auth",
+      "doc_description": "Provide recent bloodwork if available"
+    },
+    {
+      "specialty_clinic_id": "tepati-dm",
+      "doc_name": "Medication & Insulin Log",
+      "doc_type": "form",
+      "doc_description": "All current diabetes medications and dosages"
+    },
+    {
+      "specialty_clinic_id": "hlub-dm",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "hlub-dm",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "hlub-dm",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "hlub-dm",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "hlub-dm",
+      "doc_name": "HLUB Diabetes Intake Form",
+      "doc_type": "form",
+      "doc_description": "Hmong-language version available"
+    },
+    {
+      "specialty_clinic_id": "hlub-dm",
+      "doc_name": "Blood Glucose Log",
+      "doc_type": "form",
+      "doc_description": "Daily glucose readings for 2 weeks"
+    },
+    {
+      "specialty_clinic_id": "imani-endo",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "imani-endo",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "imani-endo",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "imani-endo",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "imani-endo",
+      "doc_name": "Imani Endocrinology Referral",
+      "doc_type": "form",
+      "doc_description": "Endocrinology and diabetes specialty intake"
+    },
+    {
+      "specialty_clinic_id": "imani-endo",
+      "doc_name": "Lab Work Authorization",
+      "doc_type": "auth",
+      "doc_description": "For thyroid, A1C, or other endocrine labs"
+    },
+    {
+      "specialty_clinic_id": "phac-dm",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "phac-dm",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "phac-dm",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "phac-dm",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "phac-dm",
+      "doc_name": "PHAC Diabetes Screening Form",
+      "doc_type": "form",
+      "doc_description": "Paul Hom Asian Clinic diabetes intake"
+    },
+    {
+      "specialty_clinic_id": "phac-dm",
+      "doc_name": "Covered California Enrollment",
+      "doc_type": "insurance",
+      "doc_description": "Insurance enrollment assistance available"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-dm",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-dm",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-dm",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-dm",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "nadezhda-dm",
+      "doc_name": "Nadezhda Diabetes Education Enrollment",
+      "doc_type": "form",
+      "doc_description": "Russian/Ukrainian version available"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-dm",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-dm",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-dm",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-dm",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "bayanihan-dm",
+      "doc_name": "Bayanihan Diabetes Empowerment Form",
+      "doc_type": "form",
+      "doc_description": "Includes GoodRx medication cost assistance"
+    },
+    {
+      "specialty_clinic_id": "hlub-hep",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "hlub-hep",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "hlub-hep",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "hlub-hep",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "hlub-hep",
+      "doc_name": "Hepatitis Screening Consent",
+      "doc_type": "auth",
+      "doc_description": "Consent for Hep B / Hep C screening"
+    },
+    {
+      "specialty_clinic_id": "hlub-hep",
+      "doc_name": "Liver Function Lab Authorization",
+      "doc_type": "auth",
+      "doc_description": "Pre-authorization for liver function tests"
+    },
+    {
+      "specialty_clinic_id": "hlub-hep",
+      "doc_name": "HLUB Hepatitis Intake Form",
+      "doc_type": "form",
+      "doc_description": "Hmong-language version available"
+    },
+    {
+      "specialty_clinic_id": "phac-hep",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "phac-hep",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "phac-hep",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "phac-hep",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "phac-hep",
+      "doc_name": "PHAC Hepatitis Screening Form",
+      "doc_type": "form",
+      "doc_description": "Hep B / Hep C screening intake"
+    },
+    {
+      "specialty_clinic_id": "phac-hep",
+      "doc_name": "Liver Cancer Screening Consent",
+      "doc_type": "auth",
+      "doc_description": "Monthly liver cancer screening event"
+    },
+    {
+      "specialty_clinic_id": "vncares-hep",
+      "doc_name": "General Referral Form",
+      "doc_type": "form",
+      "doc_description": "Standard referral required for all specialty visits"
+    },
+    {
+      "specialty_clinic_id": "vncares-hep",
+      "doc_name": "Patient Consent Form",
+      "doc_type": "auth",
+      "doc_description": "Authorization for treatment and information sharing"
+    },
+    {
+      "specialty_clinic_id": "vncares-hep",
+      "doc_name": "Insurance / Medi-Cal Card Copy",
+      "doc_type": "insurance",
+      "doc_description": "Front and back — or note if uninsured"
+    },
+    {
+      "specialty_clinic_id": "vncares-hep",
+      "doc_name": "Medical History Questionnaire",
+      "doc_type": "form",
+      "doc_description": "Complete prior to your appointment"
+    },
+    {
+      "specialty_clinic_id": "vncares-hep",
+      "doc_name": "VN CARES Liver Screening Form",
+      "doc_type": "form",
+      "doc_description": "Monthly cancer screening event"
+    },
+    {
+      "specialty_clinic_id": "vncares-hep",
+      "doc_name": "Hepatitis Screening Consent",
+      "doc_type": "auth",
+      "doc_description": "For Hep B / Hep C testing"
+    },
+    {
+      "specialty_clinic_id": "klohc-ime",
+      "doc_name": "USCIS Form I-693",
+      "doc_type": "form",
+      "doc_description": "Official immigration medical exam form — completed by a USCIS Civil Surgeon"
+    },
+    {
+      "specialty_clinic_id": "klohc-ime",
+      "doc_name": "Vaccination Records",
+      "doc_type": "form",
+      "doc_description": "Bring all available immunization records"
+    },
+    {
+      "specialty_clinic_id": "klohc-ime",
+      "doc_name": "Government-Issued ID or Passport",
+      "doc_type": "auth",
+      "doc_description": "Required for USCIS examination"
+    },
+    {
+      "specialty_clinic_id": "klohc-ime",
+      "doc_name": "Medical History Summary",
+      "doc_type": "form",
+      "doc_description": "Complete medical and psychiatric history"
+    },
+    {
+      "specialty_clinic_id": "klohc-ime",
+      "doc_name": "Medi-Cal / Insurance Status",
+      "doc_type": "insurance",
+      "doc_description": "Sliding scale fees may apply if uninsured"
+    }
+  ]
 }
