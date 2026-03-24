@@ -11,6 +11,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.management-input::placeholder {
+  color: #475569;
+  opacity: 1;
+}
+
 /* Scrollbar styles */
 ::-webkit-scrollbar {
   width: 8px;

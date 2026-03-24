@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { withIronSessionApiRoute } from "iron-session/next";
 import { getSessionOptions } from "@/lib/auth/session";
-import { verifyUserPassword } from "@/lib/auth/password";
+import { verifyUserPassword } from "@/lib/auth/users";
 
 type LoginRequest = {
   username?: string;
@@ -39,6 +39,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<LoginResponse>)
     req.session.isLoggedIn = true;
     req.session.userId = user.id;
     req.session.username = user.username;
+    req.session.role = user.role;
+    req.session.clinicKey = user.clinicKey;
     await req.session.save();
 
     return res.status(200).json({ ok: true });

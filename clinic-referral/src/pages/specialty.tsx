@@ -1,5 +1,4 @@
 import Link from "next/link";
-import type { GetServerSideProps } from "next";
 import { withIronSessionSsr } from "iron-session/next";
 import { getClinics, getSpecialties } from "@/lib/dataSource/postgres";
 import { getSessionOptions } from "@/lib/auth/session";

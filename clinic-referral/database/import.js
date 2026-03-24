@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * Import JSON data into PostgreSQL database
  * For Vercel Neon database

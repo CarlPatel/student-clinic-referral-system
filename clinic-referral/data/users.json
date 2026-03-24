@@ -2,19 +2,25 @@
   {
     "id": "ahdzaim",
     "username": "alice",
+    "role": "clinic_member",
+    "clinicKey": "tepati",
     "salt": "be2f92fd346e0344b98cfaf0c4928f31",
     "passwordHash": "618c56a38d070878decb8de58899c9f7ca744b957325a883a1dce407ff7831cc82c610fc4eeb90d0cd20aca45128ad3a10ab6b03173d363ba489f28f0447cfe5"
   },
   {
     "id": "bd9wgcg",
     "username": "bob",
+    "role": "clinic_member",
+    "clinicKey": "klohc",
     "salt": "868f4cb043bb65d926bf45d7ef2376f1",
     "passwordHash": "a7f2234c4095afb9ea9fb5fb6096a133c96e8667cc547d2cb0bb4b192965e955af057b84c597d38fc63ef190a78d3f5d9a94111dbd79b4bfc466817eea89b3da"
   },
   {
-    "id": "czd05r8",
-    "username": "charlie",
-    "salt": "0607533b8a6afa9492f223cfde51a086",
-    "passwordHash": "a3a589e2aeb1717bd2cd35a0a500d9bdd0c6d8ad511a133b293062cce99700df522d3437ee55fb0a533cb07650cdfa4146e6b34c5ef83368b475a6a4f9ba441c"
+    "id": "975cfeb7-26cd-474a-a39f-76556e8eebeb",
+    "username": "carl",
+    "role": "master_admin",
+    "clinicKey": "hlub",
+    "salt": "304365e6b4d951ae56f3d8861a844a4f",
+    "passwordHash": "0baf70344c326d990f5dde90b0685304c3a8d1c6d8dcc49658ba3477ca4cfbac09a0da17b14743cd21f78b7a9e99ae07616064ff7518754d08b199cb6fcfed43"
   }
 ]
