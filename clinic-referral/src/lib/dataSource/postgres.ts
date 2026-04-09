@@ -80,7 +80,7 @@ type AppSpecialtyDocumentRow = {
 
 const globalForPool = globalThis as unknown as { __clinicPool?: Pool; __referralStatusReady?: boolean };
 
-function getPool(): Pool {
+export function getPool(): Pool {
   if (globalForPool.__clinicPool) return globalForPool.__clinicPool;
 
   let connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
