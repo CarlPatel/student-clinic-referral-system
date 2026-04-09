@@ -168,6 +168,9 @@ function ReferralTracker({
   const SPECIALTIES_DATA = specialtiesData;
   const CLINIC_NAMES = Object.values(CLINICS).map((c) => c.name);
   const SPECIALTY_LIST = Object.keys(SPECIALTIES_DATA);
+  const canSkipReferringClinic = (role === "clinic_admin" || role === "clinic_member") && Boolean(userClinicName);
+  const firstStep = canSkipReferringClinic ? 1 : 0;
+  const visibleSteps = canSkipReferringClinic ? STEPS.slice(1) : STEPS;
   const defaultClinicFilter = role === "master_admin" ? "All" : userClinicName ?? "All";
   const getSpecialtyIcon = (specialty: string) => SPECIALTIES_DATA[specialty]?.icon ?? "🏥";
   const formatReferralTime = (time: string) => {
@@ -177,16 +180,49 @@ function ReferralTracker({
     }
     return parsed.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
   };
+  const formatReferralDateTimeShort = (date: string, time: string) => {
+    const parsed = new Date(`${date}T${time}`);
+    if (Number.isNaN(parsed.getTime())) {
+      return `${date}, ${time}`;
+    }
+    return parsed.toLocaleString("en-US");
+  };
 
   const [referrals, setReferrals] = useState<Referral[]>(initialReferrals);
   const [view, setView] = useState<"list" | "form" | "detail">("list");
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [step, setStep] = useState(0);
+  const [form, setForm] = useState(() => ({
+    ...EMPTY_FORM,
+    referringClinic: canSkipReferringClinic ? userClinicName ?? "" : ""
+  }));
+  const [step, setStep] = useState(firstStep);
   const [submitted, setSubmitted] = useState(false);
   const [detailId, setDetailId] = useState<number | null>(null);
+  const [isEditingDetailNotes, setIsEditingDetailNotes] = useState(false);
+  const [detailNotesDraft, setDetailNotesDraft] = useState("");
+  const [isSavingDetailNotes, setIsSavingDetailNotes] = useState(false);
   const [filterClinic, setFilterClinic] = useState(defaultClinicFilter);
   const [filterSpecialty, setFilterSpecialty] = useState("All");
+  const [filterStatus, setFilterStatus] = useState("All");
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!canSkipReferringClinic) {
+      return;
+    }
+
+    setForm((current) => {
+      if (current.referringClinic === userClinicName) {
+        return current;
+      }
+
+      return {
+        ...current,
+        referringClinic: userClinicName ?? ""
+      };
+    });
+
+    setStep((current) => (current < firstStep ? firstStep : current));
+  }, [canSkipReferringClinic, firstStep, userClinicName]);
 
   const save = (updated: Referral[]) => {
     setReferrals(updated);
@@ -210,6 +246,10 @@ function ReferralTracker({
   };
   const back = () => {
     setErrors({});
+    if (step === firstStep) {
+      setView("list");
+      return;
+    }
     setStep((s) => s - 1);
   };
 
@@ -247,9 +287,13 @@ function ReferralTracker({
   };
 
   const startNew = () => {
-    setForm(EMPTY_FORM);
-    setStep(0);
+    setForm({
+      ...EMPTY_FORM,
+      referringClinic: canSkipReferringClinic ? userClinicName ?? "" : ""
+    });
+    setStep(firstStep);
     setSubmitted(false);
+    setErrors({});
     setView("form");
   };
 
@@ -309,10 +353,21 @@ function ReferralTracker({
   const filtered = referrals.filter(
     (r) =>
       (filterClinic === "All" || r.referringClinic === filterClinic || r.receivingClinic === filterClinic) &&
-      (filterSpecialty === "All" || r.specialty === filterSpecialty)
+      (filterSpecialty === "All" || r.specialty === filterSpecialty) &&
+      (filterStatus === "All" || r.status === filterStatus)
   );
 
   const detailEntry = referrals.find((r) => r.id === detailId);
+
+  useEffect(() => {
+    if (!detailEntry) {
+      setIsEditingDetailNotes(false);
+      setDetailNotesDraft("");
+      return;
+    }
+
+    setDetailNotesDraft(detailEntry.notes ?? "");
+  }, [detailEntry]);
 
   const inp = (field: string, value: string) => {
     setForm((f) => {
@@ -332,6 +387,60 @@ function ReferralTracker({
       }
       return newErrors;
     });
+  };
+
+  const editDetailNotes = () => {
+    if (!detailEntry) {
+      return;
+    }
+
+    setDetailNotesDraft(detailEntry.notes ?? "");
+    setIsEditingDetailNotes(true);
+  };
+
+  const discardDetailNotesChanges = () => {
+    if (!detailEntry) {
+      return;
+    }
+
+    if (!window.confirm("Discard your notes changes?")) {
+      return;
+    }
+
+    setDetailNotesDraft(detailEntry.notes ?? "");
+    setIsEditingDetailNotes(false);
+  };
+
+  const saveDetailNotes = async () => {
+    if (!detailEntry) {
+      return;
+    }
+
+    setIsSavingDetailNotes(true);
+
+    const updatedEntry: Referral = {
+      ...detailEntry,
+      notes: detailNotesDraft.trim()
+    };
+
+    try {
+      const response = await fetch("/api/referrals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedEntry)
+      });
+
+      if (!response.ok) {
+        throw new Error("Referral notes could not be updated.");
+      }
+
+      save(referrals.map((entry) => (entry.id === detailEntry.id ? updatedEntry : entry)));
+      setIsEditingDetailNotes(false);
+    } catch (error) {
+      console.error("Failed to update referral notes", error);
+    } finally {
+      setIsSavingDetailNotes(false);
+    }
   };
 
   const inputStyle = (err?: string) => ({
@@ -468,25 +577,24 @@ function ReferralTracker({
           </div>
           <div style={{ color: "#fff", fontSize: 20, fontWeight: 700, marginBottom: 6 }}>{detailEntry.specialty}</div>
           <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>
-            Submitted {new Date(detailEntry.submittedAt).toLocaleString()}
+            Submitted {formatReferralDateTimeShort(detailEntry.date, detailEntry.time)}
           </div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
           {[
             { label: "Referring Clinic", value: detailEntry.referringClinic, icon: "🏥" },
             { label: "Receiving Clinic", value: detailEntry.receivingClinic, icon: "🎯" },
-            { label: "Status", value: detailEntry.status, icon: "📌" },
             {
-              label: "Date",
-              value: new Date(detailEntry.date + "T12:00:00").toLocaleDateString("en-US", {
+              label: "Date & Time",
+              value: `${new Date(detailEntry.date + "T12:00:00").toLocaleDateString("en-US", {
                 weekday: "long",
                 year: "numeric",
                 month: "long",
                 day: "numeric"
-              }),
+              })} at ${formatReferralTime(detailEntry.time)}`,
               icon: "📅"
             },
-            { label: "Time", value: detailEntry.time, icon: "🕐" },
+            { label: "Status", value: detailEntry.status, icon: "📌" },
             { label: "Specialty", value: detailEntry.specialty, icon: "🩺" },
             { label: "Referring Preceptor", value: detailEntry.preceptor, icon: "👨‍⚕️" }
           ].map((item) => (
@@ -510,29 +618,95 @@ function ReferralTracker({
             </div>
           ))}
         </div>
-        {detailEntry.notes && (
-          <div style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: "16px 18px" }}>
+        <div style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: "16px 18px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 10 }}>
             <div
               style={{
                 fontSize: 10.5,
                 color: "#94A3B8",
                 fontWeight: 700,
                 textTransform: "uppercase",
-                letterSpacing: 0.8,
-                marginBottom: 6
+                letterSpacing: 0.8
               }}
             >
               📝 Notes
             </div>
-            <div style={{ fontSize: 14, color: "#334155", lineHeight: 1.6 }}>{detailEntry.notes}</div>
+            {!isEditingDetailNotes ? (
+              <button
+                onClick={editDetailNotes}
+                style={{
+                  padding: "8px 12px",
+                  background: "#F8FAFC",
+                  border: "1px solid #E2E8F0",
+                  borderRadius: 8,
+                  color: "#334155",
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  cursor: "pointer"
+                }}
+              >
+                Edit
+              </button>
+            ) : (
+              <div style={{ display: "flex", gap: 8 }}>
+                <button
+                  onClick={discardDetailNotesChanges}
+                  disabled={isSavingDetailNotes}
+                  style={{
+                    padding: "8px 12px",
+                    background: "#F8FAFC",
+                    border: "1px solid #E2E8F0",
+                    borderRadius: 8,
+                    color: "#334155",
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    cursor: isSavingDetailNotes ? "default" : "pointer",
+                    opacity: isSavingDetailNotes ? 0.65 : 1
+                  }}
+                >
+                  Discard Changes
+                </button>
+                <button
+                  onClick={saveDetailNotes}
+                  disabled={isSavingDetailNotes}
+                  style={{
+                    padding: "8px 12px",
+                    background: "#0F172A",
+                    border: "none",
+                    borderRadius: 8,
+                    color: "#fff",
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    cursor: isSavingDetailNotes ? "default" : "pointer",
+                    opacity: isSavingDetailNotes ? 0.65 : 1
+                  }}
+                >
+                  {isSavingDetailNotes ? "Saving..." : "Save"}
+                </button>
+              </div>
+            )}
           </div>
-        )}
+          {isEditingDetailNotes ? (
+            <textarea
+              value={detailNotesDraft}
+              onChange={(event) => setDetailNotesDraft(event.target.value)}
+              rows={4}
+              placeholder="Add referral notes..."
+              style={{ ...inputStyle(), resize: "vertical", fontFamily: "inherit" }}
+            />
+          ) : (
+            <div style={{ fontSize: 14, color: "#334155", lineHeight: 1.6 }}>
+              {detailEntry.notes?.trim() ? detailEntry.notes : "No notes added."}
+            </div>
+          )}
+        </div>
       </div>
     );
 
   // ── FORM VIEW ──
   if (view === "form") {
-    const progress = (step / (STEPS.length - 1)) * 100;
+    const displayStep = canSkipReferringClinic ? step - 1 : step;
+    const progress = (displayStep / (visibleSteps.length - 1)) * 100;
     return (
       <div style={{ maxWidth: 600, margin: "0 auto" }}>
         {/* Progress header */}
@@ -540,12 +714,12 @@ function ReferralTracker({
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
             <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#0F172A" }}>Log a Referral</h2>
             <span style={{ fontSize: 12, color: "#94A3B8", fontWeight: 500 }}>
-              Step {step + 1} of {STEPS.length}
+              Step {displayStep + 1} of {visibleSteps.length}
             </span>
           </div>
           {/* Step pills */}
           <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" }}>
-            {STEPS.map((s, i) => (
+            {visibleSteps.map((s, i) => (
               <div
                 key={s}
                 style={{
@@ -553,12 +727,12 @@ function ReferralTracker({
                   fontWeight: 600,
                   padding: "4px 12px",
                   borderRadius: 20,
-                  background: i < step ? "#0F172A" : i === step ? "#38BDF8" : "#F1F5F9",
-                  color: i < step ? "#fff" : i === step ? "#0F172A" : "#94A3B8",
+                  background: i < displayStep ? "#0F172A" : i === displayStep ? "#38BDF8" : "#F1F5F9",
+                  color: i < displayStep ? "#fff" : i === displayStep ? "#0F172A" : "#94A3B8",
                   transition: "all 0.2s"
                 }}
               >
-                {i < step ? "✓ " : ""}
+                {i < displayStep ? "✓ " : ""}
                 {s}
               </div>
             ))}
@@ -601,6 +775,7 @@ function ReferralTracker({
                 <select
                   value={form.referringClinic}
                   onChange={(e) => inp("referringClinic", e.target.value)}
+                  disabled={canSkipReferringClinic}
                   style={selectStyle(errors.referringClinic)}
                 >
                   <option value="">— Select referring clinic —</option>
@@ -624,6 +799,11 @@ function ReferralTracker({
               </div>
               {errors.referringClinic && (
                 <div style={{ color: "#EF4444", fontSize: 12, marginTop: 6 }}>⚠ {errors.referringClinic}</div>
+              )}
+              {canSkipReferringClinic && (
+                <div style={{ color: "#64748B", fontSize: 12, marginTop: 6 }}>
+                  Your clinic is filled automatically from your account and cannot be changed.
+                </div>
               )}
             </div>
           )}
@@ -803,7 +983,7 @@ function ReferralTracker({
 
           {/* Navigation */}
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 28, gap: 10 }}>
-            {step > 0 ? (
+            {step > firstStep ? (
               <button
                 onClick={back}
                 style={{
@@ -893,8 +1073,11 @@ function ReferralTracker({
         </div>
         <button
           onClick={() => {
-            setForm(EMPTY_FORM);
-            setStep(0);
+            setForm({
+              ...EMPTY_FORM,
+              referringClinic: canSkipReferringClinic ? userClinicName ?? "" : ""
+            });
+            setStep(firstStep);
             setErrors({});
             setView("form");
           }}
@@ -1015,11 +1198,47 @@ function ReferralTracker({
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </div>
-          {(filterClinic !== defaultClinicFilter || filterSpecialty !== "All") && (
+          <div style={{ position: "relative" }}>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              style={{
+                padding: "7px 28px 7px 12px",
+                border: "1.5px solid #E2E8F0",
+                borderRadius: 8,
+                background: "#fff",
+                color: "#334155",
+                fontSize: 12.5,
+                cursor: "pointer",
+                outline: "none",
+                appearance: "none"
+              }}
+            >
+              <option value="All">Status</option>
+              {REFERRAL_STATUSES.map((status) => (
+                <option key={status} value={status}>
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </option>
+              ))}
+            </select>
+            <svg
+              style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
+              width="12"
+              height="12"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="#94A3B8"
+              strokeWidth="2.5"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+          {(filterClinic !== defaultClinicFilter || filterSpecialty !== "All" || filterStatus !== "All") && (
             <button
               onClick={() => {
                 setFilterClinic(defaultClinicFilter);
                 setFilterSpecialty("All");
+                setFilterStatus("All");
               }}
               style={{
                 padding: "7px 12px",
