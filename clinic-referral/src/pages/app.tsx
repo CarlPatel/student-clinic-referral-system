@@ -64,15 +64,19 @@ export const getServerSideProps = withIronSessionSsr<AppPageProps>(
       getReferrals()
     ]);
 
+    const userRole = context.req.session.role || "clinic_member";
+    const userClinicName = context.req.session.clinicKey ? appData.clinics[context.req.session.clinicKey]?.name : undefined;
+    const visibleReferrals = initialReferrals.filter((referral) => canAccessReferral(referral, userRole, userClinicName));
+
     return {
       props: {
         username: context.req.session.username || "User",
         userId: context.req.session.userId || "",
-        role: context.req.session.role || "clinic_member",
+        role: userRole,
         clinicKey: context.req.session.clinicKey || "",
         clinics: appData.clinics,
         specialtiesData: appData.specialtiesData,
-        initialReferrals
+        initialReferrals: visibleReferrals
       }
     };
   },
@@ -103,6 +107,18 @@ const ROLE_LABELS: Record<UserRole, string> = {
 };
 
 const ROLE_OPTIONS: UserRole[] = ["clinic_member", "clinic_admin", "master_admin"];
+
+function canAccessReferral(referral: Referral, role: UserRole, clinicName?: string) {
+  if (role === "master_admin") {
+    return true;
+  }
+
+  if (!clinicName) {
+    return false;
+  }
+
+  return referral.referringClinic === clinicName || referral.receivingClinic === clinicName;
+}
 
 // ─── HELPER COMPONENTS ──────────────────────────────────────────────────────
 function DocIcon({ type }: { type: "form" | "auth" | "insurance" }) {
@@ -137,11 +153,15 @@ function DocIcon({ type }: { type: "form" | "auth" | "insurance" }) {
 function ReferralTracker({
   clinics,
   specialtiesData,
-  initialReferrals
+  initialReferrals,
+  role,
+  userClinicName
 }: {
   clinics: Record<string, ClinicInfo>;
   specialtiesData: Record<string, SpecialtyData>;
   initialReferrals: Referral[];
+  role: UserRole;
+  userClinicName?: string;
 }) {
   const CLINICS = clinics;
   const SPECIALTIES_DATA = specialtiesData;
@@ -196,17 +216,22 @@ function ReferralTracker({
     
     // Save to database via API
     try {
-      await fetch("/api/referrals", {
+      const response = await fetch("/api/referrals", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(entry)
       });
+
+      if (!response.ok) {
+        throw new Error("Referral could not be saved.");
+      }
     } catch (error) {
       console.error("Failed to save referral to database", error);
+      return;
     }
     
     // Save to state and localStorage
-    const updated = [entry, ...referrals];
+    const updated = [entry, ...referrals].filter((referral) => canAccessReferral(referral, role, userClinicName));
     save(updated);
     setSubmitted(true);
   };
@@ -221,11 +246,16 @@ function ReferralTracker({
   const deleteReferral = async (id: number) => {
     // Delete from database via API
     try {
-      await fetch(`/api/referrals?id=${id}`, {
+      const response = await fetch(`/api/referrals?id=${id}`, {
         method: "DELETE"
       });
+
+      if (!response.ok) {
+        throw new Error("Referral could not be deleted.");
+      }
     } catch (error) {
       console.error("Failed to delete referral from database", error);
+      return;
     }
     
     // Remove from state and localStorage
@@ -1567,7 +1597,7 @@ function UserManagement({
 }
 
 // ─── MAIN APP COMPONENT ─────────────────────────────────────────────────────
-export default function ClinicReferralApp({ username, userId, role, clinics, specialtiesData, initialReferrals }: AppPageProps) {
+export default function ClinicReferralApp({ username, userId, role, clinicKey, clinics, specialtiesData, initialReferrals }: AppPageProps) {
   const CLINICS = clinics;
   const SPECIALTIES_DATA = specialtiesData;
   const specialties = Object.keys(SPECIALTIES_DATA);
@@ -1954,7 +1984,13 @@ export default function ClinicReferralApp({ username, userId, role, clinics, spe
                 </div>
               </header>
               <div style={{ flex: 1, overflowY: "auto", padding: "24px 28px" }}>
-                <ReferralTracker clinics={CLINICS} specialtiesData={SPECIALTIES_DATA} initialReferrals={initialReferrals} />
+                <ReferralTracker
+                  clinics={CLINICS}
+                  specialtiesData={SPECIALTIES_DATA}
+                  initialReferrals={initialReferrals}
+                  role={role}
+                  userClinicName={clinicKey ? CLINICS[clinicKey]?.name : undefined}
+                />
               </div>
             </>
           )}
