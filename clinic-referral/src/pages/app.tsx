@@ -168,7 +168,15 @@ function ReferralTracker({
   const SPECIALTIES_DATA = specialtiesData;
   const CLINIC_NAMES = Object.values(CLINICS).map((c) => c.name);
   const SPECIALTY_LIST = Object.keys(SPECIALTIES_DATA);
+  const defaultClinicFilter = role === "master_admin" ? "All" : userClinicName ?? "All";
   const getSpecialtyIcon = (specialty: string) => SPECIALTIES_DATA[specialty]?.icon ?? "🏥";
+  const formatReferralTime = (time: string) => {
+    const parsed = new Date(`1970-01-01T${time}`);
+    if (Number.isNaN(parsed.getTime())) {
+      return time;
+    }
+    return parsed.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+  };
 
   const [referrals, setReferrals] = useState<Referral[]>(initialReferrals);
   const [view, setView] = useState<"list" | "form" | "detail">("list");
@@ -176,7 +184,7 @@ function ReferralTracker({
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [detailId, setDetailId] = useState<number | null>(null);
-  const [filterClinic, setFilterClinic] = useState("All");
+  const [filterClinic, setFilterClinic] = useState(defaultClinicFilter);
   const [filterSpecialty, setFilterSpecialty] = useState("All");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -1007,10 +1015,10 @@ function ReferralTracker({
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </div>
-          {(filterClinic !== "All" || filterSpecialty !== "All") && (
+          {(filterClinic !== defaultClinicFilter || filterSpecialty !== "All") && (
             <button
               onClick={() => {
-                setFilterClinic("All");
+                setFilterClinic(defaultClinicFilter);
                 setFilterSpecialty("All");
               }}
               style={{
@@ -1065,14 +1073,14 @@ function ReferralTracker({
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr 120px 1fr 110px 120px 56px",
+              gridTemplateColumns: "110px 1fr 1fr 1fr 120px 120px 56px",
               padding: "10px 18px",
               background: "#F8FAFC",
               borderBottom: "1px solid #E2E8F0",
               gap: 8
             }}
           >
-            {["Referring Clinic", "Receiving Clinic", "Specialty", "Status", "Date", "Preceptor", ""].map((h) => (
+            {["Date", "Referring Clinic", "Receiving Clinic", "Specialty", "Preceptor", "Status", ""].map((h) => (
               <div
                 key={h}
                 style={{ fontSize: 10.5, fontWeight: 700, color: "#94A3B8", textTransform: "uppercase", letterSpacing: 0.8 }}
@@ -1086,7 +1094,7 @@ function ReferralTracker({
               key={r.id}
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr 120px 1fr 110px 120px 56px",
+                gridTemplateColumns: "110px 1fr 1fr 1fr 120px 120px 56px",
                 padding: "13px 18px",
                 borderBottom: i < filtered.length - 1 ? "1px solid #F1F5F9" : "none",
                 alignItems: "center",
@@ -1096,6 +1104,10 @@ function ReferralTracker({
               onMouseEnter={(e) => (e.currentTarget.style.background = "#F8FAFC")}
               onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
             >
+              <div style={{ fontSize: 12, color: "#64748B" }}>
+                {new Date(r.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 1 }}>{formatReferralTime(r.time)}</div>
+              </div>
               <div style={{ fontSize: 12.5, color: "#0F172A", fontWeight: 500 }}>{r.referringClinic}</div>
               <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
                 <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="#38BDF8" strokeWidth="2.5">
@@ -1107,7 +1119,10 @@ function ReferralTracker({
                 <span style={{ fontSize: 13 }}>{getSpecialtyIcon(r.specialty)}</span>
                 <span style={{ fontSize: 12, color: "#334155" }}>{r.specialty}</span>
               </div>
-                            <div>
+              <div style={{ fontSize: 12, color: "#334155", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {r.preceptor}
+              </div>
+              <div>
                 <select
                   value={r.status}
                   onChange={(event) => void updateReferralStatus(r.id, event.target.value as Referral["status"])}
@@ -1126,15 +1141,8 @@ function ReferralTracker({
                     <option key={status} value={status}>
                       {status.charAt(0).toUpperCase() + status.slice(1)}
                     </option>
-                  ))}
+                    ))}
                 </select>
-              </div>
-              <div style={{ fontSize: 12, color: "#64748B" }}>
-                {new Date(r.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 1 }}>{r.time}</div>
-              </div>
-              <div style={{ fontSize: 12, color: "#334155", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {r.preceptor}
               </div>
               <div style={{ display: "flex", gap: 6 }}>
                 <button
