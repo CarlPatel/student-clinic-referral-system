@@ -1561,6 +1561,7 @@ function UserManagement({
     role: "" as UserRole | "",
     clinicKey: ""
   });
+  const allClinicsValue = "__all_clinics__";
   const managementSelectStyle = {
     padding: "9px 11px",
     borderRadius: 9,
@@ -1693,7 +1694,7 @@ function UserManagement({
                 className="management-input"
                 value={form.username}
                 onChange={(event) => setForm((current) => ({ ...current, username: event.target.value }))}
-                placeholder="username"
+                placeholder="Username"
                 style={{
                   width: "100%",
                   boxSizing: "border-box",
@@ -1730,7 +1731,19 @@ function UserManagement({
               <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#334155", marginBottom: 6 }}>Role</label>
               <select
                 value={form.role}
-                onChange={(event) => setForm((current) => ({ ...current, role: event.target.value as UserRole | "" }))}
+                onChange={(event) =>
+                  setForm((current) => {
+                    const nextRole = event.target.value as UserRole | "";
+                    return {
+                      ...current,
+                      role: nextRole,
+                      clinicKey:
+                        nextRole === "master_admin"
+                          ? ""
+                          : current.clinicKey || clinicOptions[0]?.key || ""
+                    };
+                  })
+                }
                 style={{
                   width: "100%",
                   boxSizing: "border-box",
@@ -1756,7 +1769,8 @@ function UserManagement({
             <div>
               <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#334155", marginBottom: 6 }}>Clinic</label>
               <select
-                value={form.clinicKey}
+                value={form.role === "master_admin" ? allClinicsValue : form.clinicKey}
+                disabled={form.role === "master_admin"}
                 onChange={(event) => setForm((current) => ({ ...current, clinicKey: event.target.value }))}
                 style={{
                   width: "100%",
@@ -1765,13 +1779,18 @@ function UserManagement({
                   borderRadius: 10,
                   border: "1.5px solid #E2E8F0",
                   fontSize: 13.5,
-                  background: "#fff",
-                  color: form.clinicKey ? "#0F172A" : "#64748B"
+                  background: form.role === "master_admin" ? "#F8FAFC" : "#fff",
+                  color: form.role === "master_admin" || form.clinicKey ? "#0F172A" : "#64748B",
+                  cursor: form.role === "master_admin" ? "not-allowed" : "pointer"
                 }}
               >
-                <option value="" disabled>
-                  Select a clinic
-                </option>
+                {form.role === "master_admin" ? (
+                  <option value={allClinicsValue}>All clinics</option>
+                ) : (
+                  <option value="" disabled>
+                    Select a clinic
+                  </option>
+                )}
                 {clinicOptions.map((clinic) => (
                   <option key={clinic.key} value={clinic.key}>
                     {clinic.name}
@@ -1891,7 +1910,14 @@ function UserManagement({
 
                   <select
                     value={user.role}
-                    onChange={(event) => void updateAccess(user.id, event.target.value as UserRole, user.clinicKey)}
+                    onChange={(event) => {
+                      const nextRole = event.target.value as UserRole;
+                      void updateAccess(
+                        user.id,
+                        nextRole,
+                        nextRole === "master_admin" ? "" : user.clinicKey || clinicOptions[0]?.key || ""
+                      );
+                    }}
                     style={managementSelectStyle}
                   >
                     {ROLE_OPTIONS.map((role) => (
@@ -1902,10 +1928,17 @@ function UserManagement({
                   </select>
 
                   <select
-                    value={user.clinicKey}
+                    value={user.role === "master_admin" ? allClinicsValue : user.clinicKey}
+                    disabled={user.role === "master_admin"}
                     onChange={(event) => void updateAccess(user.id, user.role, event.target.value)}
-                    style={managementSelectStyle}
+                    style={{
+                      ...managementSelectStyle,
+                      background: user.role === "master_admin" ? "#F8FAFC" : "#fff",
+                      color: "#0F172A",
+                      cursor: user.role === "master_admin" ? "not-allowed" : "pointer"
+                    }}
                   >
+                    {user.role === "master_admin" && <option value={allClinicsValue}>All clinics</option>}
                     {clinicOptions.map((clinic) => (
                       <option key={clinic.key} value={clinic.key}>
                         {clinic.name}

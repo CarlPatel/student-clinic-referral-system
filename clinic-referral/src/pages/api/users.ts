@@ -51,11 +51,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<UsersResponse>)
         clinicKey?: string;
       };
 
-      if (typeof username !== "string" || typeof password !== "string" || !isRole(role) || !(await isValidClinicKey(clinicKey))) {
+      const clinicRequired = role !== "master_admin";
+      const hasValidClinic = clinicRequired ? await isValidClinicKey(clinicKey) : true;
+
+      if (typeof username !== "string" || typeof password !== "string" || !isRole(role) || !hasValidClinic) {
         return res.status(400).json({ ok: false, message: "Username, password, role, and clinic are required" });
       }
 
-      const normalizedClinicKey = typeof clinicKey === "string" ? clinicKey.trim() : "";
+      const normalizedClinicKey = role === "master_admin" ? "" : typeof clinicKey === "string" ? clinicKey.trim() : "";
       const user = await createUser({ username, password, role, clinicKey: normalizedClinicKey });
       const users = await listUsers();
       return res.status(201).json({ ok: true, user, users });
@@ -64,11 +67,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<UsersResponse>)
     if (req.method === "PATCH") {
       const { userId, role, clinicKey } = (req.body ?? {}) as { userId?: string; role?: UserRole; clinicKey?: string };
 
-      if (typeof userId !== "string" || !isRole(role) || !(await isValidClinicKey(clinicKey))) {
+      const clinicRequired = role !== "master_admin";
+      const hasValidClinic = clinicRequired ? await isValidClinicKey(clinicKey) : true;
+
+      if (typeof userId !== "string" || !isRole(role) || !hasValidClinic) {
         return res.status(400).json({ ok: false, message: "User ID, role, and clinic are required" });
       }
 
-      const normalizedClinicKey = typeof clinicKey === "string" ? clinicKey.trim() : "";
+      const normalizedClinicKey = role === "master_admin" ? "" : typeof clinicKey === "string" ? clinicKey.trim() : "";
       const user = await updateUserAccess(userId, role, normalizedClinicKey);
       if (userId === req.session.userId) {
         req.session.role = user.role;
