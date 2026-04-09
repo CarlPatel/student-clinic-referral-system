@@ -113,6 +113,8 @@ const ROLE_LABELS: Record<UserRole, string> = {
 
 const ROLE_OPTIONS: UserRole[] = ["clinic_member", "clinic_admin", "master_admin"];
 const REFERRAL_STATUSES: Referral["status"][] = ["sent", "received", "scheduled", "completed"];
+let lastSecond = -1;
+let sequence = 0;
 
 function canAccessReferral(referral: Referral, role: UserRole, clinicName?: string) {
   if (role === "master_admin") {
@@ -195,14 +197,20 @@ function ReferralTracker({
     return parsed.toLocaleString("en-US");
   };
   const generateReferralId = () => {
-    const usedIds = new Set(referrals.map((entry) => entry.id));
-    let nextId = Math.floor(Date.now() / 1000);
+    const currentSecond = Math.floor(Date.now() / 1000) % 1_000_000_000;
 
-    while (usedIds.has(nextId)) {
-      nextId += 1;
+    if (currentSecond === lastSecond) {
+      sequence += 1;
+    } else {
+      lastSecond = currentSecond;
+      sequence = 0;
     }
 
-    return nextId;
+    if (sequence > 9) {
+      throw new Error("Too many IDs generated in the same second");
+    }
+
+    return Number(`${currentSecond}${sequence}`);
   };
 
   const [referrals, setReferrals] = useState<Referral[]>(initialReferrals);
