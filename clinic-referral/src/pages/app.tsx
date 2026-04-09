@@ -194,6 +194,16 @@ function ReferralTracker({
     }
     return parsed.toLocaleString("en-US");
   };
+  const generateReferralId = () => {
+    const usedIds = new Set(referrals.map((entry) => entry.id));
+    let nextId = Math.floor(Date.now() / 1000);
+
+    while (usedIds.has(nextId)) {
+      nextId += 1;
+    }
+
+    return nextId;
+  };
 
   const [referrals, setReferrals] = useState<Referral[]>(initialReferrals);
   const [view, setView] = useState<"list" | "form" | "detail">("list");
@@ -204,6 +214,7 @@ function ReferralTracker({
   const [step, setStep] = useState(firstStep);
   const [submitted, setSubmitted] = useState(false);
   const [detailId, setDetailId] = useState<number | null>(null);
+  const [pendingDeleteReferral, setPendingDeleteReferral] = useState<Referral | null>(null);
   const [isEditingDetailNotes, setIsEditingDetailNotes] = useState(false);
   const [detailNotesDraft, setDetailNotesDraft] = useState("");
   const [isSavingDetailNotes, setIsSavingDetailNotes] = useState(false);
@@ -296,7 +307,7 @@ function ReferralTracker({
     const now = new Date();
     const entry: Referral = { 
       ...form, 
-      id: Date.now(), 
+      id: generateReferralId(), 
       date: now.toISOString().split('T')[0], 
       time: now.toTimeString().split(' ')[0].substring(0, 5),
       status: "sent",
@@ -1325,14 +1336,14 @@ function ReferralTracker({
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "110px 1fr 1fr 1fr 120px 120px 56px",
+              gridTemplateColumns: "100px 110px 1fr 1fr 1fr 120px 120px 56px",
               padding: "10px 18px",
               background: "#F8FAFC",
               borderBottom: "1px solid #E2E8F0",
               gap: 8
             }}
           >
-            {["Date", "Referring Clinic", "Receiving Clinic", "Specialty", "Preceptor", "Status", ""].map((h) => (
+            {["Record #", "Date", "Referring Clinic", "Receiving Clinic", "Specialty", "Preceptor", "Status", ""].map((h) => (
               <div
                 key={h}
                 style={{ fontSize: 10.5, fontWeight: 700, color: "#94A3B8", textTransform: "uppercase", letterSpacing: 0.8 }}
@@ -1346,7 +1357,7 @@ function ReferralTracker({
               key={r.id}
               style={{
                 display: "grid",
-                gridTemplateColumns: "110px 1fr 1fr 1fr 120px 120px 56px",
+                gridTemplateColumns: "100px 110px 1fr 1fr 1fr 120px 120px 56px",
                 padding: "13px 18px",
                 borderBottom: i < filtered.length - 1 ? "1px solid #F1F5F9" : "none",
                 alignItems: "center",
@@ -1356,6 +1367,7 @@ function ReferralTracker({
               onMouseEnter={(e) => (e.currentTarget.style.background = "#F8FAFC")}
               onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
             >
+              <div style={{ fontSize: 11, fontFamily: "monospace", color: "#334155", fontWeight: 500}}>#{r.id}</div>
               <div style={{ fontSize: 12, color: "#64748B" }}>
                 {new Date(r.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                 <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 1 }}>{formatReferralTime(r.time)}</div>
@@ -1422,7 +1434,7 @@ function ReferralTracker({
                   </svg>
                 </button>
                 <button
-                  onClick={() => deleteReferral(r.id)}
+                  onClick={() => setPendingDeleteReferral(r)}
                   title="Delete"
                   style={{
                     background: "#FEF2F2",
@@ -1452,6 +1464,73 @@ function ReferralTracker({
           No referrals match the current filters.
         </div>
       )}
+
+      {pendingDeleteReferral ? (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(15,23,42,0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 20,
+            zIndex: 50
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: 440,
+              background: "#fff",
+              borderRadius: 16,
+              padding: 24,
+              boxShadow: "0 20px 40px rgba(15,23,42,0.2)"
+            }}
+          >
+            <h3 style={{ margin: "0 0 8px", fontSize: 18, fontWeight: 800, color: "#0F172A" }}>Delete referral?</h3>
+            <p style={{ margin: "0 0 20px", fontSize: 13.5, color: "#475569", lineHeight: 1.6 }}>
+              Remove referral <strong>#{pendingDeleteReferral.id}</strong> from <strong>{pendingDeleteReferral.referringClinic}</strong> to{" "}
+              <strong>{pendingDeleteReferral.receivingClinic}</strong>. This action cannot be undone.
+            </p>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+              <button
+                onClick={() => setPendingDeleteReferral(null)}
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: 10,
+                  border: "1px solid #CBD5E1",
+                  background: "#fff",
+                  color: "#334155",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer"
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  void deleteReferral(pendingDeleteReferral.id);
+                  setPendingDeleteReferral(null);
+                }}
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: 10,
+                  border: "none",
+                  background: "#DC2626",
+                  color: "#fff",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: "pointer"
+                }}
+              >
+                Confirm delete
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
