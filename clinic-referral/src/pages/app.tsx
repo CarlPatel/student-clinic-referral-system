@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import type { GetServerSideProps } from "next";
+import Link from "next/link";
 import { withIronSessionSsr } from "iron-session/next";
 import { getSessionOptions } from "@/lib/auth/session";
-import { getAppData, getReferrals, saveReferral, type Referral } from "@/lib/dataSource/postgres";
+import { getAppData, getReferrals, type Referral } from "@/lib/dataSource/postgres";
 import Head from "next/head";
+import type { AppUser, UserRole } from "@/lib/types";
 
 // ─── TYPES ──────────────────────────────────────────────────────────────────
 type ClinicInfo = {
@@ -37,9 +38,17 @@ type SpecialtyData = {
 
 type AppPageProps = {
   username: string;
+  userId: string;
+  role: UserRole;
+  clinicKey: string;
   clinics: Record<string, ClinicInfo>;
   specialtiesData: Record<string, SpecialtyData>;
   initialReferrals: Referral[];
+};
+
+type ReferralFormDraft = {
+  receivingClinic?: string;
+  specialty?: string;
 };
 
 // ─── SERVER SIDE PROPS ──────────────────────────────────────────────────────
@@ -60,12 +69,19 @@ export const getServerSideProps = withIronSessionSsr<AppPageProps>(
       getReferrals()
     ]);
 
+    const userRole = context.req.session.role || "clinic_member";
+    const userClinicName = context.req.session.clinicKey ? appData.clinics[context.req.session.clinicKey]?.name : undefined;
+    const visibleReferrals = initialReferrals.filter((referral) => canAccessReferral(referral, userRole, userClinicName));
+
     return {
       props: {
         username: context.req.session.username || "User",
+        userId: context.req.session.userId || "",
+        role: userRole,
+        clinicKey: context.req.session.clinicKey || "",
         clinics: appData.clinics,
         specialtiesData: appData.specialtiesData,
-        initialReferrals
+        initialReferrals: visibleReferrals
       }
     };
   },
@@ -88,6 +104,29 @@ const EMPTY_FORM = {
 };
 
 const STEPS = ["Referring Clinic", "Specialty", "Receiving Clinic", "Preceptor", "Review"];
+
+const ROLE_LABELS: Record<UserRole, string> = {
+  clinic_member: "Clinic member",
+  clinic_admin: "Clinic admin",
+  master_admin: "Master admin"
+};
+
+const ROLE_OPTIONS: UserRole[] = ["clinic_member", "clinic_admin", "master_admin"];
+const REFERRAL_STATUSES: Referral["status"][] = ["sent", "received", "scheduled", "completed"];
+let lastSecond = -1;
+let sequence = 0;
+
+function canAccessReferral(referral: Referral, role: UserRole, clinicName?: string) {
+  if (role === "master_admin") {
+    return true;
+  }
+
+  if (!clinicName) {
+    return false;
+  }
+
+  return referral.referringClinic === clinicName || referral.receivingClinic === clinicName;
+}
 
 // ─── HELPER COMPONENTS ──────────────────────────────────────────────────────
 function DocIcon({ type }: { type: "form" | "auth" | "insurance" }) {
@@ -122,26 +161,126 @@ function DocIcon({ type }: { type: "form" | "auth" | "insurance" }) {
 function ReferralTracker({
   clinics,
   specialtiesData,
-  initialReferrals
+  initialReferrals,
+  role,
+  userClinicName,
+  launchDraft
 }: {
   clinics: Record<string, ClinicInfo>;
   specialtiesData: Record<string, SpecialtyData>;
   initialReferrals: Referral[];
+  role: UserRole;
+  userClinicName?: string;
+  launchDraft?: ReferralFormDraft | null;
 }) {
   const CLINICS = clinics;
   const SPECIALTIES_DATA = specialtiesData;
   const CLINIC_NAMES = Object.values(CLINICS).map((c) => c.name);
   const SPECIALTY_LIST = Object.keys(SPECIALTIES_DATA);
+  const canSkipReferringClinic = (role === "clinic_admin" || role === "clinic_member") && Boolean(userClinicName);
+  const firstStep = canSkipReferringClinic ? 1 : 0;
+  const visibleSteps = canSkipReferringClinic ? STEPS.slice(1) : STEPS;
+  const defaultClinicFilter = role === "master_admin" ? "All" : userClinicName ?? "All";
+  const getSpecialtyIcon = (specialty: string) => SPECIALTIES_DATA[specialty]?.icon ?? "🏥";
+  const formatReferralTime = (time: string) => {
+    const parsed = new Date(`1970-01-01T${time}`);
+    if (Number.isNaN(parsed.getTime())) {
+      return time;
+    }
+    return parsed.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+  };
+  const formatReferralDateTimeShort = (date: string, time: string) => {
+    const parsed = new Date(`${date}T${time}`);
+    if (Number.isNaN(parsed.getTime())) {
+      return `${date}, ${time}`;
+    }
+    return parsed.toLocaleString("en-US");
+  };
+  const generateReferralId = () => {
+    const currentSecond = Math.floor(Date.now() / 1000) % 1_000_000_000;
+
+    if (currentSecond === lastSecond) {
+      sequence += 1;
+    } else {
+      lastSecond = currentSecond;
+      sequence = 0;
+    }
+
+    if (sequence > 9) {
+      throw new Error("Too many IDs generated in the same second");
+    }
+
+    return Number(`${currentSecond}${sequence}`);
+  };
 
   const [referrals, setReferrals] = useState<Referral[]>(initialReferrals);
   const [view, setView] = useState<"list" | "form" | "detail">("list");
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [step, setStep] = useState(0);
+  const [form, setForm] = useState(() => ({
+    ...EMPTY_FORM,
+    referringClinic: canSkipReferringClinic ? userClinicName ?? "" : ""
+  }));
+  const [step, setStep] = useState(firstStep);
   const [submitted, setSubmitted] = useState(false);
   const [detailId, setDetailId] = useState<number | null>(null);
-  const [filterClinic, setFilterClinic] = useState("All");
+  const [pendingDeleteReferral, setPendingDeleteReferral] = useState<Referral | null>(null);
+  const [isEditingDetailNotes, setIsEditingDetailNotes] = useState(false);
+  const [detailNotesDraft, setDetailNotesDraft] = useState("");
+  const [isSavingDetailNotes, setIsSavingDetailNotes] = useState(false);
+  const [filterClinic, setFilterClinic] = useState(defaultClinicFilter);
   const [filterSpecialty, setFilterSpecialty] = useState("All");
+  const [filterStatus, setFilterStatus] = useState("All");
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const buildInitialForm = (draft?: ReferralFormDraft | null) => ({
+    ...EMPTY_FORM,
+    referringClinic: canSkipReferringClinic ? userClinicName ?? "" : "",
+    specialty: draft?.specialty ?? "",
+    receivingClinic: draft?.receivingClinic ?? ""
+  });
+
+  useEffect(() => {
+    if (!canSkipReferringClinic) {
+      return;
+    }
+
+    setForm((current) => {
+      if (current.referringClinic === userClinicName) {
+        return current;
+      }
+
+      return {
+        ...current,
+        referringClinic: userClinicName ?? ""
+      };
+    });
+
+    setStep((current) => (current < firstStep ? firstStep : current));
+  }, [canSkipReferringClinic, firstStep, userClinicName]);
+
+  useEffect(() => {
+    if (!launchDraft) {
+      return;
+    }
+
+    setForm({
+      ...EMPTY_FORM,
+      referringClinic: canSkipReferringClinic ? userClinicName ?? "" : "",
+      specialty: launchDraft.specialty ?? "",
+      receivingClinic: launchDraft.receivingClinic ?? ""
+    });
+    setStep(
+      !canSkipReferringClinic
+        ? 0
+        : launchDraft.specialty && launchDraft.receivingClinic
+          ? 3
+          : launchDraft.specialty
+            ? 2
+            : firstStep
+    );
+    setSubmitted(false);
+    setErrors({});
+    setView("form");
+  }, [canSkipReferringClinic, firstStep, launchDraft, userClinicName]);
 
   const save = (updated: Referral[]) => {
     setReferrals(updated);
@@ -165,6 +304,10 @@ function ReferralTracker({
   };
   const back = () => {
     setErrors({});
+    if (step === firstStep) {
+      setView("list");
+      return;
+    }
     setStep((s) => s - 1);
   };
 
@@ -172,57 +315,114 @@ function ReferralTracker({
     const now = new Date();
     const entry: Referral = { 
       ...form, 
-      id: Date.now(), 
+      id: generateReferralId(), 
       date: now.toISOString().split('T')[0], 
       time: now.toTimeString().split(' ')[0].substring(0, 5),
+      status: "sent",
       submittedAt: now.toISOString() 
     } as Referral;
     
     // Save to database via API
     try {
-      await fetch("/api/referrals", {
+      const response = await fetch("/api/referrals", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(entry)
       });
+
+      if (!response.ok) {
+        throw new Error("Referral could not be saved.");
+      }
     } catch (error) {
       console.error("Failed to save referral to database", error);
+      return;
     }
     
     // Save to state and localStorage
-    const updated = [entry, ...referrals];
+    const updated = [entry, ...referrals].filter((referral) => canAccessReferral(referral, role, userClinicName));
     save(updated);
     setSubmitted(true);
   };
 
   const startNew = () => {
-    setForm(EMPTY_FORM);
-    setStep(0);
+    setForm(buildInitialForm());
+    setStep(firstStep);
     setSubmitted(false);
+    setErrors({});
     setView("form");
   };
 
   const deleteReferral = async (id: number) => {
     // Delete from database via API
     try {
-      await fetch(`/api/referrals?id=${id}`, {
+      const response = await fetch(`/api/referrals?id=${id}`, {
         method: "DELETE"
       });
+
+      if (!response.ok) {
+        throw new Error("Referral could not be deleted.");
+      }
     } catch (error) {
       console.error("Failed to delete referral from database", error);
+      return;
     }
     
     // Remove from state and localStorage
     save(referrals.filter((r) => r.id !== id));
   };
 
+  const updateReferralStatus = async (id: number, status: Referral["status"]) => {
+    const referral = referrals.find((entry) => entry.id === id);
+
+    if (!referral) {
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/referrals", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status })
+      });
+
+      if (!response.ok) {
+        throw new Error("Referral status could not be updated.");
+      }
+    } catch (error) {
+      console.error("Failed to update referral status", error);
+      return;
+    }
+
+    save(
+      referrals.map((entry) =>
+        entry.id === id
+          ? {
+              ...entry,
+              status
+            }
+          : entry
+      )
+    );
+  };
+
   const filtered = referrals.filter(
     (r) =>
       (filterClinic === "All" || r.referringClinic === filterClinic || r.receivingClinic === filterClinic) &&
-      (filterSpecialty === "All" || r.specialty === filterSpecialty)
+      (filterSpecialty === "All" || r.specialty === filterSpecialty) &&
+      (filterStatus === "All" || r.status === filterStatus)
   );
 
   const detailEntry = referrals.find((r) => r.id === detailId);
+
+  useEffect(() => {
+    if (!detailEntry) {
+      setIsEditingDetailNotes(false);
+      setDetailNotesDraft("");
+      return;
+    }
+
+    setDetailNotesDraft(detailEntry.notes ?? "");
+  }, [detailEntry]);
 
   const inp = (field: string, value: string) => {
     setForm((f) => {
@@ -242,6 +442,60 @@ function ReferralTracker({
       }
       return newErrors;
     });
+  };
+
+  const editDetailNotes = () => {
+    if (!detailEntry) {
+      return;
+    }
+
+    setDetailNotesDraft(detailEntry.notes ?? "");
+    setIsEditingDetailNotes(true);
+  };
+
+  const discardDetailNotesChanges = () => {
+    if (!detailEntry) {
+      return;
+    }
+
+    if (!window.confirm("Discard your notes changes?")) {
+      return;
+    }
+
+    setDetailNotesDraft(detailEntry.notes ?? "");
+    setIsEditingDetailNotes(false);
+  };
+
+  const saveDetailNotes = async () => {
+    if (!detailEntry) {
+      return;
+    }
+
+    setIsSavingDetailNotes(true);
+
+    const updatedEntry: Referral = {
+      ...detailEntry,
+      notes: detailNotesDraft.trim()
+    };
+
+    try {
+      const response = await fetch("/api/referrals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedEntry)
+      });
+
+      if (!response.ok) {
+        throw new Error("Referral notes could not be updated.");
+      }
+
+      save(referrals.map((entry) => (entry.id === detailEntry.id ? updatedEntry : entry)));
+      setIsEditingDetailNotes(false);
+    } catch (error) {
+      console.error("Failed to update referral notes", error);
+    } finally {
+      setIsSavingDetailNotes(false);
+    }
   };
 
   const inputStyle = (err?: string) => ({
@@ -378,7 +632,7 @@ function ReferralTracker({
           </div>
           <div style={{ color: "#fff", fontSize: 20, fontWeight: 700, marginBottom: 6 }}>{detailEntry.specialty}</div>
           <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>
-            Submitted {new Date(detailEntry.submittedAt).toLocaleString()}
+            Submitted {formatReferralDateTimeShort(detailEntry.date, detailEntry.time)}
           </div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
@@ -386,16 +640,16 @@ function ReferralTracker({
             { label: "Referring Clinic", value: detailEntry.referringClinic, icon: "🏥" },
             { label: "Receiving Clinic", value: detailEntry.receivingClinic, icon: "🎯" },
             {
-              label: "Date",
-              value: new Date(detailEntry.date + "T12:00:00").toLocaleDateString("en-US", {
+              label: "Date & Time",
+              value: `${new Date(detailEntry.date + "T12:00:00").toLocaleDateString("en-US", {
                 weekday: "long",
                 year: "numeric",
                 month: "long",
                 day: "numeric"
-              }),
+              })} at ${formatReferralTime(detailEntry.time)}`,
               icon: "📅"
             },
-            { label: "Time", value: detailEntry.time, icon: "🕐" },
+            { label: "Status", value: detailEntry.status, icon: "📌" },
             { label: "Specialty", value: detailEntry.specialty, icon: "🩺" },
             { label: "Referring Preceptor", value: detailEntry.preceptor, icon: "👨‍⚕️" }
           ].map((item) => (
@@ -419,29 +673,95 @@ function ReferralTracker({
             </div>
           ))}
         </div>
-        {detailEntry.notes && (
-          <div style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: "16px 18px" }}>
+        <div style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: "16px 18px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 10 }}>
             <div
               style={{
                 fontSize: 10.5,
                 color: "#94A3B8",
                 fontWeight: 700,
                 textTransform: "uppercase",
-                letterSpacing: 0.8,
-                marginBottom: 6
+                letterSpacing: 0.8
               }}
             >
               📝 Notes
             </div>
-            <div style={{ fontSize: 14, color: "#334155", lineHeight: 1.6 }}>{detailEntry.notes}</div>
+            {!isEditingDetailNotes ? (
+              <button
+                onClick={editDetailNotes}
+                style={{
+                  padding: "8px 12px",
+                  background: "#F8FAFC",
+                  border: "1px solid #E2E8F0",
+                  borderRadius: 8,
+                  color: "#334155",
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  cursor: "pointer"
+                }}
+              >
+                Edit
+              </button>
+            ) : (
+              <div style={{ display: "flex", gap: 8 }}>
+                <button
+                  onClick={discardDetailNotesChanges}
+                  disabled={isSavingDetailNotes}
+                  style={{
+                    padding: "8px 12px",
+                    background: "#F8FAFC",
+                    border: "1px solid #E2E8F0",
+                    borderRadius: 8,
+                    color: "#334155",
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    cursor: isSavingDetailNotes ? "default" : "pointer",
+                    opacity: isSavingDetailNotes ? 0.65 : 1
+                  }}
+                >
+                  Discard Changes
+                </button>
+                <button
+                  onClick={saveDetailNotes}
+                  disabled={isSavingDetailNotes}
+                  style={{
+                    padding: "8px 12px",
+                    background: "#0F172A",
+                    border: "none",
+                    borderRadius: 8,
+                    color: "#fff",
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    cursor: isSavingDetailNotes ? "default" : "pointer",
+                    opacity: isSavingDetailNotes ? 0.65 : 1
+                  }}
+                >
+                  {isSavingDetailNotes ? "Saving..." : "Save"}
+                </button>
+              </div>
+            )}
           </div>
-        )}
+          {isEditingDetailNotes ? (
+            <textarea
+              value={detailNotesDraft}
+              onChange={(event) => setDetailNotesDraft(event.target.value)}
+              rows={4}
+              placeholder="Add referral notes..."
+              style={{ ...inputStyle(), resize: "vertical", fontFamily: "inherit" }}
+            />
+          ) : (
+            <div style={{ fontSize: 14, color: "#334155", lineHeight: 1.6 }}>
+              {detailEntry.notes?.trim() ? detailEntry.notes : "No notes added."}
+            </div>
+          )}
+        </div>
       </div>
     );
 
   // ── FORM VIEW ──
   if (view === "form") {
-    const progress = (step / (STEPS.length - 1)) * 100;
+    const displayStep = canSkipReferringClinic ? step - 1 : step;
+    const progress = (displayStep / (visibleSteps.length - 1)) * 100;
     return (
       <div style={{ maxWidth: 600, margin: "0 auto" }}>
         {/* Progress header */}
@@ -449,12 +769,12 @@ function ReferralTracker({
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
             <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#0F172A" }}>Log a Referral</h2>
             <span style={{ fontSize: 12, color: "#94A3B8", fontWeight: 500 }}>
-              Step {step + 1} of {STEPS.length}
+              Step {displayStep + 1} of {visibleSteps.length}
             </span>
           </div>
           {/* Step pills */}
           <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" }}>
-            {STEPS.map((s, i) => (
+            {visibleSteps.map((s, i) => (
               <div
                 key={s}
                 style={{
@@ -462,12 +782,12 @@ function ReferralTracker({
                   fontWeight: 600,
                   padding: "4px 12px",
                   borderRadius: 20,
-                  background: i < step ? "#0F172A" : i === step ? "#38BDF8" : "#F1F5F9",
-                  color: i < step ? "#fff" : i === step ? "#0F172A" : "#94A3B8",
+                  background: i < displayStep ? "#0F172A" : i === displayStep ? "#38BDF8" : "#F1F5F9",
+                  color: i < displayStep ? "#fff" : i === displayStep ? "#0F172A" : "#94A3B8",
                   transition: "all 0.2s"
                 }}
               >
-                {i < step ? "✓ " : ""}
+                {i < displayStep ? "✓ " : ""}
                 {s}
               </div>
             ))}
@@ -510,6 +830,7 @@ function ReferralTracker({
                 <select
                   value={form.referringClinic}
                   onChange={(e) => inp("referringClinic", e.target.value)}
+                  disabled={canSkipReferringClinic}
                   style={selectStyle(errors.referringClinic)}
                 >
                   <option value="">— Select referring clinic —</option>
@@ -533,6 +854,11 @@ function ReferralTracker({
               </div>
               {errors.referringClinic && (
                 <div style={{ color: "#EF4444", fontSize: 12, marginTop: 6 }}>⚠ {errors.referringClinic}</div>
+              )}
+              {canSkipReferringClinic && (
+                <div style={{ color: "#64748B", fontSize: 12, marginTop: 6 }}>
+                  Your clinic is filled automatically from your account and cannot be changed.
+                </div>
               )}
             </div>
           )}
@@ -568,7 +894,7 @@ function ReferralTracker({
                       transition: "all 0.13s"
                     }}
                   >
-                    <span>{(SPECIALTIES_DATA as any)[s]?.icon || "🏥"}</span>
+                    <span>{getSpecialtyIcon(s)}</span>
                     {s}
                     {form.specialty === s && <span style={{ marginLeft: "auto", color: "#38BDF8" }}>✓</span>}
                   </button>
@@ -682,7 +1008,7 @@ function ReferralTracker({
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {[
                   { label: "Referring Clinic", value: form.referringClinic, icon: "🏥" },
-                  { label: "Specialty", value: `${(SPECIALTIES_DATA as any)[form.specialty]?.icon || ""} ${form.specialty}`, icon: "" },
+                  { label: "Specialty", value: `${getSpecialtyIcon(form.specialty)} ${form.specialty}`, icon: "" },
                   { label: "Receiving Clinic", value: form.receivingClinic, icon: "🎯" },
                   { label: "Referring Preceptor", value: form.preceptor, icon: "👨‍⚕️" },
                   ...(form.notes ? [{ label: "Notes", value: form.notes, icon: "📝" }] : [])
@@ -712,7 +1038,7 @@ function ReferralTracker({
 
           {/* Navigation */}
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 28, gap: 10 }}>
-            {step > 0 ? (
+            {step > firstStep ? (
               <button
                 onClick={back}
                 style={{
@@ -802,8 +1128,8 @@ function ReferralTracker({
         </div>
         <button
           onClick={() => {
-            setForm(EMPTY_FORM);
-            setStep(0);
+            setForm(buildInitialForm());
+            setStep(firstStep);
             setErrors({});
             setView("form");
           }}
@@ -924,11 +1250,47 @@ function ReferralTracker({
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </div>
-          {(filterClinic !== "All" || filterSpecialty !== "All") && (
+          <div style={{ position: "relative" }}>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              style={{
+                padding: "7px 28px 7px 12px",
+                border: "1.5px solid #E2E8F0",
+                borderRadius: 8,
+                background: "#fff",
+                color: "#334155",
+                fontSize: 12.5,
+                cursor: "pointer",
+                outline: "none",
+                appearance: "none"
+              }}
+            >
+              <option value="All">Status</option>
+              {REFERRAL_STATUSES.map((status) => (
+                <option key={status} value={status}>
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </option>
+              ))}
+            </select>
+            <svg
+              style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
+              width="12"
+              height="12"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="#94A3B8"
+              strokeWidth="2.5"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+          {(filterClinic !== defaultClinicFilter || filterSpecialty !== "All" || filterStatus !== "All") && (
             <button
               onClick={() => {
-                setFilterClinic("All");
+                setFilterClinic(defaultClinicFilter);
                 setFilterSpecialty("All");
+                setFilterStatus("All");
               }}
               style={{
                 padding: "7px 12px",
@@ -982,14 +1344,14 @@ function ReferralTracker({
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr 1fr 110px 120px 56px",
+              gridTemplateColumns: "100px 110px 1fr 1fr 1fr 120px 120px 56px",
               padding: "10px 18px",
               background: "#F8FAFC",
               borderBottom: "1px solid #E2E8F0",
               gap: 8
             }}
           >
-            {["Referring Clinic", "Receiving Clinic", "Specialty", "Date", "Preceptor", ""].map((h) => (
+            {["Record #", "Date", "Referring Clinic", "Receiving Clinic", "Specialty", "Preceptor", "Status", ""].map((h) => (
               <div
                 key={h}
                 style={{ fontSize: 10.5, fontWeight: 700, color: "#94A3B8", textTransform: "uppercase", letterSpacing: 0.8 }}
@@ -1003,7 +1365,7 @@ function ReferralTracker({
               key={r.id}
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr 1fr 110px 120px 56px",
+                gridTemplateColumns: "100px 110px 1fr 1fr 1fr 120px 120px 56px",
                 padding: "13px 18px",
                 borderBottom: i < filtered.length - 1 ? "1px solid #F1F5F9" : "none",
                 alignItems: "center",
@@ -1013,6 +1375,11 @@ function ReferralTracker({
               onMouseEnter={(e) => (e.currentTarget.style.background = "#F8FAFC")}
               onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
             >
+              <div style={{ fontSize: 11, fontFamily: "monospace", color: "#334155", fontWeight: 500}}>#{r.id}</div>
+              <div style={{ fontSize: 12, color: "#64748B" }}>
+                {new Date(r.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 1 }}>{formatReferralTime(r.time)}</div>
+              </div>
               <div style={{ fontSize: 12.5, color: "#0F172A", fontWeight: 500 }}>{r.referringClinic}</div>
               <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
                 <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="#38BDF8" strokeWidth="2.5">
@@ -1021,15 +1388,33 @@ function ReferralTracker({
                 <span style={{ fontSize: 12.5, color: "#0F172A", fontWeight: 500 }}>{r.receivingClinic}</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                <span style={{ fontSize: 13 }}>{(SPECIALTIES_DATA as any)[r.specialty]?.icon || "🏥"}</span>
+                <span style={{ fontSize: 13 }}>{getSpecialtyIcon(r.specialty)}</span>
                 <span style={{ fontSize: 12, color: "#334155" }}>{r.specialty}</span>
-              </div>
-              <div style={{ fontSize: 12, color: "#64748B" }}>
-                {new Date(r.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 1 }}>{r.time}</div>
               </div>
               <div style={{ fontSize: 12, color: "#334155", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {r.preceptor}
+              </div>
+              <div>
+                <select
+                  value={r.status}
+                  onChange={(event) => void updateReferralStatus(r.id, event.target.value as Referral["status"])}
+                  style={{
+                    width: "100%",
+                    padding: "7px 10px",
+                    borderRadius: 8,
+                    border: "1.5px solid #E2E8F0",
+                    background: "#fff",
+                    color: "#0F172A",
+                    fontSize: 12.5,
+                    fontWeight: 600
+                  }}
+                >
+                  {REFERRAL_STATUSES.map((status) => (
+                    <option key={status} value={status}>
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </option>
+                    ))}
+                </select>
               </div>
               <div style={{ display: "flex", gap: 6 }}>
                 <button
@@ -1057,7 +1442,7 @@ function ReferralTracker({
                   </svg>
                 </button>
                 <button
-                  onClick={() => deleteReferral(r.id)}
+                  onClick={() => setPendingDeleteReferral(r)}
                   title="Delete"
                   style={{
                     background: "#FEF2F2",
@@ -1087,20 +1472,584 @@ function ReferralTracker({
           No referrals match the current filters.
         </div>
       )}
+
+      {pendingDeleteReferral ? (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(15,23,42,0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 20,
+            zIndex: 50
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: 440,
+              background: "#fff",
+              borderRadius: 16,
+              padding: 24,
+              boxShadow: "0 20px 40px rgba(15,23,42,0.2)"
+            }}
+          >
+            <h3 style={{ margin: "0 0 8px", fontSize: 18, fontWeight: 800, color: "#0F172A" }}>Delete referral?</h3>
+            <p style={{ margin: "0 0 20px", fontSize: 13.5, color: "#475569", lineHeight: 1.6 }}>
+              Remove referral <strong>#{pendingDeleteReferral.id}</strong> from <strong>{pendingDeleteReferral.referringClinic}</strong> to{" "}
+              <strong>{pendingDeleteReferral.receivingClinic}</strong>. This action cannot be undone.
+            </p>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+              <button
+                onClick={() => setPendingDeleteReferral(null)}
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: 10,
+                  border: "1px solid #CBD5E1",
+                  background: "#fff",
+                  color: "#334155",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer"
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  void deleteReferral(pendingDeleteReferral.id);
+                  setPendingDeleteReferral(null);
+                }}
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: 10,
+                  border: "none",
+                  background: "#DC2626",
+                  color: "#fff",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: "pointer"
+                }}
+              >
+                Confirm delete
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function UserManagement({
+  currentUserId,
+  clinicOptions
+}: {
+  currentUserId: string;
+  clinicOptions: Array<{ key: string; name: string }>;
+}) {
+  const [users, setUsers] = useState<AppUser[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [pendingDeleteUser, setPendingDeleteUser] = useState<AppUser | null>(null);
+  const [form, setForm] = useState({
+    username: "",
+    password: "",
+    role: "" as UserRole | "",
+    clinicKey: ""
+  });
+  const allClinicsValue = "__all_clinics__";
+  const managementSelectStyle = {
+    padding: "9px 11px",
+    borderRadius: 9,
+    border: "1.5px solid #E2E8F0",
+    background: "#fff",
+    fontSize: 13,
+    color: "#0F172A"
+  };
+
+  const loadUsers = async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/users");
+      const payload = (await response.json()) as { ok: boolean; users?: AppUser[]; message?: string };
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.message ?? "Unable to load users.");
+      }
+
+      setUsers(payload.users ?? []);
+    } catch (loadError) {
+      console.error(loadError);
+      setError(loadError instanceof Error ? loadError.message : "Unable to load users.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadUsers();
+  }, []);
+
+  const createNewUser = async () => {
+    setIsSaving(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form)
+      });
+      const payload = (await response.json()) as { ok: boolean; users?: AppUser[]; message?: string };
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.message ?? "Unable to create user.");
+      }
+
+      setUsers(payload.users ?? []);
+      setForm({
+        username: "",
+        password: "",
+        role: "",
+        clinicKey: ""
+      });
+    } catch (saveError) {
+      console.error(saveError);
+      setError(saveError instanceof Error ? saveError.message : "Unable to create user.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const updateAccess = async (userId: string, role: UserRole, clinicKey: string) => {
+    setError("");
+
+    try {
+      const response = await fetch("/api/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, role, clinicKey })
+      });
+      const payload = (await response.json()) as { ok: boolean; users?: AppUser[]; message?: string };
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.message ?? "Unable to update user access.");
+      }
+
+      setUsers(payload.users ?? []);
+    } catch (saveError) {
+      console.error(saveError);
+      setError(saveError instanceof Error ? saveError.message : "Unable to update user access.");
+    }
+  };
+
+  const removeUser = async (userId: string) => {
+    setError("");
+
+    try {
+      const response = await fetch(`/api/users?userId=${encodeURIComponent(userId)}`, {
+        method: "DELETE"
+      });
+      const payload = (await response.json()) as { ok: boolean; users?: AppUser[]; message?: string };
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.message ?? "Unable to delete user.");
+      }
+
+      setUsers(payload.users ?? []);
+      setPendingDeleteUser(null);
+    } catch (saveError) {
+      console.error(saveError);
+      setError(saveError instanceof Error ? saveError.message : "Unable to delete user.");
+    }
+  };
+
+  return (
+    <div>
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(280px, 360px) 1fr", gap: 24, alignItems: "start" }}>
+        <section
+          style={{
+            background: "#fff",
+            border: "1.5px solid #E2E8F0",
+            borderRadius: 16,
+            padding: 22,
+            boxShadow: "0 2px 12px rgba(15,23,42,0.05)"
+          }}
+        >
+          <h2 style={{ margin: "0 0 6px", fontSize: 18, fontWeight: 800, color: "#0F172A" }}>Create user</h2>
+          <p style={{ margin: "0 0 18px", color: "#64748B", fontSize: 13.5 }}>
+            Add a new clinic member, clinic admin, or master admin account.
+          </p>
+
+          <div style={{ display: "grid", gap: 12 }}>
+            <div>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#334155", marginBottom: 6 }}>Username</label>
+              <input
+                className="management-input"
+                value={form.username}
+                onChange={(event) => setForm((current) => ({ ...current, username: event.target.value }))}
+                placeholder="Username"
+                style={{
+                  width: "100%",
+                  boxSizing: "border-box",
+                  padding: "11px 13px",
+                  borderRadius: 10,
+                  border: "1.5px solid #E2E8F0",
+                  fontSize: 13.5,
+                  color: "#0F172A"
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#334155", marginBottom: 6 }}>Password</label>
+              <input
+                className="management-input"
+                type="password"
+                value={form.password}
+                onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
+                placeholder="Minimum 8 characters"
+                style={{
+                  width: "100%",
+                  boxSizing: "border-box",
+                  padding: "11px 13px",
+                  borderRadius: 10,
+                  border: "1.5px solid #E2E8F0",
+                  fontSize: 13.5,
+                  color: "#0F172A"
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#334155", marginBottom: 6 }}>Role</label>
+              <select
+                value={form.role}
+                onChange={(event) =>
+                  setForm((current) => {
+                    const nextRole = event.target.value as UserRole | "";
+                    return {
+                      ...current,
+                      role: nextRole,
+                      clinicKey:
+                        nextRole === "master_admin"
+                          ? ""
+                          : current.clinicKey || clinicOptions[0]?.key || ""
+                    };
+                  })
+                }
+                style={{
+                  width: "100%",
+                  boxSizing: "border-box",
+                  padding: "11px 13px",
+                  borderRadius: 10,
+                  border: "1.5px solid #E2E8F0",
+                  fontSize: 13.5,
+                  background: "#fff",
+                  color: form.role ? "#0F172A" : "#64748B"
+                }}
+              >
+                <option value="" disabled>
+                  Select a role
+                </option>
+                {ROLE_OPTIONS.map((role) => (
+                  <option key={role} value={role}>
+                    {ROLE_LABELS[role]}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#334155", marginBottom: 6 }}>Clinic</label>
+              <select
+                value={form.role === "master_admin" ? allClinicsValue : form.clinicKey}
+                disabled={form.role === "master_admin"}
+                onChange={(event) => setForm((current) => ({ ...current, clinicKey: event.target.value }))}
+                style={{
+                  width: "100%",
+                  boxSizing: "border-box",
+                  padding: "11px 13px",
+                  borderRadius: 10,
+                  border: "1.5px solid #E2E8F0",
+                  fontSize: 13.5,
+                  background: form.role === "master_admin" ? "#F8FAFC" : "#fff",
+                  color: form.role === "master_admin" || form.clinicKey ? "#0F172A" : "#64748B",
+                  cursor: form.role === "master_admin" ? "not-allowed" : "pointer"
+                }}
+              >
+                {form.role === "master_admin" ? (
+                  <option value={allClinicsValue}>All clinics</option>
+                ) : (
+                  <option value="" disabled>
+                    Select a clinic
+                  </option>
+                )}
+                {clinicOptions.map((clinic) => (
+                  <option key={clinic.key} value={clinic.key}>
+                    {clinic.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              onClick={createNewUser}
+              disabled={isSaving}
+              style={{
+                padding: "11px 16px",
+                borderRadius: 10,
+                border: "none",
+                background: "#0F172A",
+                color: "#fff",
+                fontSize: 13.5,
+                fontWeight: 700,
+                cursor: isSaving ? "not-allowed" : "pointer",
+                opacity: isSaving ? 0.6 : 1
+              }}
+            >
+              {isSaving ? "Creating..." : "Create user"}
+            </button>
+          </div>
+        </section>
+
+        <section
+          style={{
+            background: "#fff",
+            border: "1.5px solid #E2E8F0",
+            borderRadius: 16,
+            overflow: "hidden",
+            boxShadow: "0 2px 12px rgba(15,23,42,0.05)"
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "18px 20px",
+              borderBottom: "1px solid #E2E8F0"
+            }}
+          >
+            <div>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#0F172A" }}>User management</h2>
+              <p style={{ margin: "4px 0 0", color: "#64748B", fontSize: 13.5 }}>
+                Adjust roles and remove accounts from the system.
+              </p>
+            </div>
+            <button
+              onClick={() => void loadUsers()}
+              style={{
+                padding: "8px 12px",
+                borderRadius: 8,
+                border: "1px solid #CBD5E1",
+                background: "#fff",
+                color: "#334155",
+                fontSize: 12.5,
+                fontWeight: 600,
+                cursor: "pointer"
+              }}
+            >
+              Refresh
+            </button>
+          </div>
+
+          {error ? (
+            <div style={{ margin: 20, padding: "12px 14px", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 10, color: "#B91C1C", fontSize: 13 }}>
+              {error}
+            </div>
+          ) : null}
+
+          {isLoading ? (
+            <div style={{ padding: 24, color: "#64748B", fontSize: 13.5 }}>Loading users...</div>
+          ) : (
+            <div style={{ overflowX: "auto" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1.2fr 1fr 1fr 140px",
+                  gap: 12,
+                  padding: "12px 20px",
+                  background: "#F8FAFC",
+                  borderBottom: "1px solid #E2E8F0",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 0.8,
+                  textTransform: "uppercase",
+                  color: "#94A3B8"
+                }}
+              >
+                <div>User</div>
+                <div>Role</div>
+                <div>Clinic</div>
+                <div>Actions</div>
+              </div>
+
+              {users.map((user) => (
+                <div
+                  key={user.id}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1.2fr 1fr 1fr 140px",
+                    gap: 12,
+                    padding: "16px 20px",
+                    borderBottom: "1px solid #F1F5F9",
+                    alignItems: "center"
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#0F172A" }}>{user.username}</div>
+                    <div style={{ fontSize: 12, color: "#94A3B8" }}>{user.id === currentUserId ? "Current account" : ""}</div>
+                  </div>
+
+                  <select
+                    value={user.role}
+                    onChange={(event) => {
+                      const nextRole = event.target.value as UserRole;
+                      void updateAccess(
+                        user.id,
+                        nextRole,
+                        nextRole === "master_admin" ? "" : user.clinicKey || clinicOptions[0]?.key || ""
+                      );
+                    }}
+                    style={managementSelectStyle}
+                  >
+                    {ROLE_OPTIONS.map((role) => (
+                      <option key={role} value={role}>
+                        {ROLE_LABELS[role]}
+                      </option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={user.role === "master_admin" ? allClinicsValue : user.clinicKey}
+                    disabled={user.role === "master_admin"}
+                    onChange={(event) => void updateAccess(user.id, user.role, event.target.value)}
+                    style={{
+                      ...managementSelectStyle,
+                      background: user.role === "master_admin" ? "#F8FAFC" : "#fff",
+                      color: "#0F172A",
+                      cursor: user.role === "master_admin" ? "not-allowed" : "pointer"
+                    }}
+                  >
+                    {user.role === "master_admin" && <option value={allClinicsValue}>All clinics</option>}
+                    {clinicOptions.map((clinic) => (
+                      <option key={clinic.key} value={clinic.key}>
+                        {clinic.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  <button
+                    onClick={() => setPendingDeleteUser(user)}
+                    disabled={user.id === currentUserId}
+                    style={{
+                      padding: "9px 12px",
+                      borderRadius: 9,
+                      border: "none",
+                      background: user.id === currentUserId ? "#E2E8F0" : "#FEF2F2",
+                      color: user.id === currentUserId ? "#94A3B8" : "#DC2626",
+                      fontSize: 12.5,
+                      fontWeight: 700,
+                      cursor: user.id === currentUserId ? "not-allowed" : "pointer"
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+
+      {pendingDeleteUser ? (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(15,23,42,0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 20,
+            zIndex: 50
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: 420,
+              background: "#fff",
+              borderRadius: 16,
+              padding: 24,
+              boxShadow: "0 20px 40px rgba(15,23,42,0.2)"
+            }}
+          >
+            <h3 style={{ margin: "0 0 8px", fontSize: 18, fontWeight: 800, color: "#0F172A" }}>Delete user?</h3>
+            <p style={{ margin: "0 0 20px", fontSize: 13.5, color: "#475569", lineHeight: 1.6 }}>
+              Remove <strong>{pendingDeleteUser.username}</strong> from the system. This action cannot be undone.
+            </p>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+              <button
+                onClick={() => setPendingDeleteUser(null)}
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: 10,
+                  border: "1px solid #CBD5E1",
+                  background: "#fff",
+                  color: "#334155",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer"
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => void removeUser(pendingDeleteUser.id)}
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: 10,
+                  border: "none",
+                  background: "#DC2626",
+                  color: "#fff",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: "pointer"
+                }}
+              >
+                Confirm delete
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
 
 // ─── MAIN APP COMPONENT ─────────────────────────────────────────────────────
-export default function ClinicReferralApp({ username, clinics, specialtiesData, initialReferrals }: AppPageProps) {
+export default function ClinicReferralApp({ username, userId, role, clinicKey, clinics, specialtiesData, initialReferrals }: AppPageProps) {
   const CLINICS = clinics;
   const SPECIALTIES_DATA = specialtiesData;
   const specialties = Object.keys(SPECIALTIES_DATA);
-  const [section, setSection] = useState<"specialties" | "tracker">("specialties");
+  const clinicOptions = Object.entries(CLINICS)
+    .map(([key, info]) => ({ key, name: info.name }))
+    .sort((left, right) => left.name.localeCompare(right.name));
+  const canManageUsers = role === "master_admin";
+  const [section, setSection] = useState<"specialties" | "tracker" | "users">("tracker");
   const [activeSpecialty, setActiveSpecialty] = useState(specialties[0]);
    const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [search, setSearch] = useState("");
+  const [trackerLaunchDraft, setTrackerLaunchDraft] = useState<ReferralFormDraft | null>(null);
 
   const filtered = specialties.filter((s) => s.toLowerCase().includes(search.toLowerCase()));
   const currentEntries = (SPECIALTIES_DATA as Record<string, SpecialtyData>)[activeSpecialty]?.clinics || [];
@@ -1111,6 +2060,11 @@ export default function ClinicReferralApp({ username, clinics, specialtiesData, 
     setActiveSpecialty(s);
     setSelectedEntry(null);
     setSection("specialties");
+  };
+
+  const openReferralFormForClinic = (draft: ReferralFormDraft) => {
+    setTrackerLaunchDraft({ ...draft });
+    setSection("tracker");
   };
 
   return (
@@ -1228,6 +2182,49 @@ export default function ClinicReferralApp({ username, clinics, specialtiesData, 
             </button>
           </div>
 
+          {canManageUsers && (
+            <div style={{ padding: "4px 8px 4px" }}>
+              <button
+                onClick={() => setSection("users")}
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 9,
+                  padding: sidebarOpen ? "10px 10px" : "10px 0",
+                  justifyContent: sidebarOpen ? "flex-start" : "center",
+                  borderRadius: 10,
+                  border: "none",
+                  cursor: "pointer",
+                  background: section === "users" ? "rgba(52,211,153,0.15)" : "rgba(255,255,255,0.04)",
+                  color: section === "users" ? "#6EE7B7" : "rgba(255,255,255,0.6)",
+                  fontWeight: section === "users" ? 700 : 500,
+                  fontSize: 13,
+                  transition: "all 0.13s",
+                  outline: "none",
+                  position: "relative"
+                }}
+              >
+                {section === "users" && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      width: 3,
+                      height: 18,
+                      borderRadius: 2,
+                      background: "#6EE7B7"
+                    }}
+                  />
+                )}
+                <span style={{ fontSize: 17, flexShrink: 0 }}>👥</span>
+                {sidebarOpen && <span>User Management</span>}
+              </button>
+            </div>
+          )}
+
           {/* Divider + label */}
           {sidebarOpen && (
             <div style={{ padding: "12px 16px 4px", display: "flex", alignItems: "center", gap: 8 }}>
@@ -1250,7 +2247,7 @@ export default function ClinicReferralApp({ username, clinics, specialtiesData, 
           {!sidebarOpen && <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "4px 0" }} />}
 
           {/* Search */}
-          {sidebarOpen && section !== "tracker" && (
+          {sidebarOpen && section === "specialties" && (
             <div style={{ padding: "6px 12px 4px" }}>
               <input
                 value={search}
@@ -1272,7 +2269,7 @@ export default function ClinicReferralApp({ username, clinics, specialtiesData, 
           )}
 
           {/* Specialty nav */}
-          <nav style={{ flex: 1, overflowY: "auto", padding: "4px 8px 12px" }}>
+          <nav className="hide-scrollbar" style={{ flex: 1, overflowY: "auto", padding: "4px 8px 12px" }}>
             {filtered.map((s) => {
               const active = section === "specialties" && activeSpecialty === s;
               return (
@@ -1377,12 +2374,12 @@ export default function ClinicReferralApp({ username, clinics, specialtiesData, 
               {sidebarOpen && (
                 <div>
                   <div style={{ color: "#fff", fontSize: 12.5, fontWeight: 600 }}>{username}</div>
-                  <div style={{ color: "rgba(255,255,255,0.32)", fontSize: 10.5 }}>Student</div>
+                  <div style={{ color: "rgba(255,255,255,0.32)", fontSize: 10.5 }}>{ROLE_LABELS[role]}</div>
                 </div>
               )}
             </div>
             {sidebarOpen && (
-              <a
+              <Link
                 href="/logout"
                 style={{
                   color: "rgba(255,255,255,0.5)",
@@ -1402,7 +2399,7 @@ export default function ClinicReferralApp({ username, clinics, specialtiesData, 
                 }}
               >
                 Sign out
-              </a>
+              </Link>
             )}
           </div>
         </aside>
@@ -1432,7 +2429,42 @@ export default function ClinicReferralApp({ username, clinics, specialtiesData, 
                 </div>
               </header>
               <div style={{ flex: 1, overflowY: "auto", padding: "24px 28px" }}>
-                <ReferralTracker clinics={CLINICS} specialtiesData={SPECIALTIES_DATA} initialReferrals={initialReferrals} />
+                <ReferralTracker
+                  clinics={CLINICS}
+                  specialtiesData={SPECIALTIES_DATA}
+                  initialReferrals={initialReferrals}
+                  role={role}
+                  userClinicName={clinicKey ? CLINICS[clinicKey]?.name : undefined}
+                  launchDraft={trackerLaunchDraft}
+                />
+              </div>
+            </>
+          )}
+
+          {/* USERS SECTION */}
+          {section === "users" && canManageUsers && (
+            <>
+              <header
+                style={{
+                  background: "#fff",
+                  borderBottom: "1px solid #E2E8F0",
+                  padding: "14px 26px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  flexShrink: 0
+                }}
+              >
+                <span style={{ fontSize: 22 }}>👥</span>
+                <div>
+                  <h1 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "#0F172A" }}>User Management</h1>
+                  <p style={{ margin: 0, fontSize: 11.5, color: "#94A3B8", marginTop: 1 }}>
+                    Create accounts, assign roles, and manage system access
+                  </p>
+                </div>
+              </header>
+              <div style={{ flex: 1, overflowY: "auto", padding: "24px 28px" }}>
+                <UserManagement currentUserId={userId} clinicOptions={clinicOptions} />
               </div>
             </>
           )}
@@ -1819,6 +2851,35 @@ export default function ClinicReferralApp({ username, clinics, specialtiesData, 
                           )}
                         </div>
                       </div>
+                    </div>
+
+                    <div style={{ marginTop: 18, display: "flex", justifyContent: "flex-end" }}>
+                      <button
+                        onClick={() =>
+                          openReferralFormForClinic({
+                            specialty: activeSpecialty,
+                            receivingClinic: currentInfo.name
+                          })
+                        }
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          padding: "11px 18px",
+                          background: "#0F172A",
+                          border: "none",
+                          borderRadius: 10,
+                          color: "#fff",
+                          fontSize: 13.5,
+                          fontWeight: 700,
+                          cursor: "pointer"
+                        }}
+                      >
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Create Referral for This Clinic
+                      </button>
                     </div>
                   </div>
                 )}

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState, useRef } from "react";
-import type { GetServerSideProps } from "next";
 import { withIronSessionSsr } from "iron-session/next";
 import { getClinics, getSpecialties } from "@/lib/dataSource/postgres";
 import { getSessionOptions } from "@/lib/auth/session";
@@ -57,16 +56,11 @@ export default function ClinicPage({
     username
 }: ClinicPageProps) {
     const router = useRouter();
+    const initialOpenClinicId = typeof router.query.open === "string" ? router.query.open : null;
     const clinicRefs = useRef<Record<string, HTMLElement | null>>({});
     const hasAutoScrolled = useRef(false);
     // openClinicId controls which clinic is expanded (accordion behavior)
-    const [openClinicId, setOpenClinicId] = useState<string | null>(null);
-
-    // Read ?open=<clinicId> and auto-open that clinic
-    useEffect(() => {
-        const open = typeof router.query.open === "string" ? router.query.open : null;
-        if (open) setOpenClinicId(open);
-    }, [router.query.open]);
+    const [openClinicId, setOpenClinicId] = useState<string | null>(initialOpenClinicId);
 
     useEffect(() => {
         // Only auto-scroll if:

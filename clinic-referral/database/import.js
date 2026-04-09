@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * Import JSON data into PostgreSQL database
  * For Vercel Neon database
@@ -15,6 +16,7 @@ const path = require('path');
 const schema = fs.readFileSync(path.join(__dirname, './schema.sql'), 'utf8');
 const clinicsData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/clinics.json'), 'utf8'));
 const specialtiesData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/specialties.json'), 'utf8'));
+const usersData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/users.json'), 'utf8'));
 
 // Database connection - set your Vercel Neon connection string
 const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
@@ -144,6 +146,16 @@ async function importData() {
     }
     console.log(`✅ Imported ${specialtiesData.specialty_documents.length} documents\n`);
 
+    // Import users
+    console.log('👤 Importing users...');
+    for (const user of usersData) {
+      await client.query(
+        'INSERT INTO users (id, username, role, clinic_key, salt, password_hash) VALUES ($1, $2, $3, $4, $5, $6)',
+        [user.id, user.username, user.role, user.clinicKey, user.salt, user.passwordHash]
+      );
+    }
+    console.log(`✅ Imported ${usersData.length} users\n`);
+
     // Verification queries
     console.log('🔍 Verifying import...');
     const counts = await client.query(`
@@ -154,7 +166,8 @@ async function importData() {
         (SELECT COUNT(*) FROM clinic_referral_methods) as referral_methods,
         (SELECT COUNT(*) FROM clinic_specialties) as clinic_specialties,
         (SELECT COUNT(*) FROM specialty_clinics) as specialty_clinics,
-        (SELECT COUNT(*) FROM specialty_documents) as documents
+        (SELECT COUNT(*) FROM specialty_documents) as documents,
+        (SELECT COUNT(*) FROM users) as users
     `);
     
     console.log('📊 Final counts:');
@@ -165,6 +178,7 @@ async function importData() {
     console.log(`   Clinic-Specialty Links: ${counts.rows[0].clinic_specialties}`);
     console.log(`   Specialty-Clinic Pairings: ${counts.rows[0].specialty_clinics}`);
     console.log(`   Documents: ${counts.rows[0].documents}`);
+    console.log(`   Users: ${counts.rows[0].users}`);
     
     console.log('\n✅ Import completed successfully!');
 

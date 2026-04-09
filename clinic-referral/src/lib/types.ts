@@ -4,6 +4,15 @@ export type Specialty = {
   description?: string;
 };
 
+export type UserRole = "clinic_member" | "clinic_admin" | "master_admin";
+
+export type AppUser = {
+  id: string;
+  username: string;
+  role: UserRole;
+  clinicKey: string;
+};
+
 export type Clinic = {
   id: string;
   name: string;

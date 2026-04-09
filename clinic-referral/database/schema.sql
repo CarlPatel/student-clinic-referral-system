@@ -3,6 +3,7 @@
 
 -- Drop existing tables if they exist (in reverse dependency order)
 DROP TABLE IF EXISTS referrals CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS specialty_documents CASCADE;
 DROP TABLE IF EXISTS specialty_clinics CASCADE;
 DROP TABLE IF EXISTS clinic_specialties CASCADE;
@@ -113,9 +114,22 @@ CREATE TABLE referrals (
     date DATE NOT NULL,
     time TIME NOT NULL,
     specialty VARCHAR(255) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'sent' CHECK (status IN ('sent', 'received', 'scheduled', 'completed')),
     preceptor VARCHAR(255) NOT NULL,
     notes TEXT,
     submitted_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Users (application authentication and authorization)
+CREATE TABLE users (
+    id UUID PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    role VARCHAR(20) NOT NULL CHECK (role IN ('clinic_member', 'clinic_admin', 'master_admin')),
+    clinic_key VARCHAR(50) NOT NULL DEFAULT '',
+    salt VARCHAR(255) NOT NULL,
+    password_hash TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -157,6 +171,10 @@ CREATE INDEX idx_referrals_receiving_clinic ON referrals(receiving_clinic);
 CREATE INDEX idx_referrals_specialty ON referrals(specialty);
 CREATE INDEX idx_referrals_submitted_at ON referrals(submitted_at DESC);
 CREATE INDEX idx_referrals_date ON referrals(date);
+
+-- Users indexes
+CREATE INDEX idx_users_username ON users(username);
+CREATE INDEX idx_users_role ON users(role);
 
 -- ============================================================================
 -- HELPFUL VIEWS (OPTIONAL)
@@ -208,6 +226,7 @@ COMMENT ON TABLE clinic_specialties IS 'Junction table: which specialties each c
 COMMENT ON TABLE specialty_clinics IS 'Specialty-centric view with frequency and additional details';
 COMMENT ON TABLE specialty_documents IS 'Required documents for specialty-clinic pairings';
 COMMENT ON TABLE referrals IS 'Universal referral tracking — all referrals submitted through the system';
+COMMENT ON TABLE users IS 'Application users for login and role-based access';
 
 -- ============================================================================
 -- SETUP COMPLETE
