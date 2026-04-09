@@ -46,6 +46,11 @@ type AppPageProps = {
   initialReferrals: Referral[];
 };
 
+type ReferralFormDraft = {
+  receivingClinic?: string;
+  specialty?: string;
+};
+
 // ─── SERVER SIDE PROPS ──────────────────────────────────────────────────────
 export const getServerSideProps = withIronSessionSsr<AppPageProps>(
   async (context) => {
@@ -156,13 +161,15 @@ function ReferralTracker({
   specialtiesData,
   initialReferrals,
   role,
-  userClinicName
+  userClinicName,
+  launchDraft
 }: {
   clinics: Record<string, ClinicInfo>;
   specialtiesData: Record<string, SpecialtyData>;
   initialReferrals: Referral[];
   role: UserRole;
   userClinicName?: string;
+  launchDraft?: ReferralFormDraft | null;
 }) {
   const CLINICS = clinics;
   const SPECIALTIES_DATA = specialtiesData;
@@ -205,6 +212,13 @@ function ReferralTracker({
   const [filterStatus, setFilterStatus] = useState("All");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const buildInitialForm = (draft?: ReferralFormDraft | null) => ({
+    ...EMPTY_FORM,
+    referringClinic: canSkipReferringClinic ? userClinicName ?? "" : "",
+    specialty: draft?.specialty ?? "",
+    receivingClinic: draft?.receivingClinic ?? ""
+  });
+
   useEffect(() => {
     if (!canSkipReferringClinic) {
       return;
@@ -223,6 +237,31 @@ function ReferralTracker({
 
     setStep((current) => (current < firstStep ? firstStep : current));
   }, [canSkipReferringClinic, firstStep, userClinicName]);
+
+  useEffect(() => {
+    if (!launchDraft) {
+      return;
+    }
+
+    setForm({
+      ...EMPTY_FORM,
+      referringClinic: canSkipReferringClinic ? userClinicName ?? "" : "",
+      specialty: launchDraft.specialty ?? "",
+      receivingClinic: launchDraft.receivingClinic ?? ""
+    });
+    setStep(
+      !canSkipReferringClinic
+        ? 0
+        : launchDraft.specialty && launchDraft.receivingClinic
+          ? 3
+          : launchDraft.specialty
+            ? 2
+            : firstStep
+    );
+    setSubmitted(false);
+    setErrors({});
+    setView("form");
+  }, [canSkipReferringClinic, firstStep, launchDraft, userClinicName]);
 
   const save = (updated: Referral[]) => {
     setReferrals(updated);
@@ -287,10 +326,7 @@ function ReferralTracker({
   };
 
   const startNew = () => {
-    setForm({
-      ...EMPTY_FORM,
-      referringClinic: canSkipReferringClinic ? userClinicName ?? "" : ""
-    });
+    setForm(buildInitialForm());
     setStep(firstStep);
     setSubmitted(false);
     setErrors({});
@@ -1073,10 +1109,7 @@ function ReferralTracker({
         </div>
         <button
           onClick={() => {
-            setForm({
-              ...EMPTY_FORM,
-              referringClinic: canSkipReferringClinic ? userClinicName ?? "" : ""
-            });
+            setForm(buildInitialForm());
             setStep(firstStep);
             setErrors({});
             setView("form");
@@ -1891,11 +1924,12 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
     .map(([key, info]) => ({ key, name: info.name }))
     .sort((left, right) => left.name.localeCompare(right.name));
   const canManageUsers = role === "master_admin";
-  const [section, setSection] = useState<"specialties" | "tracker" | "users">("specialties");
+  const [section, setSection] = useState<"specialties" | "tracker" | "users">("tracker");
   const [activeSpecialty, setActiveSpecialty] = useState(specialties[0]);
    const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [search, setSearch] = useState("");
+  const [trackerLaunchDraft, setTrackerLaunchDraft] = useState<ReferralFormDraft | null>(null);
 
   const filtered = specialties.filter((s) => s.toLowerCase().includes(search.toLowerCase()));
   const currentEntries = (SPECIALTIES_DATA as Record<string, SpecialtyData>)[activeSpecialty]?.clinics || [];
@@ -1906,6 +1940,11 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
     setActiveSpecialty(s);
     setSelectedEntry(null);
     setSection("specialties");
+  };
+
+  const openReferralFormForClinic = (draft: ReferralFormDraft) => {
+    setTrackerLaunchDraft({ ...draft });
+    setSection("tracker");
   };
 
   return (
@@ -2110,7 +2149,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
           )}
 
           {/* Specialty nav */}
-          <nav style={{ flex: 1, overflowY: "auto", padding: "4px 8px 12px" }}>
+          <nav className="hide-scrollbar" style={{ flex: 1, overflowY: "auto", padding: "4px 8px 12px" }}>
             {filtered.map((s) => {
               const active = section === "specialties" && activeSpecialty === s;
               return (
@@ -2276,6 +2315,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                   initialReferrals={initialReferrals}
                   role={role}
                   userClinicName={clinicKey ? CLINICS[clinicKey]?.name : undefined}
+                  launchDraft={trackerLaunchDraft}
                 />
               </div>
             </>
@@ -2691,6 +2731,35 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                           )}
                         </div>
                       </div>
+                    </div>
+
+                    <div style={{ marginTop: 18, display: "flex", justifyContent: "flex-end" }}>
+                      <button
+                        onClick={() =>
+                          openReferralFormForClinic({
+                            specialty: activeSpecialty,
+                            receivingClinic: currentInfo.name
+                          })
+                        }
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          padding: "11px 18px",
+                          background: "#0F172A",
+                          border: "none",
+                          borderRadius: 10,
+                          color: "#fff",
+                          fontSize: 13.5,
+                          fontWeight: 700,
+                          cursor: "pointer"
+                        }}
+                      >
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Create Referral for This Clinic
+                      </button>
                     </div>
                   </div>
                 )}
