@@ -107,6 +107,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
 };
 
 const ROLE_OPTIONS: UserRole[] = ["clinic_member", "clinic_admin", "master_admin"];
+const REFERRAL_STATUSES: Referral["status"][] = ["sent", "received", "scheduled", "completed"];
 
 function canAccessReferral(referral: Referral, role: UserRole, clinicName?: string) {
   if (role === "master_admin") {
@@ -211,6 +212,7 @@ function ReferralTracker({
       id: Date.now(), 
       date: now.toISOString().split('T')[0], 
       time: now.toTimeString().split(' ')[0].substring(0, 5),
+      status: "sent",
       submittedAt: now.toISOString() 
     } as Referral;
     
@@ -260,6 +262,40 @@ function ReferralTracker({
     
     // Remove from state and localStorage
     save(referrals.filter((r) => r.id !== id));
+  };
+
+  const updateReferralStatus = async (id: number, status: Referral["status"]) => {
+    const referral = referrals.find((entry) => entry.id === id);
+
+    if (!referral) {
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/referrals", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status })
+      });
+
+      if (!response.ok) {
+        throw new Error("Referral status could not be updated.");
+      }
+    } catch (error) {
+      console.error("Failed to update referral status", error);
+      return;
+    }
+
+    save(
+      referrals.map((entry) =>
+        entry.id === id
+          ? {
+              ...entry,
+              status
+            }
+          : entry
+      )
+    );
   };
 
   const filtered = referrals.filter(
@@ -431,6 +467,7 @@ function ReferralTracker({
           {[
             { label: "Referring Clinic", value: detailEntry.referringClinic, icon: "🏥" },
             { label: "Receiving Clinic", value: detailEntry.receivingClinic, icon: "🎯" },
+            { label: "Status", value: detailEntry.status, icon: "📌" },
             {
               label: "Date",
               value: new Date(detailEntry.date + "T12:00:00").toLocaleDateString("en-US", {
@@ -1028,14 +1065,14 @@ function ReferralTracker({
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr 1fr 110px 120px 56px",
+              gridTemplateColumns: "1fr 1fr 120px 1fr 110px 120px 56px",
               padding: "10px 18px",
               background: "#F8FAFC",
               borderBottom: "1px solid #E2E8F0",
               gap: 8
             }}
           >
-            {["Referring Clinic", "Receiving Clinic", "Specialty", "Date", "Preceptor", ""].map((h) => (
+            {["Referring Clinic", "Receiving Clinic", "Specialty", "Status", "Date", "Preceptor", ""].map((h) => (
               <div
                 key={h}
                 style={{ fontSize: 10.5, fontWeight: 700, color: "#94A3B8", textTransform: "uppercase", letterSpacing: 0.8 }}
@@ -1049,7 +1086,7 @@ function ReferralTracker({
               key={r.id}
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr 1fr 110px 120px 56px",
+                gridTemplateColumns: "1fr 1fr 120px 1fr 110px 120px 56px",
                 padding: "13px 18px",
                 borderBottom: i < filtered.length - 1 ? "1px solid #F1F5F9" : "none",
                 alignItems: "center",
@@ -1069,6 +1106,28 @@ function ReferralTracker({
               <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
                 <span style={{ fontSize: 13 }}>{getSpecialtyIcon(r.specialty)}</span>
                 <span style={{ fontSize: 12, color: "#334155" }}>{r.specialty}</span>
+              </div>
+                            <div>
+                <select
+                  value={r.status}
+                  onChange={(event) => void updateReferralStatus(r.id, event.target.value as Referral["status"])}
+                  style={{
+                    width: "100%",
+                    padding: "7px 10px",
+                    borderRadius: 8,
+                    border: "1.5px solid #E2E8F0",
+                    background: "#fff",
+                    color: "#0F172A",
+                    fontSize: 12.5,
+                    fontWeight: 600
+                  }}
+                >
+                  {REFERRAL_STATUSES.map((status) => (
+                    <option key={status} value={status}>
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div style={{ fontSize: 12, color: "#64748B" }}>
                 {new Date(r.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}

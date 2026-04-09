@@ -78,7 +78,7 @@ type AppSpecialtyDocumentRow = {
   doc_description: string | null;
 };
 
-const globalForPool = globalThis as unknown as { __clinicPool?: Pool };
+const globalForPool = globalThis as unknown as { __clinicPool?: Pool; __referralStatusReady?: boolean };
 
 function getPool(): Pool {
   if (globalForPool.__clinicPool) return globalForPool.__clinicPool;
@@ -362,6 +362,7 @@ export type Referral = {
   date: string;
   time: string;
   specialty: string;
+  status: "sent" | "received" | "scheduled" | "completed";
   preceptor: string;
   notes: string;
   submittedAt: string;
@@ -374,23 +375,55 @@ type DbReferralRow = {
   date: Date | string;
   time: string;
   specialty: string;
+  status: Referral["status"] | null;
   preceptor: string;
   notes: string | null;
   submitted_at: Date | string;
 };
 
+async function ensureReferralStatusColumn(): Promise<void> {
+  if (globalForPool.__referralStatusReady) {
+    return;
+  }
+
+  const pool = getPool();
+  await pool.query(`ALTER TABLE referrals ADD COLUMN IF NOT EXISTS status VARCHAR(20)`);
+  await pool.query(`UPDATE referrals SET status = 'sent' WHERE status IS NULL`);
+  await pool.query(`ALTER TABLE referrals ALTER COLUMN status SET DEFAULT 'sent'`);
+  await pool.query(`ALTER TABLE referrals ALTER COLUMN status SET NOT NULL`);
+  await pool.query(
+    `
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1
+          FROM pg_constraint
+          WHERE conname = 'referrals_status_check'
+        ) THEN
+          ALTER TABLE referrals
+          ADD CONSTRAINT referrals_status_check
+          CHECK (status IN ('sent', 'received', 'scheduled', 'completed'));
+        END IF;
+      END $$;
+    `
+  );
+  globalForPool.__referralStatusReady = true;
+}
+
 export async function saveReferral(referral: Referral): Promise<void> {
+  await ensureReferralStatusColumn();
   const pool = getPool();
   await pool.query(
     `
-      INSERT INTO referrals (id, referring_clinic, receiving_clinic, date, time, specialty, preceptor, notes, submitted_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      INSERT INTO referrals (id, referring_clinic, receiving_clinic, date, time, specialty, status, preceptor, notes, submitted_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       ON CONFLICT (id) DO UPDATE SET
         referring_clinic = EXCLUDED.referring_clinic,
         receiving_clinic = EXCLUDED.receiving_clinic,
         date = EXCLUDED.date,
         time = EXCLUDED.time,
         specialty = EXCLUDED.specialty,
+        status = EXCLUDED.status,
         preceptor = EXCLUDED.preceptor,
         notes = EXCLUDED.notes,
         submitted_at = EXCLUDED.submitted_at
@@ -402,6 +435,7 @@ export async function saveReferral(referral: Referral): Promise<void> {
       referral.date,
       referral.time,
       referral.specialty,
+      referral.status,
       referral.preceptor,
       referral.notes || null,
       referral.submittedAt
@@ -410,9 +444,10 @@ export async function saveReferral(referral: Referral): Promise<void> {
 }
 
 export async function getReferrals(): Promise<Referral[]> {
+  await ensureReferralStatusColumn();
   const rows = await query<DbReferralRow>(
     `
-      SELECT id, referring_clinic, receiving_clinic, date, time, specialty, preceptor, notes, submitted_at
+      SELECT id, referring_clinic, receiving_clinic, date, time, specialty, status, preceptor, notes, submitted_at
       FROM referrals
       ORDER BY submitted_at DESC
     `
@@ -425,6 +460,7 @@ export async function getReferrals(): Promise<Referral[]> {
     date: row.date instanceof Date ? row.date.toISOString().split('T')[0] : row.date,
     time: row.time,
     specialty: row.specialty,
+    status: row.status ?? "sent",
     preceptor: row.preceptor,
     notes: row.notes || "",
     submittedAt: row.submitted_at instanceof Date ? row.submitted_at.toISOString() : row.submitted_at
@@ -436,3 +472,8 @@ export async function deleteReferral(id: number): Promise<void> {
   await pool.query("DELETE FROM referrals WHERE id = $1", [id]);
 }
 
+export async function updateReferralStatus(id: number, status: Referral["status"]): Promise<void> {
+  await ensureReferralStatusColumn();
+  const pool = getPool();
+  await pool.query("UPDATE referrals SET status = $2 WHERE id = $1", [id, status]);
+}

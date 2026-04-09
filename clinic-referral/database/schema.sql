@@ -113,6 +113,7 @@ CREATE TABLE referrals (
     date DATE NOT NULL,
     time TIME NOT NULL,
     specialty VARCHAR(255) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'sent' CHECK (status IN ('sent', 'received', 'scheduled', 'completed')),
     preceptor VARCHAR(255) NOT NULL,
     notes TEXT,
     submitted_at TIMESTAMP NOT NULL,

@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { withIronSessionApiRoute } from "iron-session/next";
 
 import { getSessionOptions } from "@/lib/auth/session";
-import { getAppData, getReferrals, saveReferral, deleteReferral, type Referral } from "@/lib/dataSource/postgres";
+import { getAppData, getReferrals, saveReferral, deleteReferral, updateReferralStatus, type Referral } from "@/lib/dataSource/postgres";
 import type { UserRole } from "@/lib/types";
 
 type ReferralResponse = {
@@ -46,6 +46,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse<ReferralRespons
 
       await saveReferral(referral);
       return res.status(200).json({ ok: true });
+    } else if (req.method === "PATCH") {
+      const { id, status } = (req.body ?? {}) as { id?: number; status?: Referral["status"] };
+
+      if (typeof id !== "number" || !status) {
+        return res.status(400).json({ ok: false, message: "Referral ID and status are required" });
+      }
+
+      const referrals = await getReferrals();
+      const referral = referrals.find((entry) => entry.id === id);
+
+      if (!referral) {
+        return res.status(404).json({ ok: false, message: "Referral not found" });
+      }
+
+      if (!canAccessReferral(referral, userRole, userClinicName)) {
+        return res.status(403).json({ ok: false, message: "You can only update referrals for your clinic." });
+      }
+
+      await updateReferralStatus(id, status);
+      return res.status(200).json({ ok: true });
     } else if (req.method === "DELETE") {
       const { id } = req.query;
 
@@ -67,7 +87,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<ReferralRespons
       await deleteReferral(parseInt(id, 10));
       return res.status(200).json({ ok: true });
     } else {
-      res.setHeader("Allow", ["POST", "DELETE"]);
+      res.setHeader("Allow", ["POST", "PATCH", "DELETE"]);
       return res.status(405).json({ ok: false, message: "Method not allowed" });
     }
   } catch (error) {
