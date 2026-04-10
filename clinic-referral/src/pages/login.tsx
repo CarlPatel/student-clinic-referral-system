@@ -80,7 +80,7 @@ export default function LoginPage({ nextPath }: LoginPageProps) {
         <section className="auth-card">
           <h1 className="auth-title">Clinic Referral Access</h1>
           <p className="auth-subtitle">Sign in with your username and password.</p>
-          <p className="auth-demo">Demo: alice, bob, charlie (all use password: password123)</p>
+          <p className="auth-demo">Demo: admin, manager, member (all use password: password123)</p>
 
           <form onSubmit={handleSubmit} className="auth-form">
             <label className="auth-label" htmlFor="username">
@@ -94,7 +94,7 @@ export default function LoginPage({ nextPath }: LoginPageProps) {
               value={username}
               onChange={(event) => setUsername(event.target.value)}
               className="auth-input"
-              placeholder="alice, bob, charlie"
+              placeholder="admin, manager, member"
               required
             />
 

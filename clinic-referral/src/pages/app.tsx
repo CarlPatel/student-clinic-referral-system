@@ -2044,6 +2044,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
     .map(([key, info]) => ({ key, name: info.name }))
     .sort((left, right) => left.name.localeCompare(right.name));
   const canManageUsers = role === "master_admin";
+  const sidebarClinicLabel = role === "master_admin" ? "" : clinicKey ? CLINICS[clinicKey]?.name ?? "Unknown clinic" : "No clinic assigned";
   const [section, setSection] = useState<"specialties" | "tracker" | "users">("tracker");
   const [activeSpecialty, setActiveSpecialty] = useState(specialties[0]);
    const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
@@ -2374,7 +2375,8 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
               {sidebarOpen && (
                 <div>
                   <div style={{ color: "#fff", fontSize: 12.5, fontWeight: 600 }}>{username}</div>
-                  <div style={{ color: "rgba(255,255,255,0.32)", fontSize: 10.5 }}>{ROLE_LABELS[role]}</div>
+                  {sidebarClinicLabel ? <div style={{ color: "rgba(255,255,255,0.33)", fontSize: 10.5 }}>{sidebarClinicLabel}</div> : null}
+                  <div style={{ color: "rgba(255,255,255,0.33)", fontSize: 10.5 }}>{ROLE_LABELS[role]}</div>
                 </div>
               )}
             </div>
@@ -2387,7 +2389,8 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                   textDecoration: "none",
                   padding: "4px 8px",
                   borderRadius: 6,
-                  transition: "all 0.15s"
+                  transition: "all 0.15s",
+                  whiteSpace: "nowrap"
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = "rgba(255,255,255,0.08)";
