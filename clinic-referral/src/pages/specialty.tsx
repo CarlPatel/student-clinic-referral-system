@@ -1,19 +1,19 @@
 import Link from "next/link";
 import { withIronSessionSsr } from "iron-session/next";
-import { getClinics, getSpecialties } from "@/lib/dataSource/postgres";
+import { getClinics, getServices } from "@/lib/dataSource/postgres";
 import { getSessionOptions } from "@/lib/auth/session";
-import type { Clinic, Specialty } from "@/lib/types";
+import type { Clinic, Service } from "@/lib/types";
 
-type SpecialtyPageProps = {
-  specialties: Specialty[];
+type ServicePageProps = {
+  services: Service[];
   clinics: Clinic[];
   username: string;
 };
 
-export const getServerSideProps = withIronSessionSsr<SpecialtyPageProps>(
+export const getServerSideProps = withIronSessionSsr<ServicePageProps>(
   async (context) => {
     if (!context.req.session.isLoggedIn) {
-      const nextPath = context.resolvedUrl ?? "/specialty";
+      const nextPath = context.resolvedUrl ?? "/service";
       return {
         redirect: {
           destination: `/login?next=${encodeURIComponent(nextPath)}`,
@@ -22,40 +22,40 @@ export const getServerSideProps = withIronSessionSsr<SpecialtyPageProps>(
       };
     }
 
-    const [specialties, clinics] = await Promise.all([getSpecialties(), getClinics()]);
-    return { props: { specialties, clinics, username: context.req.session.username || "User" } };
+    const [services, clinics] = await Promise.all([getServices(), getClinics()]);
+    return { props: { services, clinics, username: context.req.session.username || "User" } };
   },
   getSessionOptions()
 );
 
-function groupClinicsBySpecialty(specialties: Specialty[], clinics: Clinic[]) {
+function groupClinicsByService(services: Service[], clinics: Clinic[]) {
   const map: Record<string, Clinic[]> = {};
-  for (const s of specialties) map[s.id] = [];
+  for (const service of services) map[service.id] = [];
   for (const c of clinics) {
-    for (const sid of c.specialtyIds) {
-      if (!map[sid]) map[sid] = [];
-      map[sid].push(c);
+    for (const serviceId of c.serviceIds) {
+      if (!map[serviceId]) map[serviceId] = [];
+      map[serviceId].push(c);
     }
   }
-  for (const sid of Object.keys(map)) {
-    map[sid].sort((a, b) => a.name.localeCompare(b.name));
+  for (const serviceId of Object.keys(map)) {
+    map[serviceId].sort((a, b) => a.name.localeCompare(b.name));
   }
   return map;
 }
 
-export default function SpecialtyPage({
-  specialties,
+export default function ServicePage({
+  services,
   clinics,
   username
-}: SpecialtyPageProps) {
-  const grouped = groupClinicsBySpecialty(specialties, clinics);
+}: ServicePageProps) {
+  const grouped = groupClinicsByService(services, clinics);
 
   return (
-    <main className="specialty-page">
+    <main className="service-page">
       <header className="page-header">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
-            <h1 className="page-title">Clinic Directory by Specialty</h1>
+            <h1 className="page-title">Clinic Directory by Service</h1>
             <p className="page-user-info">Signed in as: <strong>{username}</strong></p>
           </div>
         </div>
@@ -68,30 +68,30 @@ export default function SpecialtyPage({
         </div>
       </header>
 
-      <div className="specialty-grid">
-        {specialties
+      <div className="service-grid">
+        {services
           .slice()
           .sort((a, b) => a.name.localeCompare(b.name))
-          .map((s) => {
-            const clinicsForSpecialty = grouped[s.id] ?? [];
+          .map((service) => {
+            const clinicsForService = grouped[service.id] ?? [];
             return (
               <section
-                key={s.id}
-                className="specialty-card"
+                key={service.id}
+                className="service-card"
               >
-                <h2 className="specialty-title">
-                  {s.name}{" "}
-                  <span className="specialty-count">
-                    ({clinicsForSpecialty.length})
+                <h2 className="service-title">
+                  {service.name}{" "}
+                  <span className="service-count">
+                    ({clinicsForService.length})
                   </span>
                 </h2>
 
-                {clinicsForSpecialty.length === 0 ? (
-                  <p className="specialty-empty">No clinics listed yet.</p>
+                {clinicsForService.length === 0 ? (
+                  <p className="service-empty">No clinics listed yet.</p>
                 ) : (
-                  <ul className="specialty-list">
-                    {clinicsForSpecialty.map((c) => (
-                      <li key={c.id} className="specialty-list-item">
+                  <ul className="service-list">
+                    {clinicsForService.map((c) => (
+                      <li key={c.id} className="service-list-item">
                         {/* This link opens the clinic page with that clinic expanded */}
                         <Link href={`/clinic?open=${encodeURIComponent(c.id)}`}>{c.name}</Link>
                       </li>

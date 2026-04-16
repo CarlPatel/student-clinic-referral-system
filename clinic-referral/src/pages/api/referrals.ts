@@ -11,16 +11,16 @@ type ReferralResponse = {
   error?: string;
 };
 
-function canAccessReferral(referral: Referral, role: UserRole, clinicName?: string) {
+function canAccessReferral(referral: Referral, role: UserRole, clinicId?: string) {
   if (role === "master_admin") {
     return true;
   }
 
-  if (!clinicName) {
+  if (!clinicId) {
     return false;
   }
 
-  return referral.referringClinic === clinicName || referral.receivingClinic === clinicName;
+  return referral.referringClinicId === clinicId || referral.receivingClinicId === clinicId;
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse<ReferralResponse>) {
@@ -31,16 +31,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<ReferralRespons
 
     const appData = await getAppData();
     const userRole = req.session.role || "clinic_member";
-    const userClinicName = req.session.clinicKey ? appData.clinics[req.session.clinicKey]?.name : undefined;
+    const userClinicId = req.session.clinicKey ? appData.clinics[req.session.clinicKey]?.id : undefined;
 
     if (req.method === "POST") {
       const referral = req.body as Referral;
 
-      if (!referral || !referral.id) {
+      if (!referral || !referral.id || !referral.referringClinicId || !referral.receivingClinicId || !referral.clinicServiceId) {
         return res.status(400).json({ ok: false, message: "Invalid referral data" });
       }
 
-      if (!canAccessReferral(referral, userRole, userClinicName)) {
+      if (!canAccessReferral(referral, userRole, userClinicId)) {
         return res.status(403).json({ ok: false, message: "You can only save referrals for your clinic." });
       }
 
@@ -60,7 +60,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<ReferralRespons
         return res.status(404).json({ ok: false, message: "Referral not found" });
       }
 
-      if (!canAccessReferral(referral, userRole, userClinicName)) {
+      if (!canAccessReferral(referral, userRole, userClinicId)) {
         return res.status(403).json({ ok: false, message: "You can only update referrals for your clinic." });
       }
 
@@ -80,7 +80,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<ReferralRespons
         return res.status(404).json({ ok: false, message: "Referral not found" });
       }
 
-      if (!canAccessReferral(referral, userRole, userClinicName)) {
+      if (!canAccessReferral(referral, userRole, userClinicId)) {
         return res.status(403).json({ ok: false, message: "You can only delete referrals for your clinic." });
       }
 

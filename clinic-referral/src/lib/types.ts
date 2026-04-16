@@ -1,7 +1,9 @@
-export type Specialty = {
+export type Service = {
   id: string;
   name: string;
   description?: string;
+  icon?: string;
+  serviceType?: string;
 };
 
 export type UserRole = "clinic_member" | "clinic_admin" | "master_admin";
@@ -10,14 +12,14 @@ export type AppUser = {
   id: string;
   username: string;
   role: UserRole;
-  clinicKey: string;
+  clinicKey: string | null;
 };
 
 export type Clinic = {
   id: string;
   name: string;
-  affiliation?: string;
-  specialtyIds: string[];
+  serviceIds: string[];
+  tags: string[];
 
   location?: {
     address?: string;
@@ -34,7 +36,6 @@ export type Clinic = {
   };
 
   hours?: string;
-  eligibility?: string;
 
   referral?: {
     acceptingReferrals?: boolean;

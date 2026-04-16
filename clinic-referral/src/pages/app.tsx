@@ -8,12 +8,12 @@ import type { AppUser, UserRole } from "@/lib/types";
 
 // ─── TYPES ──────────────────────────────────────────────────────────────────
 type ClinicInfo = {
+  id: string;
   name: string;
   location: string;
   phone: string;
   contact: string;
   founded: string;
-  population: string;
   tags: string[];
   website: string | null;
 };
@@ -26,13 +26,19 @@ type Document = {
 
 type ClinicEntry = {
   id: string;
+  serviceId: string;
+  clinicId: string;
   clinicKey: string;
-  freq: string;
+  status: string;
+  notes: string;
+  acceptingReferrals: boolean;
   docs: Document[];
 };
 
-type SpecialtyData = {
+type ServiceData = {
+  id: string;
   icon: string;
+  serviceType: string;
   clinics: ClinicEntry[];
 };
 
@@ -42,13 +48,13 @@ type AppPageProps = {
   role: UserRole;
   clinicKey: string;
   clinics: Record<string, ClinicInfo>;
-  specialtiesData: Record<string, SpecialtyData>;
+  servicesData: Record<string, ServiceData>;
   initialReferrals: Referral[];
 };
 
 type ReferralFormDraft = {
   receivingClinic?: string;
-  specialty?: string;
+  service?: string;
 };
 
 // ─── SERVER SIDE PROPS ──────────────────────────────────────────────────────
@@ -70,8 +76,8 @@ export const getServerSideProps = withIronSessionSsr<AppPageProps>(
     ]);
 
     const userRole = context.req.session.role || "clinic_member";
-    const userClinicName = context.req.session.clinicKey ? appData.clinics[context.req.session.clinicKey]?.name : undefined;
-    const visibleReferrals = initialReferrals.filter((referral) => canAccessReferral(referral, userRole, userClinicName));
+    const userClinicId = context.req.session.clinicKey ? appData.clinics[context.req.session.clinicKey]?.id : undefined;
+    const visibleReferrals = initialReferrals.filter((referral) => canAccessReferral(referral, userRole, userClinicId));
 
     return {
       props: {
@@ -80,7 +86,7 @@ export const getServerSideProps = withIronSessionSsr<AppPageProps>(
         role: userRole,
         clinicKey: context.req.session.clinicKey || "",
         clinics: appData.clinics,
-        specialtiesData: appData.specialtiesData,
+        servicesData: appData.servicesData,
         initialReferrals: visibleReferrals
       }
     };
@@ -98,12 +104,12 @@ const docTypeStyles = {
 const EMPTY_FORM = {
   referringClinic: "",
   receivingClinic: "",
-  specialty: "",
+  service: "",
   preceptor: "",
   notes: ""
 };
 
-const STEPS = ["Referring Clinic", "Specialty", "Receiving Clinic", "Preceptor", "Review"];
+const STEPS = ["Referring Clinic", "Service", "Receiving Clinic", "Preceptor", "Review"];
 
 const ROLE_LABELS: Record<UserRole, string> = {
   clinic_member: "Clinic member",
@@ -116,16 +122,16 @@ const REFERRAL_STATUSES: Referral["status"][] = ["sent", "received", "scheduled"
 let lastSecond = -1;
 let sequence = 0;
 
-function canAccessReferral(referral: Referral, role: UserRole, clinicName?: string) {
+function canAccessReferral(referral: Referral, role: UserRole, clinicId?: string) {
   if (role === "master_admin") {
     return true;
   }
 
-  if (!clinicName) {
+  if (!clinicId) {
     return false;
   }
 
-  return referral.referringClinic === clinicName || referral.receivingClinic === clinicName;
+  return referral.referringClinicId === clinicId || referral.receivingClinicId === clinicId;
 }
 
 // ─── HELPER COMPONENTS ──────────────────────────────────────────────────────
@@ -160,28 +166,29 @@ function DocIcon({ type }: { type: "form" | "auth" | "insurance" }) {
 // ─── REFERRAL TRACKER COMPONENT ────────────────────────────────────────────
 function ReferralTracker({
   clinics,
-  specialtiesData,
+  servicesData,
   initialReferrals,
   role,
   userClinicName,
   launchDraft
 }: {
   clinics: Record<string, ClinicInfo>;
-  specialtiesData: Record<string, SpecialtyData>;
+  servicesData: Record<string, ServiceData>;
   initialReferrals: Referral[];
   role: UserRole;
   userClinicName?: string;
   launchDraft?: ReferralFormDraft | null;
 }) {
   const CLINICS = clinics;
-  const SPECIALTIES_DATA = specialtiesData;
+  const SERVICES_DATA = servicesData;
   const CLINIC_NAMES = Object.values(CLINICS).map((c) => c.name);
-  const SPECIALTY_LIST = Object.keys(SPECIALTIES_DATA);
+  const clinicByName = Object.fromEntries(Object.values(CLINICS).map((clinic) => [clinic.name, clinic]));
+  const SERVICE_LIST = Object.keys(SERVICES_DATA);
   const canSkipReferringClinic = (role === "clinic_admin" || role === "clinic_member") && Boolean(userClinicName);
   const firstStep = canSkipReferringClinic ? 1 : 0;
   const visibleSteps = canSkipReferringClinic ? STEPS.slice(1) : STEPS;
   const defaultClinicFilter = role === "master_admin" ? "All" : userClinicName ?? "All";
-  const getSpecialtyIcon = (specialty: string) => SPECIALTIES_DATA[specialty]?.icon ?? "🏥";
+  const getServiceIcon = (service: string) => SERVICES_DATA[service]?.icon ?? "🏥";
   const formatReferralTime = (time: string) => {
     const parsed = new Date(`1970-01-01T${time}`);
     if (Number.isNaN(parsed.getTime())) {
@@ -227,14 +234,14 @@ function ReferralTracker({
   const [detailNotesDraft, setDetailNotesDraft] = useState("");
   const [isSavingDetailNotes, setIsSavingDetailNotes] = useState(false);
   const [filterClinic, setFilterClinic] = useState(defaultClinicFilter);
-  const [filterSpecialty, setFilterSpecialty] = useState("All");
+  const [filterService, setFilterService] = useState("All");
   const [filterStatus, setFilterStatus] = useState("All");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const buildInitialForm = (draft?: ReferralFormDraft | null) => ({
     ...EMPTY_FORM,
     referringClinic: canSkipReferringClinic ? userClinicName ?? "" : "",
-    specialty: draft?.specialty ?? "",
+    service: draft?.service ?? "",
     receivingClinic: draft?.receivingClinic ?? ""
   });
 
@@ -265,15 +272,15 @@ function ReferralTracker({
     setForm({
       ...EMPTY_FORM,
       referringClinic: canSkipReferringClinic ? userClinicName ?? "" : "",
-      specialty: launchDraft.specialty ?? "",
+      service: launchDraft.service ?? "",
       receivingClinic: launchDraft.receivingClinic ?? ""
     });
     setStep(
       !canSkipReferringClinic
         ? 0
-        : launchDraft.specialty && launchDraft.receivingClinic
+        : launchDraft.service && launchDraft.receivingClinic
           ? 3
-          : launchDraft.specialty
+          : launchDraft.service
             ? 2
             : firstStep
     );
@@ -290,7 +297,7 @@ function ReferralTracker({
   const validate = () => {
     const e: Record<string, string> = {};
     if (step === 0 && !form.referringClinic) e.referringClinic = "Please select a referring clinic";
-    if (step === 1 && !form.specialty) e.specialty = "Please select a specialty";
+    if (step === 1 && !form.service) e.service = "Please select a service";
     if (step === 2 && !form.receivingClinic) e.receivingClinic = "Please select a receiving clinic";
     if (step === 2 && form.referringClinic && form.receivingClinic === form.referringClinic)
       e.receivingClinic = "Referring and receiving clinic cannot be the same";
@@ -313,14 +320,33 @@ function ReferralTracker({
 
   const submit = async () => {
     const now = new Date();
-    const entry: Referral = { 
-      ...form, 
-      id: generateReferralId(), 
-      date: now.toISOString().split('T')[0], 
-      time: now.toTimeString().split(' ')[0].substring(0, 5),
+    const referringClinic = clinicByName[form.referringClinic];
+    const receivingClinic = clinicByName[form.receivingClinic];
+    const clinicService = SERVICES_DATA[form.service]?.clinics.find((entry) => entry.clinicId === receivingClinic?.id);
+
+    if (!referringClinic || !receivingClinic || !clinicService) {
+      setErrors({
+        ...errors,
+        receivingClinic: "Please select a valid receiving clinic for this service"
+      });
+      return;
+    }
+
+    const entry: Referral = {
+      id: generateReferralId(),
+      referringClinicId: referringClinic.id,
+      receivingClinicId: receivingClinic.id,
+      clinicServiceId: clinicService.id,
+      referringClinic: referringClinic.name,
+      receivingClinic: receivingClinic.name,
+      service: form.service,
+      date: now.toISOString().split("T")[0],
+      time: now.toTimeString().split(" ")[0].substring(0, 5),
       status: "sent",
-      submittedAt: now.toISOString() 
-    } as Referral;
+      preceptor: form.preceptor,
+      notes: form.notes,
+      submittedAt: now.toISOString()
+    };
     
     // Save to database via API
     try {
@@ -339,7 +365,8 @@ function ReferralTracker({
     }
     
     // Save to state and localStorage
-    const updated = [entry, ...referrals].filter((referral) => canAccessReferral(referral, role, userClinicName));
+    const userClinicId = userClinicName ? clinicByName[userClinicName]?.id : undefined;
+    const updated = [entry, ...referrals].filter((referral) => canAccessReferral(referral, role, userClinicId));
     save(updated);
     setSubmitted(true);
   };
@@ -408,7 +435,7 @@ function ReferralTracker({
   const filtered = referrals.filter(
     (r) =>
       (filterClinic === "All" || r.referringClinic === filterClinic || r.receivingClinic === filterClinic) &&
-      (filterSpecialty === "All" || r.specialty === filterSpecialty) &&
+      (filterService === "All" || r.service === filterService) &&
       (filterStatus === "All" || r.status === filterStatus)
   );
 
@@ -427,8 +454,8 @@ function ReferralTracker({
   const inp = (field: string, value: string) => {
     setForm((f) => {
       const updated = { ...f, [field]: value };
-      // If specialty changes, clear receiving clinic since it may not be valid
-      if (field === "specialty" && f.receivingClinic) {
+      // If service changes, clear receiving clinic since it may not be valid
+      if (field === "service" && f.receivingClinic) {
         updated.receivingClinic = "";
       }
       return updated;
@@ -436,8 +463,8 @@ function ReferralTracker({
     setErrors((e) => {
       const newErrors = { ...e };
       delete newErrors[field];
-      // Also clear receiving clinic error if specialty changes
-      if (field === "specialty") {
+      // Also clear receiving clinic error if service changes
+      if (field === "service") {
         delete newErrors.receivingClinic;
       }
       return newErrors;
@@ -544,7 +571,7 @@ function ReferralTracker({
         <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 800, color: "#0F172A" }}>Referral Logged!</h2>
         <p style={{ color: "#64748B", fontSize: 14, margin: "0 0 28px", maxWidth: 360, lineHeight: 1.6 }}>
           The referral from <strong>{form.referringClinic}</strong> to <strong>{form.receivingClinic}</strong> for{" "}
-          <strong>{form.specialty}</strong> has been recorded.
+          <strong>{form.service}</strong> has been recorded.
         </p>
         <div style={{ display: "flex", gap: 12 }}>
           <button
@@ -630,7 +657,7 @@ function ReferralTracker({
           >
             Referral Record · #{detailEntry.id}
           </div>
-          <div style={{ color: "#fff", fontSize: 20, fontWeight: 700, marginBottom: 6 }}>{detailEntry.specialty}</div>
+          <div style={{ color: "#fff", fontSize: 20, fontWeight: 700, marginBottom: 6 }}>{detailEntry.service}</div>
           <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>
             Submitted {formatReferralDateTimeShort(detailEntry.date, detailEntry.time)}
           </div>
@@ -650,7 +677,7 @@ function ReferralTracker({
               icon: "📅"
             },
             { label: "Status", value: detailEntry.status, icon: "📌" },
-            { label: "Specialty", value: detailEntry.specialty, icon: "🩺" },
+            { label: "Service", value: detailEntry.service, icon: "🩺" },
             { label: "Referring Preceptor", value: detailEntry.preceptor, icon: "👨‍⚕️" }
           ].map((item) => (
             <div
@@ -863,30 +890,30 @@ function ReferralTracker({
             </div>
           )}
 
-          {/* Step 1 – Specialty */}
+          {/* Step 1 – Service */}
           {step === 1 && (
             <div>
               <div style={{ fontSize: 22, marginBottom: 4 }}>🩺</div>
               <h3 style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 700, color: "#0F172A" }}>
-                What specialty is this referral for?
+                What service is this referral for?
               </h3>
               <p style={{ margin: "0 0 20px", color: "#64748B", fontSize: 13 }}>
-                Select the relevant specialty for this referral.
+                Select the relevant service for this referral.
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                {SPECIALTY_LIST.map((s) => (
+                {SERVICE_LIST.map((s) => (
                   <button
                     key={s}
-                    onClick={() => inp("specialty", s)}
+                    onClick={() => inp("service", s)}
                     style={{
                       padding: "10px 12px",
                       textAlign: "left",
-                      border: `1.5px solid ${form.specialty === s ? "#38BDF8" : "#E2E8F0"}`,
+                      border: `1.5px solid ${form.service === s ? "#38BDF8" : "#E2E8F0"}`,
                       borderRadius: 10,
-                      background: form.specialty === s ? "#F0F9FF" : "#fff",
-                      color: form.specialty === s ? "#0369A1" : "#334155",
+                      background: form.service === s ? "#F0F9FF" : "#fff",
+                      color: form.service === s ? "#0369A1" : "#334155",
                       fontSize: 12.5,
-                      fontWeight: form.specialty === s ? 600 : 400,
+                      fontWeight: form.service === s ? 600 : 400,
                       cursor: "pointer",
                       display: "flex",
                       alignItems: "center",
@@ -894,19 +921,19 @@ function ReferralTracker({
                       transition: "all 0.13s"
                     }}
                   >
-                    <span>{getSpecialtyIcon(s)}</span>
+                    <span>{getServiceIcon(s)}</span>
                     {s}
-                    {form.specialty === s && <span style={{ marginLeft: "auto", color: "#38BDF8" }}>✓</span>}
+                    {form.service === s && <span style={{ marginLeft: "auto", color: "#38BDF8" }}>✓</span>}
                   </button>
                 ))}
               </div>
-              {errors.specialty && (
-                <div style={{ color: "#EF4444", fontSize: 12, marginTop: 8 }}>⚠ {errors.specialty}</div>
+              {errors.service && (
+                <div style={{ color: "#EF4444", fontSize: 12, marginTop: 8 }}>⚠ {errors.service}</div>
               )}
             </div>
           )}
 
-          {/* Step 2 – Receiving Clinic (filtered by specialty) */}
+          {/* Step 2 – Receiving Clinic (filtered by service) */}
           {step === 2 && (
             <div>
               <div style={{ fontSize: 22, marginBottom: 4 }}>🎯</div>
@@ -914,7 +941,7 @@ function ReferralTracker({
                 Which clinic is receiving the referral?
               </h3>
               <p style={{ margin: "0 0 20px", color: "#64748B", fontSize: 13 }}>
-                Select a clinic that offers {form.specialty} services.
+                Select a clinic that offers {form.service} services.
               </p>
               <div style={{ position: "relative" }}>
                 <select
@@ -924,9 +951,9 @@ function ReferralTracker({
                 >
                   <option value="">— Select receiving clinic —</option>
                   {(() => {
-                    const specialtyData = (SPECIALTIES_DATA as Record<string, SpecialtyData>)[form.specialty];
-                    if (!specialtyData) return null;
-                    return specialtyData.clinics
+                    const serviceData = (SERVICES_DATA as Record<string, ServiceData>)[form.service];
+                    if (!serviceData) return null;
+                    return serviceData.clinics
                       .map(entry => (CLINICS as Record<string, ClinicInfo>)[entry.clinicKey].name)
                       .filter(name => name !== form.referringClinic)
                       .map((n) => (
@@ -952,8 +979,8 @@ function ReferralTracker({
                 <div style={{ color: "#EF4444", fontSize: 12, marginTop: 6 }}>⚠ {errors.receivingClinic}</div>
               )}
               <div style={{ marginTop: 16, padding: "12px 14px", background: "#F8FAFC", borderRadius: 10, fontSize: 12.5, color: "#64748B" }}>
-                <span style={{ color: "#94A3B8" }}>Specialty: </span>
-                <strong style={{ color: "#0F172A" }}>{form.specialty}</strong>
+                <span style={{ color: "#94A3B8" }}>Service: </span>
+                <strong style={{ color: "#0F172A" }}>{form.service}</strong>
               </div>
               <div style={{ marginTop: 10, padding: "12px 14px", background: "#F8FAFC", borderRadius: 10, fontSize: 12.5, color: "#64748B" }}>
                 <span style={{ color: "#94A3B8" }}>Referring from: </span>
@@ -1008,7 +1035,7 @@ function ReferralTracker({
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {[
                   { label: "Referring Clinic", value: form.referringClinic, icon: "🏥" },
-                  { label: "Specialty", value: `${getSpecialtyIcon(form.specialty)} ${form.specialty}`, icon: "" },
+                  { label: "Service", value: `${getServiceIcon(form.service)} ${form.service}`, icon: "" },
                   { label: "Receiving Clinic", value: form.receivingClinic, icon: "🎯" },
                   { label: "Referring Preceptor", value: form.preceptor, icon: "👨‍⚕️" },
                   ...(form.notes ? [{ label: "Notes", value: form.notes, icon: "📝" }] : [])
@@ -1112,7 +1139,7 @@ function ReferralTracker({
 
   // ── LIST VIEW ──
   const uniqueReferringClinics = [...new Set(referrals.map((r) => r.referringClinic))];
-  const usedSpecialties = [...new Set(referrals.map((r) => r.specialty))];
+  const usedServices = [...new Set(referrals.map((r) => r.service))];
 
   return (
     <div>
@@ -1165,7 +1192,7 @@ function ReferralTracker({
               icon: "🏥",
               color: "#8B5CF6"
             },
-            { label: "Specialties", value: new Set(referrals.map((r) => r.specialty)).size, icon: "🩺", color: "#16A34A" },
+            { label: "Services", value: new Set(referrals.map((r) => r.service)).size, icon: "🩺", color: "#16A34A" },
             { label: "Preceptors", value: new Set(referrals.map((r) => r.preceptor)).size, icon: "👨‍⚕️", color: "#F59E0B" }
           ].map((stat) => (
             <div key={stat.label} style={{ background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: "14px 16px" }}>
@@ -1217,8 +1244,8 @@ function ReferralTracker({
           </div>
           <div style={{ position: "relative" }}>
             <select
-              value={filterSpecialty}
-              onChange={(e) => setFilterSpecialty(e.target.value)}
+              value={filterService}
+              onChange={(e) => setFilterService(e.target.value)}
               style={{
                 padding: "7px 28px 7px 12px",
                 border: "1.5px solid #E2E8F0",
@@ -1231,8 +1258,8 @@ function ReferralTracker({
                 appearance: "none"
               }}
             >
-              <option value="All">All Specialties</option>
-              {usedSpecialties.map((s) => (
+              <option value="All">All Services</option>
+              {usedServices.map((s) => (
                 <option key={s} value={s}>
                   {s}
                 </option>
@@ -1285,11 +1312,11 @@ function ReferralTracker({
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </div>
-          {(filterClinic !== defaultClinicFilter || filterSpecialty !== "All" || filterStatus !== "All") && (
+          {(filterClinic !== defaultClinicFilter || filterService !== "All" || filterStatus !== "All") && (
             <button
               onClick={() => {
                 setFilterClinic(defaultClinicFilter);
-                setFilterSpecialty("All");
+                setFilterService("All");
                 setFilterStatus("All");
               }}
               style={{
@@ -1351,7 +1378,7 @@ function ReferralTracker({
               gap: 8
             }}
           >
-            {["Record #", "Date", "Referring Clinic", "Receiving Clinic", "Specialty", "Preceptor", "Status", ""].map((h) => (
+            {["Record #", "Date", "Referring Clinic", "Receiving Clinic", "Service", "Preceptor", "Status", ""].map((h) => (
               <div
                 key={h}
                 style={{ fontSize: 10.5, fontWeight: 700, color: "#94A3B8", textTransform: "uppercase", letterSpacing: 0.8 }}
@@ -1388,8 +1415,8 @@ function ReferralTracker({
                 <span style={{ fontSize: 12.5, color: "#0F172A", fontWeight: 500 }}>{r.receivingClinic}</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                <span style={{ fontSize: 13 }}>{getSpecialtyIcon(r.specialty)}</span>
-                <span style={{ fontSize: 12, color: "#334155" }}>{r.specialty}</span>
+                <span style={{ fontSize: 13 }}>{getServiceIcon(r.service)}</span>
+                <span style={{ fontSize: 12, color: "#334155" }}>{r.service}</span>
               </div>
               <div style={{ fontSize: 12, color: "#334155", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {r.preceptor}
@@ -1928,7 +1955,7 @@ function UserManagement({
                   </select>
 
                   <select
-                    value={user.role === "master_admin" ? allClinicsValue : user.clinicKey}
+                    value={user.role === "master_admin" ? allClinicsValue : user.clinicKey ?? ""}
                     disabled={user.role === "master_admin"}
                     onChange={(event) => void updateAccess(user.id, user.role, event.target.value)}
                     style={{
@@ -2036,31 +2063,31 @@ function UserManagement({
 }
 
 // ─── MAIN APP COMPONENT ─────────────────────────────────────────────────────
-export default function ClinicReferralApp({ username, userId, role, clinicKey, clinics, specialtiesData, initialReferrals }: AppPageProps) {
+export default function ClinicReferralApp({ username, userId, role, clinicKey, clinics, servicesData, initialReferrals }: AppPageProps) {
   const CLINICS = clinics;
-  const SPECIALTIES_DATA = specialtiesData;
-  const specialties = Object.keys(SPECIALTIES_DATA);
+  const SERVICES_DATA = servicesData;
+  const services = Object.keys(SERVICES_DATA);
   const clinicOptions = Object.entries(CLINICS)
     .map(([key, info]) => ({ key, name: info.name }))
     .sort((left, right) => left.name.localeCompare(right.name));
   const canManageUsers = role === "master_admin";
   const sidebarClinicLabel = role === "master_admin" ? "" : clinicKey ? CLINICS[clinicKey]?.name ?? "Unknown clinic" : "No clinic assigned";
-  const [section, setSection] = useState<"specialties" | "tracker" | "users">("tracker");
-  const [activeSpecialty, setActiveSpecialty] = useState(specialties[0]);
+  const [section, setSection] = useState<"services" | "tracker" | "users">("tracker");
+  const [activeService, setActiveService] = useState(services[0]);
    const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [search, setSearch] = useState("");
   const [trackerLaunchDraft, setTrackerLaunchDraft] = useState<ReferralFormDraft | null>(null);
 
-  const filtered = specialties.filter((s) => s.toLowerCase().includes(search.toLowerCase()));
-  const currentEntries = (SPECIALTIES_DATA as Record<string, SpecialtyData>)[activeSpecialty]?.clinics || [];
+  const filtered = services.filter((s) => s.toLowerCase().includes(search.toLowerCase()));
+  const currentEntries = (SERVICES_DATA as Record<string, ServiceData>)[activeService]?.clinics || [];
   const currentEntry = selectedEntry ? currentEntries.find((e) => e.id === selectedEntry) : null;
   const currentInfo: ClinicInfo | null = currentEntry ? (CLINICS as Record<string, ClinicInfo>)[currentEntry.clinicKey] : null;
 
-  const handleSpecialty = (s: string) => {
-    setActiveSpecialty(s);
+  const handleService = (s: string) => {
+    setActiveService(s);
     setSelectedEntry(null);
-    setSection("specialties");
+    setSection("services");
   };
 
   const openReferralFormForClinic = (draft: ReferralFormDraft) => {
@@ -2240,20 +2267,20 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                   whiteSpace: "nowrap"
                 }}
               >
-                Specialties
+                Services
               </span>
               <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.07)" }} />
             </div>
           )}
           {!sidebarOpen && <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "4px 0" }} />}
 
-          {/* Search */}
-          {sidebarOpen && section === "specialties" && (
+          {/* Search
+          {sidebarOpen && section === "services" && (
             <div style={{ padding: "6px 12px 4px" }}>
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search specialties…"
+                placeholder="Search services…"
                 style={{
                   width: "100%",
                   boxSizing: "border-box",
@@ -2267,16 +2294,16 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                 }}
               />
             </div>
-          )}
+          )} */}
 
-          {/* Specialty nav */}
+          {/* Service nav */}
           <nav className="hide-scrollbar" style={{ flex: 1, overflowY: "auto", padding: "4px 8px 12px" }}>
             {filtered.map((s) => {
-              const active = section === "specialties" && activeSpecialty === s;
+              const active = section === "services" && activeService === s;
               return (
                 <button
                   key={s}
-                  onClick={() => handleSpecialty(s)}
+                  onClick={() => handleService(s)}
                   title={!sidebarOpen ? s : undefined}
                   style={{
                     width: "100%",
@@ -2320,7 +2347,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                     />
                   )}
                   <span style={{ fontSize: 17, lineHeight: 1, flexShrink: 0 }}>
-                    {(SPECIALTIES_DATA as Record<string, SpecialtyData>)[s].icon}
+                    {(SERVICES_DATA as Record<string, ServiceData>)[s].icon}
                   </span>
                   {sidebarOpen && <span style={{ lineHeight: 1.3, flex: 1 }}>{s}</span>}
                   {sidebarOpen && (
@@ -2335,7 +2362,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                         flexShrink: 0
                       }}
                     >
-                      {(SPECIALTIES_DATA as Record<string, SpecialtyData>)[s].clinics.length}
+                      {(SERVICES_DATA as Record<string, ServiceData>)[s].clinics.length}
                     </span>
                   )}
                 </button>
@@ -2434,7 +2461,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
               <div style={{ flex: 1, overflowY: "auto", padding: "24px 28px" }}>
                 <ReferralTracker
                   clinics={CLINICS}
-                  specialtiesData={SPECIALTIES_DATA}
+                  servicesData={SERVICES_DATA}
                   initialReferrals={initialReferrals}
                   role={role}
                   userClinicName={clinicKey ? CLINICS[clinicKey]?.name : undefined}
@@ -2473,7 +2500,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
           )}
 
           {/* SPECIALTIES SECTION */}
-          {section === "specialties" && (
+          {section === "services" && (
             <>
               <header
                 style={{
@@ -2487,10 +2514,10 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 22 }}>{(SPECIALTIES_DATA as Record<string, SpecialtyData>)[activeSpecialty]?.icon}</span>
+                  <span style={{ fontSize: 22 }}>{(SERVICES_DATA as Record<string, ServiceData>)[activeService]?.icon}</span>
                   <div>
                     <h1 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "#0F172A" }}>
-                      {activeSpecialty}
+                      {activeService}
                       {currentInfo && (
                         <>
                           <span style={{ color: "#CBD5E1", margin: "0 8px" }}>/</span>
@@ -2535,7 +2562,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                 {!currentInfo && (
                   <div>
                     <p style={{ margin: "0 0 20px", color: "#64748B", fontSize: 13.5 }}>
-                      Select a clinic to view required referral documents for <strong>{activeSpecialty}</strong>.
+                      Select a clinic to view required referral documents for <strong>{activeService}</strong>.
                     </p>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(295px, 1fr))", gap: 18 }}>
                       {currentEntries.map((entry) => {
@@ -2607,9 +2634,11 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                                   fontWeight: 700
                                 }}
                               >
-                                {activeSpecialty} schedule
+                                {activeService} schedule
                               </div>
-                              <div style={{ fontSize: 12.5, color: "#334155", fontWeight: 500 }}>{entry.freq}</div>
+                              <div style={{ fontSize: 12.5, color: "#334155", fontWeight: 500 }}>
+                                {entry.notes || entry.status}
+                              </div>
                             </div>
                             {info.contact && (
                               <div style={{ marginBottom: 11 }}>
@@ -2691,7 +2720,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                             marginBottom: 5
                           }}
                         >
-                          {activeSpecialty} · {currentEntry.freq}
+                          {activeService} · {currentEntry.notes || currentEntry.status}
                         </div>
                         <div style={{ color: "#fff", fontSize: 19, fontWeight: 700, marginBottom: 6 }}>{currentInfo.name}</div>
                         <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 12.5, display: "flex", flexWrap: "wrap", gap: 18 }}>
@@ -2699,10 +2728,6 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                           {currentInfo.phone && currentInfo.phone !== "—" && <span>📞 {currentInfo.phone}</span>}
                           <span>👤 {currentInfo.contact}</span>
                           <span>🏥 Est. {currentInfo.founded}</span>
-                        </div>
-                        <div style={{ marginTop: 8, color: "rgba(255,255,255,0.35)", fontSize: 11.5 }}>
-                          <span style={{ color: "rgba(255,255,255,0.22)", marginRight: 5 }}>Serves:</span>
-                          {currentInfo.population}
                         </div>
                       </div>
                       <div
@@ -2860,7 +2885,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                       <button
                         onClick={() =>
                           openReferralFormForClinic({
-                            specialty: activeSpecialty,
+                            service: activeService,
                             receivingClinic: currentInfo.name
                           })
                         }

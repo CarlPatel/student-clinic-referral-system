@@ -40,7 +40,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<LoginResponse>)
     req.session.userId = user.id;
     req.session.username = user.username;
     req.session.role = user.role;
-    req.session.clinicKey = user.clinicKey;
+    req.session.clinicKey = user.clinicKey ?? undefined;
     await req.session.save();
 
     return res.status(200).json({ ok: true });

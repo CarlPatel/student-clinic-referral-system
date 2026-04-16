@@ -1,8 +1,8 @@
-import type { Clinic, Specialty } from "@/lib/types";
+import type { Clinic, Service } from "@/lib/types";
 
 export interface DataSource {
-  getSpecialties(): Promise<Specialty[]>;
+  getServices(): Promise<Service[]>;
   getClinics(): Promise<Clinic[]>;
   getClinicById(id: string): Promise<Clinic | null>;
-  getClinicsBySpecialty(specialtyId: string): Promise<Clinic[]>;
+  getClinicsByService(serviceId: string): Promise<Clinic[]>;
 }
