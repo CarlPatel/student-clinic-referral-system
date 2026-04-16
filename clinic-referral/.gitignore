@@ -30,6 +30,16 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# local CSV sync inputs, archives, failures, and logs
+/sync/input/*
+!/sync/input/.gitkeep
+/sync/processed/*
+!/sync/processed/.gitkeep
+/sync/failed/*
+!/sync/failed/.gitkeep
+/sync/logs/*
+!/sync/logs/.gitkeep
+
 # env files (can opt-in for committing if needed)
 .env*
 
