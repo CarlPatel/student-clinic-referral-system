@@ -196,8 +196,20 @@ function createLogger(logPath) {
   };
 }
 
+
 async function ensureSyncDirectories() {
   await Promise.all([INPUT_DIR, PROCESSED_DIR, FAILED_DIR, LOG_DIR].map((dir) => fs.mkdir(dir, { recursive: true })));
+}
+
+function matchesConfiguredFile(actualFileName, expectedFileName) {
+  if (actualFileName === expectedFileName) return true;
+
+  if (!actualFileName.toLowerCase().endsWith(expectedFileName.toLowerCase())) {
+    return false;
+  }
+
+  const prefix = actualFileName.slice(0, actualFileName.length - expectedFileName.length);
+  return prefix.trim().length > 0;
 }
 
 function getPool() {
@@ -451,21 +463,22 @@ function buildStatement(config, row) {
 }
 
 async function syncFile(client, config, logger) {
-  const filePath = path.join(INPUT_DIR, config.fileName);
-  logger.info(`Starting ${config.tableName} sync from ${config.fileName}.`);
+  const inputFileName = config.inputFileName || config.fileName;
+  const filePath = path.join(INPUT_DIR, inputFileName);
+  logger.info(`Starting ${config.tableName} sync from ${inputFileName}.`);
 
   const content = await fs.readFile(filePath, "utf8");
   const { headers, records } = parseAdminCsv(content);
   if (headers.length === 0) {
-    throw new Error(`${config.fileName} does not contain a header row.`);
+    throw new Error(`${inputFileName} does not contain a header row.`);
   }
 
   const validHeaders = headers.filter((header) => config.columns[header]);
   if (validHeaders.length === 0) {
-    throw new Error(`${config.fileName} does not contain any columns for ${config.tableName}.`);
+    throw new Error(`${inputFileName} does not contain any columns for ${config.tableName}.`);
   }
 
-  logger.info(`${config.fileName}: parsed ${records.length} data row(s) after skipping metadata, ${validHeaders.length} usable column(s).`);
+  logger.info(`${inputFileName}: parsed ${records.length} data row(s) after skipping metadata, ${validHeaders.length} usable column(s).`);
 
   await client.query("BEGIN");
   try {
@@ -478,7 +491,7 @@ async function syncFile(client, config, logger) {
       if (missingColumns.length > 0) {
         skippedRows += 1;
         logger.info(
-          `${config.fileName}: skipped source row ${sourceRowNumber}; missing required field(s): ${missingColumns.join(", ")}.`
+          `${inputFileName}: skipped source row ${sourceRowNumber}; missing required field(s): ${missingColumns.join(", ")}.`
         );
         continue;
       }
@@ -489,11 +502,11 @@ async function syncFile(client, config, logger) {
     }
 
     await client.query("COMMIT");
-    logger.info(`${config.fileName}: upsert success for ${upsertedRows} row(s); skipped ${skippedRows} row(s).`);
+    logger.info(`${inputFileName}: upsert success for ${upsertedRows} row(s); skipped ${skippedRows} row(s).`);
     return upsertedRows;
   } catch (error) {
     await client.query("ROLLBACK");
-    logger.error(`${config.fileName}: transaction rollback complete.`, error);
+    logger.error(`${inputFileName}: transaction rollback complete.`, error);
     throw error;
   }
 }
@@ -537,9 +550,13 @@ async function main() {
 
   try {
     const detectedFiles = await fs.readdir(INPUT_DIR);
-    const detectedCsvs = TABLES.filter((config) => detectedFiles.includes(config.fileName));
-    const supportedFileNames = new Set(TABLES.map((config) => config.fileName));
-    const unsupportedCsvs = detectedFiles.filter((fileName) => fileName.endsWith(".csv") && !supportedFileNames.has(fileName));
+    const detectedCsvs = TABLES.flatMap((config) => {
+      const matchedFileName = detectedFiles.find((fileName) => matchesConfiguredFile(fileName, config.fileName));
+      return matchedFileName ? [{ ...config, inputFileName: matchedFileName }] : [];
+    });
+    const unsupportedCsvs = detectedFiles.filter(
+      (fileName) => fileName.endsWith(".csv") && !TABLES.some((config) => matchesConfiguredFile(fileName, config.fileName))
+    );
 
     for (const fileName of unsupportedCsvs) {
       logger.info(`Ignoring unsupported CSV file ${fileName}; expected only the configured sync files.`);
@@ -552,7 +569,7 @@ async function main() {
     }
 
     for (const config of detectedCsvs) {
-      logger.info(`Detected ${config.fileName}.`);
+      logger.info(`Detected ${config.inputFileName || config.fileName}.`);
     }
 
     pool = getPool();
@@ -563,13 +580,14 @@ async function main() {
     try {
       for (const config of detectedCsvs) {
         const rowCount = await syncFile(client, config, logger);
-        processedFiles.push(config.fileName);
+        processedFiles.push(config.inputFileName || config.fileName);
         totalRows += rowCount;
       }
     } catch (error) {
       const failedConfig = detectedCsvs[processedFiles.length];
-      logger.error(`CSV sync failed while processing ${failedConfig.fileName}. Later files were not processed.`, error);
-      await moveFailedFile(failedConfig.fileName, runStamp, logger);
+      const failedFileName = failedConfig.inputFileName || failedConfig.fileName;
+      logger.error(`CSV sync failed while processing ${failedFileName}. Later files were not processed.`, error);
+      await moveFailedFile(failedFileName, runStamp, logger);
       throw error;
     } finally {
       client.release();

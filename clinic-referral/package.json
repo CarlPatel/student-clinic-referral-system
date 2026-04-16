@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "db:import": "node database/import.js",
-    "sync:csv": "node sync/scripts/syncCsvToDb.js"
+    "sync:csv": "node sync/scripts/syncCsvToDb.js",
+    "sync:clear": "node sync/scripts/clearSyncFolders.js"
   },
   "dependencies": {
     "iron-session": "^7.0.2",
