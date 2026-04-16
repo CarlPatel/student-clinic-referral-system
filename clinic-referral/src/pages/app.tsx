@@ -2274,8 +2274,8 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
           )}
           {!sidebarOpen && <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "4px 0" }} />}
 
-          {/* Search
-          {sidebarOpen && section === "services" && (
+          {/* Search */}
+          {/* {sidebarOpen && section === "services" && (
             <div style={{ padding: "6px 12px 4px" }}>
               <input
                 value={search}
