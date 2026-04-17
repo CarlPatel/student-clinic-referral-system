@@ -1,6 +1,6 @@
 import { buildGoogleDriveViewUrl, extractGoogleDriveFileId } from "@/lib/googleDrive";
-import type { Clinic, ClinicServiceDocument, Service } from "@/lib/types";
-import { Pool } from "pg";
+import type { Clinic, ClinicServiceDocument, ClinicServiceOption, Service, UserRole } from "@/lib/types";
+import { Pool, type PoolClient } from "pg";
 
 type DbClinicRow = {
   clinic_id: string;
@@ -44,13 +44,14 @@ type DbClinicServiceRow = {
 };
 
 type DbClinicServiceDocumentRow = {
+  id: number;
   clinic_service_id: string;
   doc_name: string;
   doc_type: "form" | "auth" | "insurance";
   doc_description: string | null;
-  url: string;
+  url: string | null;
   google_drive_file_id: string | null;
-  sort_order: number;
+  sort_order: number | null;
 };
 
 const globalForPool = globalThis as unknown as { __clinicPool?: Pool };
@@ -218,9 +219,9 @@ export async function getAppData(): Promise<{
         name: string;
         type: "form" | "auth" | "insurance";
         desc: string | null;
-        url: string;
+        url: string | null;
         googleDriveFileId: string | null;
-        sortOrder: number;
+        sortOrder: number | null;
       }>;
     }>;
   }>;
@@ -266,7 +267,7 @@ export async function getAppData(): Promise<{
     ),
     query<DbClinicServiceDocumentRow>(
       `
-        SELECT clinic_service_id, doc_name, doc_type, doc_description, url, google_drive_file_id, sort_order
+        SELECT id, clinic_service_id, doc_name, doc_type, doc_description, url, google_drive_file_id, sort_order
         FROM clinic_service_documents
         ORDER BY sort_order ASC NULLS LAST, doc_name ASC
       `
@@ -299,6 +300,8 @@ export async function getAppData(): Promise<{
     const list = docsByClinicServiceId.get(row.clinic_service_id) ?? [];
     const googleDriveFileId = row.google_drive_file_id ?? extractGoogleDriveFileId(row.url);
     list.push({
+      id: row.id,
+      clinicServiceId: row.clinic_service_id,
       name: row.doc_name,
       type: row.doc_type,
       desc: row.doc_description ?? "",
@@ -349,6 +352,242 @@ export async function getAppData(): Promise<{
   );
 
   return { clinics, servicesData };
+}
+
+function canManageForms(role: UserRole | undefined): role is "clinic_admin" | "master_admin" {
+  return role === "clinic_admin" || role === "master_admin";
+}
+
+function clinicServiceScopeWhere(role: UserRole, clinicKey?: string | null) {
+  if (role === "master_admin") {
+    return { clause: "", params: [] as unknown[] };
+  }
+
+  return { clause: "WHERE c.clinic_key = $1", params: [clinicKey] as unknown[] };
+}
+
+function mapDocumentRow(row: DbClinicServiceDocumentRow): ClinicServiceDocument {
+  const googleDriveFileId = row.google_drive_file_id ?? extractGoogleDriveFileId(row.url);
+
+  return {
+    id: row.id,
+    clinicServiceId: row.clinic_service_id,
+    name: row.doc_name,
+    type: row.doc_type,
+    desc: row.doc_description,
+    url: row.url ?? (googleDriveFileId ? buildGoogleDriveViewUrl(googleDriveFileId) : null),
+    googleDriveFileId,
+    sortOrder: row.sort_order
+  };
+}
+
+export async function listManageableClinicServices(role: UserRole, clinicKey?: string | null): Promise<ClinicServiceOption[]> {
+  if (!canManageForms(role)) {
+    return [];
+  }
+
+  if (role === "clinic_admin" && !clinicKey) {
+    return [];
+  }
+
+  const scope = clinicServiceScopeWhere(role, clinicKey);
+  const rows = await query<{
+    clinic_service_id: string;
+    clinic_id: string;
+    clinic_key: string;
+    clinic_name: string;
+    service_id: string;
+    service_name: string;
+  }>(
+    `
+      SELECT
+        cs.clinic_service_id,
+        c.clinic_id,
+        c.clinic_key,
+        c.name AS clinic_name,
+        s.service_id,
+        s.display_name AS service_name
+      FROM clinic_services cs
+      JOIN clinics c ON c.clinic_id = cs.clinic_id
+      JOIN services s ON s.service_id = cs.service_id
+      ${scope.clause}
+      ORDER BY c.name ASC, s.display_name ASC
+    `,
+    scope.params
+  );
+
+  return rows.map((row) => ({
+    id: row.clinic_service_id,
+    clinicId: row.clinic_id,
+    clinicKey: row.clinic_key,
+    clinicName: row.clinic_name,
+    serviceId: row.service_id,
+    serviceName: row.service_name
+  }));
+}
+
+export async function canManageClinicService(clinicServiceId: string, role: UserRole, clinicKey?: string | null): Promise<boolean> {
+  const options = await listManageableClinicServices(role, clinicKey);
+  return options.some((option) => option.id === clinicServiceId);
+}
+
+export async function listClinicServiceDocuments(clinicServiceId: string): Promise<ClinicServiceDocument[]> {
+  const rows = await query<DbClinicServiceDocumentRow>(
+    `
+      SELECT id, clinic_service_id, doc_name, doc_type, doc_description, url, google_drive_file_id, sort_order
+      FROM clinic_service_documents
+      WHERE clinic_service_id = $1
+      ORDER BY sort_order ASC NULLS LAST, doc_name ASC
+    `,
+    [clinicServiceId]
+  );
+
+  return rows.map(mapDocumentRow);
+}
+
+async function rewriteDocumentSortOrder(client: PoolClient, clinicServiceId: string, orderedDocumentIds: number[]) {
+  for (let index = 0; index < orderedDocumentIds.length; index += 1) {
+    await client.query(
+      `
+        UPDATE clinic_service_documents
+        SET sort_order = $1
+        WHERE id = $2 AND clinic_service_id = $3
+      `,
+      [-(index + 1), orderedDocumentIds[index], clinicServiceId]
+    );
+  }
+
+  for (let index = 0; index < orderedDocumentIds.length; index += 1) {
+    await client.query(
+      `
+        UPDATE clinic_service_documents
+        SET sort_order = $1
+        WHERE id = $2 AND clinic_service_id = $3
+      `,
+      [index + 1, orderedDocumentIds[index], clinicServiceId]
+    );
+  }
+}
+
+export async function createClinicServiceDocument(input: {
+  clinicServiceId: string;
+  docName: string;
+  docType: "form" | "auth" | "insurance";
+  docDescription: string | null;
+  url: string | null;
+  googleDriveFileId: string | null;
+}): Promise<ClinicServiceDocument> {
+  const pool = getPool();
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const insertResult = await client.query<DbClinicServiceDocumentRow>(
+      `
+        INSERT INTO clinic_service_documents (
+          clinic_service_id,
+          doc_name,
+          doc_type,
+          doc_description,
+          url,
+          google_drive_file_id,
+          sort_order
+        )
+        SELECT $1, $2, $3, $4, $5, $6, COALESCE(MAX(sort_order), 0) + 1
+        FROM clinic_service_documents
+        WHERE clinic_service_id = $1
+        RETURNING id, clinic_service_id, doc_name, doc_type, doc_description, url, google_drive_file_id, sort_order
+      `,
+      [
+        input.clinicServiceId,
+        input.docName,
+        input.docType,
+        input.docDescription,
+        input.url,
+        input.googleDriveFileId
+      ]
+    );
+
+    await client.query("COMMIT");
+    return mapDocumentRow(insertResult.rows[0]);
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+export async function updateClinicServiceDocument(input: {
+  id: number;
+  clinicServiceId: string;
+  docName: string;
+  docType: "form" | "auth" | "insurance";
+  docDescription: string | null;
+  url: string | null;
+  googleDriveFileId: string | null;
+}): Promise<ClinicServiceDocument> {
+  const rows = await query<DbClinicServiceDocumentRow>(
+    `
+      UPDATE clinic_service_documents
+      SET
+        doc_name = $1,
+        doc_type = $2,
+        doc_description = $3,
+        url = $4,
+        google_drive_file_id = $5
+      WHERE id = $6 AND clinic_service_id = $7
+      RETURNING id, clinic_service_id, doc_name, doc_type, doc_description, url, google_drive_file_id, sort_order
+    `,
+    [
+      input.docName,
+      input.docType,
+      input.docDescription,
+      input.url,
+      input.googleDriveFileId,
+      input.id,
+      input.clinicServiceId
+    ]
+  );
+
+  if (rows.length === 0) {
+    throw new Error("Document not found for the selected clinic service.");
+  }
+
+  return mapDocumentRow(rows[0]);
+}
+
+export async function saveClinicServiceDocumentOrder(clinicServiceId: string, orderedDocumentIds: number[]) {
+  const pool = getPool();
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const currentResult = await client.query<{ id: number }>(
+      `
+        SELECT id
+        FROM clinic_service_documents
+        WHERE clinic_service_id = $1
+      `,
+      [clinicServiceId]
+    );
+    const currentIds = currentResult.rows.map((row) => row.id).sort((a, b) => a - b);
+    const requestedIds = [...orderedDocumentIds].sort((a, b) => a - b);
+
+    if (currentIds.length !== requestedIds.length || currentIds.some((id, index) => id !== requestedIds[index])) {
+      throw new Error("Document order must include every document for the selected clinic service.");
+    }
+
+    await rewriteDocumentSortOrder(client, clinicServiceId, orderedDocumentIds);
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 // ============================================================================

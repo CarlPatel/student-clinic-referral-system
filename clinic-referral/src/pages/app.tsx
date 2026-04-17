@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import Link from "next/link";
 import { withIronSessionSsr } from "iron-session/next";
 import { getSessionOptions } from "@/lib/auth/session";
 import { getAppData, getReferrals, type Referral } from "@/lib/dataSource/postgres";
-import { buildGoogleDriveDownloadUrl, buildGoogleDrivePreviewUrl } from "@/lib/googleDrive";
+import { buildGoogleDriveDownloadUrl, buildGoogleDrivePreviewUrl, buildGoogleDriveViewUrl } from "@/lib/googleDrive";
 import Head from "next/head";
-import type { AppUser, ClinicServiceDocument, UserRole } from "@/lib/types";
+import type { AppUser, ClinicServiceDocument, ClinicServiceOption, UserRole } from "@/lib/types";
 
 // ─── TYPES ──────────────────────────────────────────────────────────────────
 type ClinicInfo = {
@@ -2083,6 +2083,463 @@ function UserManagement({
   );
 }
 
+function FormEditor() {
+  const [options, setOptions] = useState<ClinicServiceOption[]>([]);
+  const [selectedClinicServiceId, setSelectedClinicServiceId] = useState("");
+  const [documents, setDocuments] = useState<ClinicServiceDocument[]>([]);
+  const [draggedDocumentId, setDraggedDocumentId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingDocument, setEditingDocument] = useState<ClinicServiceDocument | null>(null);
+  const [formError, setFormError] = useState("");
+  const [form, setForm] = useState({
+    docName: "",
+    docType: "form" as "form" | "auth" | "insurance",
+    docDescription: "",
+    url: ""
+  });
+
+  const fieldStyle = {
+    width: "100%",
+    boxSizing: "border-box" as const,
+    padding: "10px 12px",
+    borderRadius: 9,
+    border: "1.5px solid #E2E8F0",
+    background: "#fff",
+    color: "#0F172A",
+    fontSize: 13
+  };
+
+  const loadDocuments = useCallback(async (clinicServiceId?: string) => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const query = clinicServiceId ? `?clinicServiceId=${encodeURIComponent(clinicServiceId)}` : "";
+      const response = await fetch(`/api/clinic-service-documents${query}`);
+      const payload = (await response.json()) as {
+        ok: boolean;
+        message?: string;
+        options?: ClinicServiceOption[];
+        documents?: ClinicServiceDocument[];
+      };
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.message ?? "Unable to load forms.");
+      }
+
+      const nextOptions = payload.options ?? [];
+      const nextClinicServiceId = clinicServiceId || nextOptions[0]?.id || "";
+      setOptions(nextOptions);
+      setSelectedClinicServiceId(nextClinicServiceId);
+      setDocuments(payload.documents ?? []);
+    } catch (loadError) {
+      console.error(loadError);
+      setError(loadError instanceof Error ? loadError.message : "Unable to load forms.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadDocuments();
+  }, [loadDocuments]);
+
+  const selectedOption = options.find((option) => option.id === selectedClinicServiceId);
+
+  const resetForm = () => {
+    setEditingDocument(null);
+    setForm({
+      docName: "",
+      docType: "form",
+      docDescription: "",
+      url: ""
+    });
+    setFormError("");
+  };
+
+  const openAddModal = () => {
+    resetForm();
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (document: ClinicServiceDocument) => {
+    setEditingDocument(document);
+    setForm({
+      docName: document.name,
+      docType: document.type,
+      docDescription: document.desc ?? "",
+      url: document.url ?? (document.googleDriveFileId ? buildGoogleDriveViewUrl(document.googleDriveFileId) : "")
+    });
+    setFormError("");
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    resetForm();
+  };
+
+  const moveDocument = (targetDocumentId: number) => {
+    if (draggedDocumentId == null || draggedDocumentId === targetDocumentId) {
+      return;
+    }
+
+    setDocuments((current) => {
+      const fromIndex = current.findIndex((document) => document.id === draggedDocumentId);
+      const toIndex = current.findIndex((document) => document.id === targetDocumentId);
+      if (fromIndex === -1 || toIndex === -1) return current;
+
+      const updated = current.slice();
+      const [moved] = updated.splice(fromIndex, 1);
+      updated.splice(toIndex, 0, moved);
+      return updated.map((document, index) => ({ ...document, sortOrder: index + 1 }));
+    });
+  };
+
+  const saveOrder = async () => {
+    if (!selectedClinicServiceId) return;
+
+    setIsSaving(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/clinic-service-documents", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clinicServiceId: selectedClinicServiceId,
+          orderedDocumentIds: documents.map((document) => document.id)
+        })
+      });
+      const payload = (await response.json()) as { ok: boolean; message?: string };
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.message ?? "Unable to save form order.");
+      }
+
+      await loadDocuments(selectedClinicServiceId);
+    } catch (saveError) {
+      console.error(saveError);
+      setError(saveError instanceof Error ? saveError.message : "Unable to save form order.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const submitForm = async () => {
+    if (!selectedClinicServiceId) return;
+
+    setIsSaving(true);
+    setFormError("");
+
+    try {
+      const isEditing = editingDocument?.id != null;
+      const response = await fetch("/api/clinic-service-documents", {
+        method: isEditing ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clinicServiceId: selectedClinicServiceId,
+          documentId: editingDocument?.id,
+          docName: form.docName,
+          docType: form.docType,
+          docDescription: form.docDescription,
+          url: form.url
+        })
+      });
+      const payload = (await response.json()) as { ok: boolean; message?: string };
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.message ?? (isEditing ? "Unable to save changes." : "Unable to add form."));
+      }
+
+      await loadDocuments(selectedClinicServiceId);
+      closeModal();
+    } catch (saveError) {
+      console.error(saveError);
+      setFormError(saveError instanceof Error ? saveError.message : "Unable to save form.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div>
+      <section
+        style={{
+          background: "#fff",
+          border: "1.5px solid #E2E8F0",
+          borderRadius: 16,
+          padding: 20,
+          marginBottom: 18,
+          boxShadow: "0 2px 12px rgba(15,23,42,0.05)"
+        }}
+      >
+        <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto", gap: 12, alignItems: "end" }}>
+          <div>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#334155", marginBottom: 6 }}>
+              Clinic service
+            </label>
+            <select
+              value={selectedClinicServiceId}
+              onChange={(event) => void loadDocuments(event.target.value)}
+              disabled={options.length === 0}
+              style={fieldStyle}
+            >
+              {options.length === 0 ? (
+                <option value="">No clinic services available</option>
+              ) : (
+                options.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.clinicName} - {option.serviceName}
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
+          <button
+            onClick={openAddModal}
+            disabled={!selectedClinicServiceId}
+            style={{
+              padding: "10px 14px",
+              borderRadius: 10,
+              border: "none",
+              background: selectedClinicServiceId ? "#0F172A" : "#CBD5E1",
+              color: "#fff",
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: selectedClinicServiceId ? "pointer" : "not-allowed"
+            }}
+          >
+            Add Form
+          </button>
+          <button
+            onClick={() => void saveOrder()}
+            disabled={isSaving || documents.length === 0}
+            style={{
+              padding: "10px 14px",
+              borderRadius: 10,
+              border: "1px solid #CBD5E1",
+              background: "#fff",
+              color: "#334155",
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: isSaving || documents.length === 0 ? "not-allowed" : "pointer",
+              opacity: isSaving || documents.length === 0 ? 0.6 : 1
+            }}
+          >
+            {isSaving ? "Saving..." : "Save Order"}
+          </button>
+        </div>
+        {selectedOption ? (
+          <div style={{ marginTop: 10, fontSize: 12, color: "#64748B" }}>
+            Editing forms for <strong>{selectedOption.clinicName}</strong> / <strong>{selectedOption.serviceName}</strong>
+          </div>
+        ) : null}
+      </section>
+
+      <section
+        style={{
+          background: "#fff",
+          border: "1.5px solid #E2E8F0",
+          borderRadius: 16,
+          overflow: "hidden",
+          boxShadow: "0 2px 12px rgba(15,23,42,0.05)"
+        }}
+      >
+        {error ? (
+          <div style={{ margin: 20, padding: "12px 14px", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 10, color: "#B91C1C", fontSize: 13 }}>
+            {error}
+          </div>
+        ) : null}
+
+        {isLoading ? (
+          <div style={{ padding: 24, color: "#64748B", fontSize: 13.5 }}>Loading forms...</div>
+        ) : documents.length === 0 ? (
+          <div style={{ padding: 24, color: "#64748B", fontSize: 13.5 }}>No forms listed for this clinic service.</div>
+        ) : (
+          <div style={{ overflowX: "auto" }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "60px 1fr 1.4fr 110px 120px 60px 30px",
+                gap: 12,
+                padding: "12px 16px",
+                background: "#F8FAFC",
+                borderBottom: "1px solid #E2E8F0",
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: 0.8,
+                textTransform: "uppercase",
+                color: "#94A3B8"
+              }}
+            >
+              <div>Order</div>
+              <div>Name</div>
+              <div>Description</div>
+              <div>Type</div>
+              <div>URL</div>
+              <div>Actions</div>
+              <div />
+            </div>
+
+            {documents.map((document) => {
+              const { previewUrl, downloadUrl } = getDocumentLinks(document);
+              return (
+                <div
+                  key={document.id}
+                  draggable
+                  onDragStart={() => setDraggedDocumentId(document.id ?? null)}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={() => document.id != null && moveDocument(document.id)}
+                  onDragEnd={() => setDraggedDocumentId(null)}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "60px 1fr 1.4fr 110px 120px 60px 30px",
+                    // gridTemplateColumns: "70px 1.1fr 1.35fr 120px 1.7fr 70px 34px",
+                    gap: 12,
+                    padding: "14px 16px",
+                    borderBottom: "1px solid #F1F5F9",
+                    alignItems: "center",
+                    background: draggedDocumentId === document.id ? "#F8FAFC" : "#fff"
+                  }}
+                >
+                  <div style={{ fontSize: 12.5, color: "#334155", fontWeight: 700 }}>{document.sortOrder ?? "-"}</div>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: "#0F172A" }}>{document.name}</div>
+                  <div style={{ fontSize: 12.5, color: "#64748B", lineHeight: 1.4 }}>{document.desc || "-"}</div>
+                  <div style={{ fontSize: 12.5, color: "#334155" }}>{docTypeStyles[document.type]?.label ?? document.type}</div>
+                  <div style={{ fontSize: 12, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {document.url || "-"}
+                  </div>
+                  <button
+                    onClick={() => openEditModal(document)}
+                    style={{
+                      border: "none",
+                      background: "transparent",
+                      padding: 0,
+                      color: "#475569",
+                      fontSize: 12.5,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      textAlign: "left"
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <div style={{ color: "#94A3B8", cursor: "grab", fontSize: 18, lineHeight: 1 }}>☰</div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {isModalOpen ? (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(15,23,42,0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 20,
+            zIndex: 50
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: 520,
+              background: "#fff",
+              borderRadius: 16,
+              padding: 24,
+              boxShadow: "0 20px 40px rgba(15,23,42,0.2)"
+            }}
+          >
+            <h3 style={{ margin: "0 0 6px", fontSize: 18, fontWeight: 800, color: "#0F172A" }}>
+              {editingDocument ? "Edit Form" : "Add Form"}
+            </h3>
+            <p style={{ margin: "0 0 18px", color: "#64748B", fontSize: 13.5 }}>
+              {editingDocument ? "Update this document without changing its order." : "Add a document to the end of the selected clinic service."}
+            </p>
+            <div style={{ display: "grid", gap: 12 }}>
+              <div>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#334155", marginBottom: 6 }}>Document name</label>
+                <input value={form.docName} onChange={(event) => setForm((current) => ({ ...current, docName: event.target.value }))} style={fieldStyle} />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#334155", marginBottom: 6 }}>Document type</label>
+                <select value={form.docType} onChange={(event) => setForm((current) => ({ ...current, docType: event.target.value as typeof form.docType }))} style={fieldStyle}>
+                  <option value="form">Form</option>
+                  <option value="auth">Authorization</option>
+                  <option value="insurance">Insurance</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#334155", marginBottom: 6 }}>Description</label>
+                <textarea
+                  value={form.docDescription}
+                  onChange={(event) => setForm((current) => ({ ...current, docDescription: event.target.value }))}
+                  rows={3}
+                  style={{ ...fieldStyle, resize: "vertical", fontFamily: "inherit" }}
+                />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#334155", marginBottom: 6 }}>Google Drive Link</label>
+                <input value={form.url} onChange={(event) => setForm((current) => ({ ...current, url: event.target.value }))} style={fieldStyle} />
+              </div>
+            </div>
+            {formError ? (
+              <div style={{ marginTop: 14, padding: "10px 12px", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 10, color: "#B91C1C", fontSize: 13 }}>
+                {formError}
+              </div>
+            ) : null}
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 20 }}>
+              <button
+                onClick={() => {
+                  closeModal();
+                }}
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: 10,
+                  border: "1px solid #CBD5E1",
+                  background: "#fff",
+                  color: "#334155",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer"
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => void submitForm()}
+                disabled={isSaving}
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: 10,
+                  border: "none",
+                  background: "#0F172A",
+                  color: "#fff",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: isSaving ? "not-allowed" : "pointer",
+                  opacity: isSaving ? 0.6 : 1
+                }}
+              >
+                {isSaving ? "Saving..." : editingDocument ? "Save Changes" : "Add Form"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 // ─── MAIN APP COMPONENT ─────────────────────────────────────────────────────
 export default function ClinicReferralApp({ username, userId, role, clinicKey, clinics, servicesData, initialReferrals }: AppPageProps) {
   const CLINICS = clinics;
@@ -2092,8 +2549,9 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
     .map(([key, info]) => ({ key, name: info.name }))
     .sort((left, right) => left.name.localeCompare(right.name));
   const canManageUsers = role === "master_admin";
+  const canManageForms = role === "clinic_admin" || role === "master_admin";
   const sidebarClinicLabel = role === "master_admin" ? "" : clinicKey ? CLINICS[clinicKey]?.name ?? "Unknown clinic" : "No clinic assigned";
-  const [section, setSection] = useState<"services" | "tracker" | "users">("tracker");
+  const [section, setSection] = useState<"services" | "tracker" | "users" | "forms">("tracker");
   const [activeService, setActiveService] = useState(services[0]);
    const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -2230,6 +2688,49 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
               {sidebarOpen && <span>Referrals Tracker</span>}
             </button>
           </div>
+
+          {canManageForms && (
+            <div style={{ padding: "4px 8px 4px" }}>
+              <button
+                onClick={() => setSection("forms")}
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 9,
+                  padding: sidebarOpen ? "10px 10px" : "10px 0",
+                  justifyContent: sidebarOpen ? "flex-start" : "center",
+                  borderRadius: 10,
+                  border: "none",
+                  cursor: "pointer",
+                  background: section === "forms" ? "rgba(14,165,233,0.15)" : "rgba(255,255,255,0.04)",
+                  color: section === "forms" ? "#7DD3FC" : "rgba(255,255,255,0.6)",
+                  fontWeight: section === "forms" ? 700 : 500,
+                  fontSize: 13,
+                  transition: "all 0.13s",
+                  outline: "none",
+                  position: "relative"
+                }}
+              >
+                {section === "forms" && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      width: 3,
+                      height: 18,
+                      borderRadius: 2,
+                      background: "#7DD3FC"
+                    }}
+                  />
+                )}
+                <span style={{ fontSize: 17, flexShrink: 0 }}>📝</span>
+                {sidebarOpen && <span>Form Editor</span>}
+              </button>
+            </div>
+          )}
 
           {canManageUsers && (
             <div style={{ padding: "4px 8px 4px" }}>
@@ -2516,6 +3017,34 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
               </header>
               <div style={{ flex: 1, overflowY: "auto", padding: "24px 28px" }}>
                 <UserManagement currentUserId={userId} clinicOptions={clinicOptions} />
+              </div>
+            </>
+          )}
+
+          {/* FORM EDITOR SECTION */}
+          {section === "forms" && canManageForms && (
+            <>
+              <header
+                style={{
+                  background: "#fff",
+                  borderBottom: "1px solid #E2E8F0",
+                  padding: "14px 26px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  flexShrink: 0
+                }}
+              >
+                <span style={{ fontSize: 22 }}>📝</span>
+                <div>
+                  <h1 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "#0F172A" }}>Form Editor</h1>
+                  <p style={{ margin: 0, fontSize: 11.5, color: "#94A3B8", marginTop: 1 }}>
+                    Add forms and manage clinic-service document order
+                  </p>
+                </div>
+              </header>
+              <div style={{ flex: 1, overflowY: "auto", padding: "24px 28px" }}>
+                <FormEditor />
               </div>
             </>
           )}

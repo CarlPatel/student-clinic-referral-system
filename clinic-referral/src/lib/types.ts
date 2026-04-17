@@ -7,12 +7,23 @@ export type Service = {
 };
 
 export type ClinicServiceDocument = {
+  id?: number;
+  clinicServiceId?: string;
   name: string;
   type: "form" | "auth" | "insurance";
   desc: string | null;
-  url: string;
+  url: string | null;
   googleDriveFileId: string | null;
-  sortOrder: number;
+  sortOrder: number | null;
+};
+
+export type ClinicServiceOption = {
+  id: string;
+  clinicId: string;
+  clinicKey: string;
+  clinicName: string;
+  serviceId: string;
+  serviceName: string;
 };
 
 export type UserRole = "clinic_member" | "clinic_admin" | "master_admin";
