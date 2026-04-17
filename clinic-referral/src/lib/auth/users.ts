@@ -14,7 +14,7 @@ type DbUserRow = {
   id: string;
   username: string;
   role: UserRole;
-  clinic_key: string;
+  clinic_key: string | null;
   salt: string;
   password_hash: string;
 };
@@ -46,7 +46,7 @@ async function ensureUsersTable(): Promise<void> {
       id UUID PRIMARY KEY,
       username VARCHAR(255) NOT NULL UNIQUE,
       role VARCHAR(20) NOT NULL CHECK (role IN ('clinic_member', 'clinic_admin', 'master_admin')),
-      clinic_key VARCHAR(50) NOT NULL DEFAULT '',
+      clinic_key VARCHAR(50) REFERENCES clinics(clinic_key) ON DELETE SET NULL ON UPDATE CASCADE,
       salt VARCHAR(255) NOT NULL,
       password_hash TEXT NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -72,7 +72,7 @@ async function ensureUsersTable(): Promise<void> {
             VALUES ($1, $2, $3, $4, $5, $6)
             ON CONFLICT (id) DO NOTHING
           `,
-          [user.id, user.username, user.role, user.clinicKey, user.salt, user.passwordHash]
+          [user.id, user.username, user.role, user.clinicKey || null, user.salt, user.passwordHash]
         );
       }
     } catch (error) {
@@ -146,7 +146,7 @@ export async function createUser(input: {
 
   const username = input.username.trim().toLowerCase();
   const password = input.password.trim();
-  const clinicKey = input.clinicKey.trim();
+  const clinicKey = input.clinicKey.trim() || null;
 
   if (username.length < 3) {
     throw new Error("Username must be at least 3 characters.");
@@ -190,7 +190,7 @@ export async function updateUserAccess(userId: string, role: UserRole, clinicKey
       WHERE id = $1
       RETURNING id, username, role, clinic_key, salt, password_hash
     `,
-    [userId, role, clinicKey.trim()]
+    [userId, role, clinicKey.trim() || null]
   );
 
   const user = result.rows[0];

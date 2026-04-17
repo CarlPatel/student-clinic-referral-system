@@ -2,13 +2,13 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { withIronSessionSsr } from "iron-session/next";
-import { getClinics, getSpecialties } from "@/lib/dataSource/postgres";
+import { getClinics, getServices } from "@/lib/dataSource/postgres";
 import { getSessionOptions } from "@/lib/auth/session";
-import type { Clinic, Specialty } from "@/lib/types";
+import type { Clinic, Service } from "@/lib/types";
 
 type ClinicPageProps = {
     clinics: Clinic[];
-    specialties: Specialty[];
+    services: Service[];
     username: string;
 };
 
@@ -24,8 +24,8 @@ export const getServerSideProps = withIronSessionSsr<ClinicPageProps>(
             };
         }
 
-        const [clinics, specialties] = await Promise.all([getClinics(), getSpecialties()]);
-        return { props: { clinics, specialties, username: context.req.session.username || "User" } };
+        const [clinics, services] = await Promise.all([getClinics(), getServices()]);
+        return { props: { clinics, services, username: context.req.session.username || "User" } };
     },
     getSessionOptions()
 );
@@ -38,7 +38,7 @@ function buildMailto(clinic: Clinic) {
     const body =
         `Hello ${clinic.name} team,\n\n` +
         `We are reaching out with a referral inquiry.\n\n` +
-        `Requested specialty/service:\n` +
+        `Requested service/service:\n` +
         `Urgency:\n` +
         `Best way to coordinate:\n\n` +
         `(Please do not include patient-identifying info.)\n`;
@@ -52,7 +52,7 @@ function Tag({ label }: { label: string }) {
 
 export default function ClinicPage({
     clinics,
-    specialties,
+    services,
     username
 }: ClinicPageProps) {
     const router = useRouter();
@@ -86,11 +86,11 @@ export default function ClinicPage({
         });
     }, [openClinicId, router.query.open]);
 
-    const specialtyNameById = useMemo(() => {
+    const serviceNameById = useMemo(() => {
         const map: Record<string, string> = {};
-        for (const s of specialties) map[s.id] = s.name;
+        for (const service of services) map[service.id] = service.name;
         return map;
-    }, [specialties]);
+    }, [services]);
 
     return (
         <main className="clinic-page">
@@ -105,7 +105,7 @@ export default function ClinicPage({
                     Click a clinic to expand details. Directory only — do not include patient-identifying info.
                 </p>
                 <div className="page-nav">
-                    <Link href="/specialty">← Back to Specialty Page</Link>
+                    <Link href="/service">← Back to Service Page</Link>
                     <Link href="/logout">Sign out</Link>
                 </div>
             </header>
@@ -139,10 +139,10 @@ export default function ClinicPage({
                                                 {clinic.name}
                                             </div>
 
-                                            {/* Specialty tags */}
+                                            {/* Service tags */}
                                             <div className="clinic-tags">
-                                                {clinic.specialtyIds.map((sid) => (
-                                                    <Tag key={sid} label={specialtyNameById[sid] ?? sid} />
+                                                {clinic.serviceIds.map((serviceId) => (
+                                                    <Tag key={serviceId} label={serviceNameById[serviceId] ?? serviceId} />
                                                 ))}
                                             </div>
                                         </div>
@@ -170,12 +170,6 @@ export default function ClinicPage({
                                         {clinic.hours ? (
                                             <p className="clinic-hours">
                                                 <b>Hours:</b> {clinic.hours}
-                                            </p>
-                                        ) : null}
-
-                                        {clinic.eligibility ? (
-                                            <p className="clinic-eligibility">
-                                                <b>Eligibility:</b> {clinic.eligibility}
                                             </p>
                                         ) : null}
 

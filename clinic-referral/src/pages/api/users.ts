@@ -78,7 +78,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<UsersResponse>)
       const user = await updateUserAccess(userId, role, normalizedClinicKey);
       if (userId === req.session.userId) {
         req.session.role = user.role;
-        req.session.clinicKey = user.clinicKey;
+        req.session.clinicKey = user.clinicKey ?? undefined;
         await req.session.save();
       }
       const users = await listUsers();

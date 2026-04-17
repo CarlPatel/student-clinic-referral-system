@@ -48,7 +48,7 @@ body {
 
 /* Page containers */
 .clinic-page,
-.specialty-page {
+.service-page {
   max-width: 1100px;
   margin: 40px auto;
   padding: 16px;
@@ -207,40 +207,40 @@ body {
   margin-top: 10px;
 }
 
-/* Specialty grid */
-.specialty-grid {
+/* Service grid */
+.service-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 14px;
 }
 
-.specialty-card {
+.service-card {
   border: 1px solid #ddd;
   border-radius: 14px;
   padding: 14px;
 }
 
-.specialty-title {
+.service-title {
   margin: 0;
   font-size: 18px;
 }
 
-.specialty-count {
+.service-count {
   font-weight: 400;
   opacity: 0.7;
 }
 
-.specialty-empty {
+.service-empty {
   margin-top: 10px;
   opacity: 0.75;
 }
 
-.specialty-list {
+.service-list {
   margin-top: 10px;
   padding-left: 18px;
 }
 
-.specialty-list-item {
+.service-list-item {
   margin-bottom: 8px;
 }
 
