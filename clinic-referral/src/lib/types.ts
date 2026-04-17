@@ -6,6 +6,15 @@ export type Service = {
   serviceType?: string;
 };
 
+export type ClinicServiceDocument = {
+  name: string;
+  type: "form" | "auth" | "insurance";
+  desc: string | null;
+  url: string;
+  googleDriveFileId: string | null;
+  sortOrder: number;
+};
+
 export type UserRole = "clinic_member" | "clinic_admin" | "master_admin";
 
 export type AppUser = {

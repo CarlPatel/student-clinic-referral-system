@@ -3,8 +3,9 @@ import Link from "next/link";
 import { withIronSessionSsr } from "iron-session/next";
 import { getSessionOptions } from "@/lib/auth/session";
 import { getAppData, getReferrals, type Referral } from "@/lib/dataSource/postgres";
+import { buildGoogleDriveDownloadUrl, buildGoogleDrivePreviewUrl } from "@/lib/googleDrive";
 import Head from "next/head";
-import type { AppUser, UserRole } from "@/lib/types";
+import type { AppUser, ClinicServiceDocument, UserRole } from "@/lib/types";
 
 // ─── TYPES ──────────────────────────────────────────────────────────────────
 type ClinicInfo = {
@@ -18,12 +19,6 @@ type ClinicInfo = {
   website: string | null;
 };
 
-type Document = {
-  name: string;
-  type: "form" | "auth" | "insurance";
-  desc: string;
-};
-
 type ClinicEntry = {
   id: string;
   serviceId: string;
@@ -32,7 +27,7 @@ type ClinicEntry = {
   status: string;
   notes: string;
   acceptingReferrals: boolean;
-  docs: Document[];
+  docs: ClinicServiceDocument[];
 };
 
 type ServiceData = {
@@ -121,6 +116,32 @@ const ROLE_OPTIONS: UserRole[] = ["clinic_member", "clinic_admin", "master_admin
 const REFERRAL_STATUSES: Referral["status"][] = ["sent", "received", "scheduled", "completed"];
 let lastSecond = -1;
 let sequence = 0;
+
+function sortDocuments(docs: ClinicServiceDocument[]) {
+  return docs.slice().sort((a, b) => {
+    if (a.sortOrder == null && b.sortOrder != null) return 1;
+    if (a.sortOrder != null && b.sortOrder == null) return -1;
+    if (a.sortOrder != null && b.sortOrder != null && a.sortOrder !== b.sortOrder) {
+      return a.sortOrder - b.sortOrder;
+    }
+
+    return a.name.localeCompare(b.name);
+  });
+}
+
+function getDocumentLinks(doc: ClinicServiceDocument) {
+  if (doc.googleDriveFileId) {
+    return {
+      previewUrl: buildGoogleDrivePreviewUrl(doc.googleDriveFileId),
+      downloadUrl: buildGoogleDriveDownloadUrl(doc.googleDriveFileId)
+    };
+  }
+
+  return {
+    previewUrl: doc.url,
+    downloadUrl: null
+  };
+}
 
 function canAccessReferral(referral: Referral, role: UserRole, clinicId?: string) {
   if (role === "master_admin") {
@@ -2076,7 +2097,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
   const [activeService, setActiveService] = useState(services[0]);
    const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search] = useState("");
   const [trackerLaunchDraft, setTrackerLaunchDraft] = useState<ReferralFormDraft | null>(null);
 
   const filtered = services.filter((s) => s.toLowerCase().includes(search.toLowerCase()));
@@ -2768,11 +2789,12 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                     </div>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      {currentEntry.docs.map((doc, i) => {
+                      {sortDocuments(currentEntry.docs).map((doc, i) => {
                         const s = docTypeStyles[doc.type];
+                        const { previewUrl, downloadUrl } = getDocumentLinks(doc);
                         return (
                           <div
-                            key={i}
+                            key={`${doc.name}-${doc.type}-${i}`}
                             style={{
                               background: "#fff",
                               border: "1.5px solid #E2E8F0",
@@ -2817,30 +2839,60 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                               >
                                 {s.label}
                               </span>
-                              <button
-                                style={{
-                                  background: "#0F172A",
-                                  color: "#fff",
-                                  border: "none",
-                                  borderRadius: 8,
-                                  padding: "6px 13px",
-                                  fontSize: 11.5,
-                                  fontWeight: 600,
-                                  cursor: "pointer",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: 4
-                                }}
-                              >
-                                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                                  />
-                                </svg>
-                                Download
-                              </button>
+                              {previewUrl && (
+                                <a
+                                  href={previewUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  style={{
+                                    background: "#F8FAFC",
+                                    color: "#334155",
+                                    border: "1px solid #E2E8F0",
+                                    borderRadius: 8,
+                                    padding: "6px 13px",
+                                    fontSize: 11.5,
+                                    fontWeight: 600,
+                                    textDecoration: "none",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 4
+                                  }}
+                                >
+                                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12H9m12 0A9 9 0 113 12a9 9 0 0118 0z" />
+                                  </svg>
+                                  Preview
+                                </a>
+                              )}
+                              {downloadUrl && (
+                                <a
+                                  href={downloadUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  style={{
+                                    background: "#0F172A",
+                                    color: "#fff",
+                                    border: "none",
+                                    borderRadius: 8,
+                                    padding: "6px 13px",
+                                    fontSize: 11.5,
+                                    fontWeight: 600,
+                                    textDecoration: "none",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 4
+                                  }}
+                                >
+                                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                    />
+                                  </svg>
+                                  Download
+                                </a>
+                              )}
                             </div>
                           </div>
                         );

@@ -49,12 +49,15 @@ SELECT
     s.display_name AS service_name,
     d.doc_name,
     d.doc_type,
-    d.doc_description
+    d.doc_description,
+    d.url,
+    d.google_drive_file_id,
+    d.sort_order
 FROM clinic_service_documents d
 JOIN clinic_services cs ON cs.clinic_service_id = d.clinic_service_id
 JOIN clinics c ON c.clinic_id = cs.clinic_id
 JOIN services s ON s.service_id = cs.service_id
-ORDER BY s.display_name, c.name, d.doc_name;
+ORDER BY s.display_name, c.name, d.sort_order NULLS LAST, d.doc_name;
 
 -- Referral tracker with display names
 SELECT

@@ -1,4 +1,5 @@
-import type { Clinic, Service } from "@/lib/types";
+import { buildGoogleDriveViewUrl, extractGoogleDriveFileId } from "@/lib/googleDrive";
+import type { Clinic, ClinicServiceDocument, Service } from "@/lib/types";
 import { Pool } from "pg";
 
 type DbClinicRow = {
@@ -47,6 +48,9 @@ type DbClinicServiceDocumentRow = {
   doc_name: string;
   doc_type: "form" | "auth" | "insurance";
   doc_description: string | null;
+  url: string;
+  google_drive_file_id: string | null;
+  sort_order: number;
 };
 
 const globalForPool = globalThis as unknown as { __clinicPool?: Pool };
@@ -213,7 +217,10 @@ export async function getAppData(): Promise<{
       docs: Array<{
         name: string;
         type: "form" | "auth" | "insurance";
-        desc: string;
+        desc: string | null;
+        url: string;
+        googleDriveFileId: string | null;
+        sortOrder: number;
       }>;
     }>;
   }>;
@@ -259,8 +266,9 @@ export async function getAppData(): Promise<{
     ),
     query<DbClinicServiceDocumentRow>(
       `
-        SELECT clinic_service_id, doc_name, doc_type, doc_description
+        SELECT clinic_service_id, doc_name, doc_type, doc_description, url, google_drive_file_id, sort_order
         FROM clinic_service_documents
+        ORDER BY sort_order ASC NULLS LAST, doc_name ASC
       `
     )
   ]);
@@ -286,13 +294,17 @@ export async function getAppData(): Promise<{
     ])
   );
 
-  const docsByClinicServiceId = new Map<string, Array<{ name: string; type: "form" | "auth" | "insurance"; desc: string }>>();
+  const docsByClinicServiceId = new Map<string, ClinicServiceDocument[]>();
   for (const row of documentRows) {
     const list = docsByClinicServiceId.get(row.clinic_service_id) ?? [];
+    const googleDriveFileId = row.google_drive_file_id ?? extractGoogleDriveFileId(row.url);
     list.push({
       name: row.doc_name,
       type: row.doc_type,
-      desc: row.doc_description ?? ""
+      desc: row.doc_description ?? "",
+      url: row.url ?? (googleDriveFileId ? buildGoogleDriveViewUrl(googleDriveFileId) : null),
+      googleDriveFileId,
+      sortOrder: row.sort_order
     });
     docsByClinicServiceId.set(row.clinic_service_id, list);
   }

@@ -66,6 +66,7 @@ const INPUT_DIR = path.join(SYNC_DIR, "input");
 const PROCESSED_DIR = path.join(SYNC_DIR, "processed");
 const FAILED_DIR = path.join(SYNC_DIR, "failed");
 const LOG_DIR = path.join(SYNC_DIR, "logs");
+const GOOGLE_DRIVE_FILE_ID_PATTERN = /^[A-Za-z0-9_-]{10,}$/;
 
 const TABLES = [
   {
@@ -146,11 +147,14 @@ const TABLES = [
       doc_name: "text",
       doc_type: "text",
       doc_description: "text",
+      url: "text",
+      google_drive_file_id: "text",
+      sort_order: "integer",
       created_at: "timestamp"
     },
     generatedColumns: new Set(["id", "created_at"]),
     requiredColumns: ["clinic_service_id", "doc_name", "doc_type"],
-    dedupeColumns: ["clinic_service_id", "doc_name", "doc_type", "doc_description"],
+    dedupeColumns: ["clinic_service_id", "doc_name", "doc_type"],
     useUntargetedConflict: true
   }
 ];
@@ -194,6 +198,57 @@ function createLogger(logPath) {
     },
     flush
   };
+}
+
+function extractGoogleDriveFileId(input) {
+  const value = typeof input === "string" ? input.trim() : "";
+  if (!value) return null;
+
+  if (GOOGLE_DRIVE_FILE_ID_PATTERN.test(value) && !value.includes(".")) {
+    return value;
+  }
+
+  try {
+    const parsed = new URL(value);
+    const host = parsed.hostname.toLowerCase();
+
+    if (!isGoogleHost(host)) {
+      return null;
+    }
+
+    const idFromQuery = parsed.searchParams.get("id");
+    if (idFromQuery && GOOGLE_DRIVE_FILE_ID_PATTERN.test(idFromQuery)) {
+      return idFromQuery;
+    }
+
+    const pathMatch = parsed.pathname.match(/\/d\/([A-Za-z0-9_-]{10,})(?:\/|$)/);
+    if (pathMatch?.[1] && GOOGLE_DRIVE_FILE_ID_PATTERN.test(pathMatch[1])) {
+      return pathMatch[1];
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
+function buildGoogleDriveViewUrl(fileId) {
+  return `https://drive.google.com/file/d/${encodeURIComponent(fileId)}/view`;
+}
+
+function isGoogleHost(host) {
+  return host === "google.com" || host.endsWith(".google.com");
+}
+
+function isGoogleUrl(input) {
+  const value = typeof input === "string" ? input.trim() : "";
+  if (!value) return false;
+
+  try {
+    return isGoogleHost(new URL(value).hostname.toLowerCase());
+  } catch {
+    return false;
+  }
 }
 
 
@@ -380,6 +435,26 @@ function normalizeRecord(record, config) {
     normalized[columnName] = value;
   }
 
+  if (config.tableName === "clinic_service_documents") {
+    const extractedFromUrl = extractGoogleDriveFileId(normalized.url);
+    const fileIdFromField = extractGoogleDriveFileId(normalized.google_drive_file_id);
+    const fileId = fileIdFromField ?? extractedFromUrl;
+
+    if (normalized.google_drive_file_id && !fileIdFromField) {
+      throw new Error(`Invalid Google Drive file ID/link for google_drive_file_id: "${normalized.google_drive_file_id}"`);
+    }
+
+    if (isGoogleUrl(normalized.url) && !extractedFromUrl && !fileIdFromField) {
+      throw new Error(`Invalid Google Drive link for url: "${normalized.url}"`);
+    }
+
+    normalized.google_drive_file_id = fileId;
+
+    if (!normalized.url && fileId) {
+      normalized.url = buildGoogleDriveViewUrl(fileId);
+    }
+  }
+
   return normalized;
 }
 
@@ -434,7 +509,6 @@ function buildUntargetedConflictInsert(config, row) {
 
   const dedupeColumns = config.dedupeColumns ?? columns;
   const whereClauses = dedupeColumns.map((column, index) => {
-    const value = row[column] ?? null;
     const parameterIndex = columns.length + index + 1;
     return `${quoteIdentifier(column)} IS NOT DISTINCT FROM $${parameterIndex}`;
   });

@@ -83,6 +83,9 @@ CREATE TABLE clinic_service_documents (
     doc_name VARCHAR(500) NOT NULL,
     doc_type VARCHAR(50) NOT NULL,
     doc_description TEXT,
+    url TEXT,
+    google_drive_file_id TEXT,
+    sort_order INTEGER,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -134,6 +137,7 @@ CREATE INDEX idx_clinic_services_accepting_referrals ON clinic_services(acceptin
 
 CREATE INDEX idx_clinic_service_documents_clinic_service_id ON clinic_service_documents(clinic_service_id);
 CREATE INDEX idx_clinic_service_documents_doc_type ON clinic_service_documents(doc_type);
+CREATE INDEX idx_clinic_service_documents_sort_order ON clinic_service_documents(clinic_service_id, sort_order, doc_name);
 
 CREATE INDEX idx_users_username ON users(username);
 CREATE INDEX idx_users_role ON users(role);
