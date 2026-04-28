@@ -15,6 +15,7 @@ SELECT
     (SELECT COUNT(*) FROM clinics) AS total_clinics,
     (SELECT COUNT(*) FROM services) AS total_services,
     (SELECT COUNT(*) FROM clinic_services) AS total_clinic_services,
+    (SELECT COUNT(*) FROM clinic_documents) AS total_clinic_documents,
     (SELECT COUNT(*) FROM clinic_service_documents) AS total_documents,
     (SELECT COUNT(*) FROM users) AS total_users,
     (SELECT COUNT(*) FROM referrals) AS total_referrals;
@@ -42,6 +43,19 @@ LEFT JOIN clinic_services cs ON cs.clinic_id = c.clinic_id
 LEFT JOIN services s ON s.service_id = cs.service_id
 GROUP BY c.clinic_id, c.name
 ORDER BY service_count DESC, c.name;
+
+-- Clinic-wide documents
+SELECT
+    c.name AS clinic_name,
+    d.doc_name,
+    d.doc_type,
+    d.doc_description,
+    d.url,
+    d.google_drive_file_id,
+    d.sort_order
+FROM clinic_documents d
+JOIN clinics c ON c.clinic_id = d.clinic_id
+ORDER BY c.name, d.sort_order NULLS LAST, d.doc_name;
 
 -- Documents required for a clinic-service pairing
 SELECT
@@ -88,6 +102,9 @@ SELECT
      FROM users u
      WHERE u.clinic_key IS NOT NULL
        AND NOT EXISTS (SELECT 1 FROM clinics c WHERE c.clinic_key = u.clinic_key)) AS orphaned_users,
+    (SELECT COUNT(*)
+     FROM clinic_documents d
+     WHERE NOT EXISTS (SELECT 1 FROM clinics c WHERE c.clinic_id = d.clinic_id)) AS orphaned_clinic_documents,
     (SELECT COUNT(*)
      FROM clinic_service_documents d
      WHERE NOT EXISTS (SELECT 1 FROM clinic_services cs WHERE cs.clinic_service_id = d.clinic_service_id)) AS orphaned_documents;
