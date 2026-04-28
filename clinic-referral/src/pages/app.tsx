@@ -5,7 +5,7 @@ import { getSessionOptions } from "@/lib/auth/session";
 import { getAppData, getReferrals, type Referral } from "@/lib/dataSource/postgres";
 import { buildGoogleDriveDownloadUrl, buildGoogleDrivePreviewUrl, buildGoogleDriveViewUrl } from "@/lib/googleDrive";
 import Head from "next/head";
-import type { AppUser, ClinicServiceDocument, ClinicServiceOption, UserRole } from "@/lib/types";
+import type { AppUser, ClinicDocument, ClinicOption, ClinicServiceDocument, ClinicServiceOption, FormDocument, UserRole } from "@/lib/types";
 
 // ─── TYPES ──────────────────────────────────────────────────────────────────
 type ClinicInfo = {
@@ -27,7 +27,9 @@ type ClinicEntry = {
   status: string;
   notes: string;
   acceptingReferrals: boolean;
-  docs: ClinicServiceDocument[];
+  clinicDocuments: ClinicDocument[];
+  serviceDocuments: ClinicServiceDocument[];
+  docs: FormDocument[];
 };
 
 type ServiceData = {
@@ -117,7 +119,7 @@ const REFERRAL_STATUSES: Referral["status"][] = ["sent", "received", "scheduled"
 let lastSecond = -1;
 let sequence = 0;
 
-function sortDocuments(docs: ClinicServiceDocument[]) {
+function sortDocuments(docs: FormDocument[]) {
   return docs.slice().sort((a, b) => {
     if (a.sortOrder == null && b.sortOrder != null) return 1;
     if (a.sortOrder != null && b.sortOrder == null) return -1;
@@ -129,7 +131,7 @@ function sortDocuments(docs: ClinicServiceDocument[]) {
   });
 }
 
-function getDocumentLinks(doc: ClinicServiceDocument) {
+function getDocumentLinks(doc: FormDocument) {
   if (doc.googleDriveFileId) {
     return {
       previewUrl: buildGoogleDrivePreviewUrl(doc.googleDriveFileId),
@@ -181,6 +183,137 @@ function DocIcon({ type }: { type: "form" | "auth" | "insurance" }) {
         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
       />
     </svg>
+  );
+}
+
+function DocumentSection({ title, documents }: { title: string; documents: FormDocument[] }) {
+  if (documents.length === 0) return null;
+
+  return (
+    <div>
+      <div
+        style={{
+          fontSize: 11,
+          fontWeight: 800,
+          letterSpacing: 0.8,
+          textTransform: "uppercase",
+          color: "#64748B",
+          margin: "2px 0 8px"
+        }}
+      >
+        {title}
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {sortDocuments(documents).map((doc, index) => {
+          const s = docTypeStyles[doc.type];
+          const { previewUrl, downloadUrl } = getDocumentLinks(doc);
+          return (
+            <div
+              key={`${title}-${doc.id ?? doc.name}-${index}`}
+              style={{
+                background: "#fff",
+                border: "1.5px solid #E2E8F0",
+                borderLeft: `4px solid ${s.color}`,
+                borderRadius: 12,
+                padding: "16px 20px",
+                display: "flex",
+                alignItems: "center",
+                gap: 14,
+                boxShadow: "0 1px 3px rgba(0,0,0,0.04)"
+              }}
+            >
+              <div
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 9,
+                  background: s.bg,
+                  color: s.color,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0
+                }}
+              >
+                <DocIcon type={doc.type} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, fontSize: 13.5, color: "#0F172A", marginBottom: 2 }}>{doc.name}</div>
+                <div style={{ color: "#94A3B8", fontSize: 12 }}>{doc.desc}</div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexShrink: 0, alignItems: "center" }}>
+                <span
+                  style={{
+                    background: s.bg,
+                    color: s.color,
+                    fontSize: 10.5,
+                    fontWeight: 600,
+                    padding: "3px 9px",
+                    borderRadius: 20
+                  }}
+                >
+                  {s.label}
+                </span>
+                {previewUrl && (
+                  <a
+                    href={previewUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      background: "#F8FAFC",
+                      color: "#334155",
+                      border: "1px solid #E2E8F0",
+                      borderRadius: 8,
+                      padding: "6px 13px",
+                      fontSize: 11.5,
+                      fontWeight: 600,
+                      textDecoration: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 4
+                    }}
+                  >
+                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12H9m12 0A9 9 0 113 12a9 9 0 0118 0z" />
+                    </svg>
+                    Preview
+                  </a>
+                )}
+                {downloadUrl && (
+                  <a
+                    href={downloadUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      background: "#0F172A",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: 8,
+                      padding: "6px 13px",
+                      fontSize: 11.5,
+                      fontWeight: 600,
+                      textDecoration: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 4
+                    }}
+                  >
+                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                      />
+                    </svg>
+                    Download
+                  </a>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -2084,15 +2217,18 @@ function UserManagement({
 }
 
 function FormEditor() {
+  const [scope, setScope] = useState<"clinic" | "clinic_service">("clinic_service");
+  const [clinicOptions, setClinicOptions] = useState<ClinicOption[]>([]);
   const [options, setOptions] = useState<ClinicServiceOption[]>([]);
+  const [selectedClinicId, setSelectedClinicId] = useState("");
   const [selectedClinicServiceId, setSelectedClinicServiceId] = useState("");
-  const [documents, setDocuments] = useState<ClinicServiceDocument[]>([]);
+  const [documents, setDocuments] = useState<FormDocument[]>([]);
   const [draggedDocumentId, setDraggedDocumentId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingDocument, setEditingDocument] = useState<ClinicServiceDocument | null>(null);
+  const [editingDocument, setEditingDocument] = useState<FormDocument | null>(null);
   const [formError, setFormError] = useState("");
   const [form, setForm] = useState({
     docName: "",
@@ -2112,18 +2248,24 @@ function FormEditor() {
     fontSize: 13
   };
 
-  const loadDocuments = useCallback(async (clinicServiceId?: string) => {
+  const loadDocuments = useCallback(async (nextScope: "clinic" | "clinic_service" = scope, selectedId?: string) => {
     setIsLoading(true);
     setError("");
 
     try {
-      const query = clinicServiceId ? `?clinicServiceId=${encodeURIComponent(clinicServiceId)}` : "";
+      const params = new URLSearchParams({ scope: nextScope });
+      const currentSelectedId = selectedId ?? (nextScope === "clinic" ? selectedClinicId : selectedClinicServiceId);
+      if (currentSelectedId) {
+        params.set(nextScope === "clinic" ? "clinicId" : "clinicServiceId", currentSelectedId);
+      }
+      const query = `?${params.toString()}`;
       const response = await fetch(`/api/clinic-service-documents${query}`);
       const payload = (await response.json()) as {
         ok: boolean;
         message?: string;
+        clinicOptions?: ClinicOption[];
         options?: ClinicServiceOption[];
-        documents?: ClinicServiceDocument[];
+        documents?: FormDocument[];
       };
 
       if (!response.ok || !payload.ok) {
@@ -2131,8 +2273,12 @@ function FormEditor() {
       }
 
       const nextOptions = payload.options ?? [];
-      const nextClinicServiceId = clinicServiceId || nextOptions[0]?.id || "";
+      const nextClinicOptions = payload.clinicOptions ?? [];
+      const nextClinicId = nextScope === "clinic" ? currentSelectedId || nextClinicOptions[0]?.id || "" : selectedClinicId || nextClinicOptions[0]?.id || "";
+      const nextClinicServiceId = nextScope === "clinic_service" ? currentSelectedId || nextOptions[0]?.id || "" : selectedClinicServiceId || nextOptions[0]?.id || "";
+      setClinicOptions(nextClinicOptions);
       setOptions(nextOptions);
+      setSelectedClinicId(nextClinicId);
       setSelectedClinicServiceId(nextClinicServiceId);
       setDocuments(payload.documents ?? []);
     } catch (loadError) {
@@ -2141,13 +2287,23 @@ function FormEditor() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [scope, selectedClinicId, selectedClinicServiceId]);
 
   useEffect(() => {
     void loadDocuments();
   }, [loadDocuments]);
 
+  const selectedClinicOption = clinicOptions.find((option) => option.id === selectedClinicId);
   const selectedOption = options.find((option) => option.id === selectedClinicServiceId);
+  const selectedScopeId = scope === "clinic" ? selectedClinicId : selectedClinicServiceId;
+  const canAddDocument = Boolean(selectedScopeId);
+  const emptyStateLabel = scope === "clinic" ? "No forms listed for this clinic." : "No forms listed for this clinic service.";
+
+  const changeScope = (nextScope: "clinic" | "clinic_service") => {
+    setScope(nextScope);
+    setDocuments([]);
+    void loadDocuments(nextScope);
+  };
 
   const resetForm = () => {
     setEditingDocument(null);
@@ -2165,7 +2321,7 @@ function FormEditor() {
     setIsModalOpen(true);
   };
 
-  const openEditModal = (document: ClinicServiceDocument) => {
+  const openEditModal = (document: FormDocument) => {
     setEditingDocument(document);
     setForm({
       docName: document.name,
@@ -2200,7 +2356,7 @@ function FormEditor() {
   };
 
   const saveOrder = async () => {
-    if (!selectedClinicServiceId) return;
+    if (!selectedScopeId) return;
 
     setIsSaving(true);
     setError("");
@@ -2210,7 +2366,9 @@ function FormEditor() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          clinicServiceId: selectedClinicServiceId,
+          scope,
+          clinicId: scope === "clinic" ? selectedClinicId : undefined,
+          clinicServiceId: scope === "clinic_service" ? selectedClinicServiceId : undefined,
           orderedDocumentIds: documents.map((document) => document.id)
         })
       });
@@ -2220,7 +2378,7 @@ function FormEditor() {
         throw new Error(payload.message ?? "Unable to save form order.");
       }
 
-      await loadDocuments(selectedClinicServiceId);
+      await loadDocuments(scope, selectedScopeId);
     } catch (saveError) {
       console.error(saveError);
       setError(saveError instanceof Error ? saveError.message : "Unable to save form order.");
@@ -2230,7 +2388,7 @@ function FormEditor() {
   };
 
   const submitForm = async () => {
-    if (!selectedClinicServiceId) return;
+    if (!selectedScopeId) return;
 
     setIsSaving(true);
     setFormError("");
@@ -2241,7 +2399,9 @@ function FormEditor() {
         method: isEditing ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          clinicServiceId: selectedClinicServiceId,
+          scope,
+          clinicId: scope === "clinic" ? selectedClinicId : undefined,
+          clinicServiceId: scope === "clinic_service" ? selectedClinicServiceId : undefined,
           documentId: editingDocument?.id,
           docName: form.docName,
           docType: form.docType,
@@ -2255,7 +2415,7 @@ function FormEditor() {
         throw new Error(payload.message ?? (isEditing ? "Unable to save changes." : "Unable to add form."));
       }
 
-      await loadDocuments(selectedClinicServiceId);
+      await loadDocuments(scope, selectedScopeId);
       closeModal();
     } catch (saveError) {
       console.error(saveError);
@@ -2277,40 +2437,72 @@ function FormEditor() {
           boxShadow: "0 2px 12px rgba(15,23,42,0.05)"
         }}
       >
-        <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto", gap: 12, alignItems: "end" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "220px 1fr auto auto", gap: 12, alignItems: "end" }}>
           <div>
             <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#334155", marginBottom: 6 }}>
-              Clinic service
+              Scope
             </label>
             <select
-              value={selectedClinicServiceId}
-              onChange={(event) => void loadDocuments(event.target.value)}
-              disabled={options.length === 0}
+              value={scope}
+              onChange={(event) => changeScope(event.target.value as typeof scope)}
               style={fieldStyle}
             >
-              {options.length === 0 ? (
-                <option value="">No clinic services available</option>
-              ) : (
-                options.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.clinicName} - {option.serviceName}
-                  </option>
-                ))
-              )}
+              <option value="clinic">Entire Clinic</option>
+              <option value="clinic_service">Clinic Service</option>
             </select>
+          </div>
+          <div>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#334155", marginBottom: 6 }}>
+              {scope === "clinic" ? "Clinic" : "Clinic service"}
+            </label>
+            {scope === "clinic" ? (
+              <select
+                value={selectedClinicId}
+                onChange={(event) => void loadDocuments("clinic", event.target.value)}
+                disabled={clinicOptions.length === 0}
+                style={fieldStyle}
+              >
+                {clinicOptions.length === 0 ? (
+                  <option value="">No clinics available</option>
+                ) : (
+                  clinicOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.clinicName}
+                    </option>
+                  ))
+                )}
+              </select>
+            ) : (
+              <select
+                value={selectedClinicServiceId}
+                onChange={(event) => void loadDocuments("clinic_service", event.target.value)}
+                disabled={options.length === 0}
+                style={fieldStyle}
+              >
+                {options.length === 0 ? (
+                  <option value="">No clinic services available</option>
+                ) : (
+                  options.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.clinicName} - {option.serviceName}
+                    </option>
+                  ))
+                )}
+              </select>
+            )}
           </div>
           <button
             onClick={openAddModal}
-            disabled={!selectedClinicServiceId}
+            disabled={!canAddDocument}
             style={{
               padding: "10px 14px",
               borderRadius: 10,
               border: "none",
-              background: selectedClinicServiceId ? "#0F172A" : "#CBD5E1",
+              background: canAddDocument ? "#0F172A" : "#CBD5E1",
               color: "#fff",
               fontSize: 13,
               fontWeight: 700,
-              cursor: selectedClinicServiceId ? "pointer" : "not-allowed"
+              cursor: canAddDocument ? "pointer" : "not-allowed"
             }}
           >
             Add Form
@@ -2333,7 +2525,12 @@ function FormEditor() {
             {isSaving ? "Saving..." : "Save Order"}
           </button>
         </div>
-        {selectedOption ? (
+        {scope === "clinic" && selectedClinicOption ? (
+          <div style={{ marginTop: 10, fontSize: 12, color: "#64748B" }}>
+            Editing clinic-wide forms for <strong>{selectedClinicOption.clinicName}</strong>
+          </div>
+        ) : null}
+        {scope === "clinic_service" && selectedOption ? (
           <div style={{ marginTop: 10, fontSize: 12, color: "#64748B" }}>
             Editing forms for <strong>{selectedOption.clinicName}</strong> / <strong>{selectedOption.serviceName}</strong>
           </div>
@@ -2358,13 +2555,13 @@ function FormEditor() {
         {isLoading ? (
           <div style={{ padding: 24, color: "#64748B", fontSize: 13.5 }}>Loading forms...</div>
         ) : documents.length === 0 ? (
-          <div style={{ padding: 24, color: "#64748B", fontSize: 13.5 }}>No forms listed for this clinic service.</div>
+          <div style={{ padding: 24, color: "#64748B", fontSize: 13.5 }}>{emptyStateLabel}</div>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "60px 1fr 1.4fr 110px 120px 60px 30px",
+                gridTemplateColumns: "60px 1fr 1.4fr 110px 120px 70px 90px 60px 30px",
                 gap: 12,
                 padding: "12px 16px",
                 background: "#F8FAFC",
@@ -2381,7 +2578,9 @@ function FormEditor() {
               <div>Description</div>
               <div>Type</div>
               <div>URL</div>
-              <div>Actions</div>
+              <div>Preview</div>
+              <div>Download</div>
+              <div>Edit</div>
               <div />
             </div>
 
@@ -2397,8 +2596,7 @@ function FormEditor() {
                   onDragEnd={() => setDraggedDocumentId(null)}
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "60px 1fr 1.4fr 110px 120px 60px 30px",
-                    // gridTemplateColumns: "70px 1.1fr 1.35fr 120px 1.7fr 70px 34px",
+                    gridTemplateColumns: "60px 1fr 1.4fr 110px 120px 70px 90px 60px 30px",
                     gap: 12,
                     padding: "14px 16px",
                     borderBottom: "1px solid #F1F5F9",
@@ -2413,6 +2611,30 @@ function FormEditor() {
                   <div style={{ fontSize: 12, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {document.url || "-"}
                   </div>
+                  {previewUrl ? (
+                    <a
+                      href={previewUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ color: "#2563EB", fontSize: 12.5, fontWeight: 700, textDecoration: "none" }}
+                    >
+                      Preview
+                    </a>
+                  ) : (
+                    <span style={{ color: "#CBD5E1", fontSize: 12.5 }}>-</span>
+                  )}
+                  {downloadUrl ? (
+                    <a
+                      href={downloadUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ color: "#2563EB", fontSize: 12.5, fontWeight: 700, textDecoration: "none" }}
+                    >
+                      Download
+                    </a>
+                  ) : (
+                    <span style={{ color: "#CBD5E1", fontSize: 12.5 }}>-</span>
+                  )}
                   <button
                     onClick={() => openEditModal(document)}
                     style={{
@@ -2463,7 +2685,9 @@ function FormEditor() {
               {editingDocument ? "Edit Form" : "Add Form"}
             </h3>
             <p style={{ margin: "0 0 18px", color: "#64748B", fontSize: 13.5 }}>
-              {editingDocument ? "Update this document without changing its order." : "Add a document to the end of the selected clinic service."}
+              {editingDocument
+                ? "Update this document without changing its order."
+                : `Add a document to the end of the selected ${scope === "clinic" ? "clinic" : "clinic service"}.`}
             </p>
             <div style={{ display: "grid", gap: 12 }}>
               <div>
@@ -3317,115 +3541,17 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                       ))}
                     </div>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      {sortDocuments(currentEntry.docs).map((doc, i) => {
-                        const s = docTypeStyles[doc.type];
-                        const { previewUrl, downloadUrl } = getDocumentLinks(doc);
-                        return (
-                          <div
-                            key={`${doc.name}-${doc.type}-${i}`}
-                            style={{
-                              background: "#fff",
-                              border: "1.5px solid #E2E8F0",
-                              borderLeft: `4px solid ${s.color}`,
-                              borderRadius: 12,
-                              padding: "16px 20px",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 14,
-                              boxShadow: "0 1px 3px rgba(0,0,0,0.04)"
-                            }}
-                          >
-                            <div
-                              style={{
-                                width: 38,
-                                height: 38,
-                                borderRadius: 9,
-                                background: s.bg,
-                                color: s.color,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                flexShrink: 0
-                              }}
-                            >
-                              <DocIcon type={doc.type} />
-                            </div>
-                            <div style={{ flex: 1 }}>
-                              <div style={{ fontWeight: 600, fontSize: 13.5, color: "#0F172A", marginBottom: 2 }}>{doc.name}</div>
-                              <div style={{ color: "#94A3B8", fontSize: 12 }}>{doc.desc}</div>
-                            </div>
-                            <div style={{ display: "flex", gap: 8, flexShrink: 0, alignItems: "center" }}>
-                              <span
-                                style={{
-                                  background: s.bg,
-                                  color: s.color,
-                                  fontSize: 10.5,
-                                  fontWeight: 600,
-                                  padding: "3px 9px",
-                                  borderRadius: 20
-                                }}
-                              >
-                                {s.label}
-                              </span>
-                              {previewUrl && (
-                                <a
-                                  href={previewUrl}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  style={{
-                                    background: "#F8FAFC",
-                                    color: "#334155",
-                                    border: "1px solid #E2E8F0",
-                                    borderRadius: 8,
-                                    padding: "6px 13px",
-                                    fontSize: 11.5,
-                                    fontWeight: 600,
-                                    textDecoration: "none",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 4
-                                  }}
-                                >
-                                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12H9m12 0A9 9 0 113 12a9 9 0 0118 0z" />
-                                  </svg>
-                                  Preview
-                                </a>
-                              )}
-                              {downloadUrl && (
-                                <a
-                                  href={downloadUrl}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  style={{
-                                    background: "#0F172A",
-                                    color: "#fff",
-                                    border: "none",
-                                    borderRadius: 8,
-                                    padding: "6px 13px",
-                                    fontSize: 11.5,
-                                    fontWeight: 600,
-                                    textDecoration: "none",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 4
-                                  }}
-                                >
-                                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                                    />
-                                  </svg>
-                                  Download
-                                </a>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                      {currentEntry.docs.length === 0 ? (
+                        <div style={{ padding: 18, color: "#64748B", fontSize: 13.5, background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 12 }}>
+                          No forms listed for this clinic service.
+                        </div>
+                      ) : (
+                        <>
+                          <DocumentSection title="Clinic Forms" documents={currentEntry.clinicDocuments} />
+                          <DocumentSection title="Service Forms" documents={currentEntry.serviceDocuments} />
+                        </>
+                      )}
                     </div>
 
                     <div

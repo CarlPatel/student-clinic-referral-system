@@ -17,6 +17,18 @@ export type ClinicServiceDocument = {
   sortOrder: number | null;
 };
 
+export type ClinicDocument = Omit<ClinicServiceDocument, "clinicServiceId"> & {
+  clinicId?: string;
+};
+
+export type FormDocument = ClinicServiceDocument | ClinicDocument;
+
+export type ClinicOption = {
+  id: string;
+  clinicKey: string;
+  clinicName: string;
+};
+
 export type ClinicServiceOption = {
   id: string;
   clinicId: string;

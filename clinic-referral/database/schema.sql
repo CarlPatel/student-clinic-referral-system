@@ -4,6 +4,7 @@
 -- Drop existing tables if they exist, in reverse dependency order.
 DROP TABLE IF EXISTS referrals CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS clinic_documents CASCADE;
 DROP TABLE IF EXISTS clinic_service_documents CASCADE;
 DROP TABLE IF EXISTS clinic_services CASCADE;
 DROP TABLE IF EXISTS services CASCADE;
@@ -89,6 +90,19 @@ CREATE TABLE clinic_service_documents (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE clinic_documents (
+    id SERIAL PRIMARY KEY,
+    clinic_id VARCHAR(100) NOT NULL REFERENCES clinics(clinic_id) ON DELETE CASCADE,
+    doc_name VARCHAR(500) NOT NULL,
+    doc_type VARCHAR(50) NOT NULL,
+    doc_description TEXT,
+    url TEXT,
+    google_drive_file_id TEXT,
+    sort_order INTEGER,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE users (
     id UUID PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
@@ -142,6 +156,12 @@ CREATE UNIQUE INDEX idx_clinic_service_documents_unique_sort_order
     ON clinic_service_documents(clinic_service_id, sort_order)
     WHERE sort_order IS NOT NULL;
 
+CREATE INDEX idx_clinic_documents_clinic_id ON clinic_documents(clinic_id);
+CREATE INDEX idx_clinic_documents_sort_order ON clinic_documents(clinic_id, sort_order, doc_name);
+CREATE UNIQUE INDEX idx_clinic_documents_unique_sort_order
+    ON clinic_documents(clinic_id, sort_order)
+    WHERE sort_order IS NOT NULL;
+
 CREATE INDEX idx_users_username ON users(username);
 CREATE INDEX idx_users_role ON users(role);
 CREATE INDEX idx_users_clinic_key ON users(clinic_key);
@@ -161,7 +181,27 @@ COMMENT ON TABLE clinics IS 'Canonical clinic directory and clinic-level referra
 COMMENT ON TABLE services IS 'Generalized service and specialty categories offered by clinics';
 COMMENT ON TABLE clinic_services IS 'Canonical clinic-to-service relationship';
 COMMENT ON TABLE clinic_service_documents IS 'Documents required for a clinic-service relationship';
+COMMENT ON TABLE clinic_documents IS 'Clinic-wide documents required for an entire clinic';
 COMMENT ON TABLE users IS 'Application users for login and role-based access';
 COMMENT ON TABLE referrals IS 'Referral tracking linked to clinics and clinic services';
+
+-- Existing database migration:
+-- CREATE TABLE IF NOT EXISTS clinic_documents (
+--     id SERIAL PRIMARY KEY,
+--     clinic_id VARCHAR(100) NOT NULL REFERENCES clinics(clinic_id) ON DELETE CASCADE,
+--     doc_name VARCHAR(500) NOT NULL,
+--     doc_type VARCHAR(50) NOT NULL,
+--     doc_description TEXT,
+--     url TEXT,
+--     google_drive_file_id TEXT,
+--     sort_order INTEGER,
+--     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+-- );
+-- CREATE INDEX IF NOT EXISTS idx_clinic_documents_clinic_id ON clinic_documents(clinic_id);
+-- CREATE INDEX IF NOT EXISTS idx_clinic_documents_sort_order ON clinic_documents(clinic_id, sort_order, doc_name);
+-- CREATE UNIQUE INDEX IF NOT EXISTS idx_clinic_documents_unique_sort_order
+--     ON clinic_documents(clinic_id, sort_order)
+--     WHERE sort_order IS NOT NULL;
 
 SELECT 'Database schema created successfully!' AS status;
