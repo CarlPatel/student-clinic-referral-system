@@ -14,6 +14,8 @@ type ClinicInfo = {
   location: string;
   phone: string;
   contact: string;
+  email: string | null;
+  mapUrl: string | null;
   founded: string;
   tags: string[];
   website: string | null;
@@ -24,6 +26,17 @@ type ClinicEntry = {
   serviceId: string;
   clinicId: string;
   clinicKey: string;
+  locationLabel: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  zip: string | null;
+  mapUrl: string | null;
+  phone: string;
+  contactPerson: string;
+  email: string | null;
+  location: string;
+  contact: string;
   status: string;
   notes: string;
   acceptingReferrals: boolean;
@@ -53,6 +66,20 @@ type ReferralFormDraft = {
   receivingClinic?: string;
   service?: string;
 };
+
+function clinicInfoForEntry(clinics: Record<string, ClinicInfo>, entry: ClinicEntry): ClinicInfo | null {
+  const clinic = clinics[entry.clinicKey];
+  if (!clinic) return null;
+
+  return {
+    ...clinic,
+    location: entry.location,
+    phone: entry.phone,
+    contact: entry.contact,
+    email: entry.email,
+    mapUrl: entry.mapUrl
+  };
+}
 
 // ─── SERVER SIDE PROPS ──────────────────────────────────────────────────────
 export const getServerSideProps = withIronSessionSsr<AppPageProps>(
@@ -2785,7 +2812,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
   const filtered = services.filter((s) => s.toLowerCase().includes(search.toLowerCase()));
   const currentEntries = (SERVICES_DATA as Record<string, ServiceData>)[activeService]?.clinics || [];
   const currentEntry = selectedEntry ? currentEntries.find((e) => e.id === selectedEntry) : null;
-  const currentInfo: ClinicInfo | null = currentEntry ? (CLINICS as Record<string, ClinicInfo>)[currentEntry.clinicKey] : null;
+  const currentInfo = currentEntry ? clinicInfoForEntry(CLINICS, currentEntry) : null;
 
   const handleService = (s: string) => {
     setActiveService(s);
@@ -3340,7 +3367,8 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                     </p>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(295px, 1fr))", gap: 18 }}>
                       {currentEntries.map((entry) => {
-                        const info = (CLINICS as Record<string, ClinicInfo>)[entry.clinicKey];
+                        const info = clinicInfoForEntry(CLINICS, entry);
+                        if (!info) return null;
                         return (
                           <button
                             key={entry.id}
@@ -3414,7 +3442,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                                 {entry.notes || entry.status}
                               </div>
                             </div>
-                            {info.contact && (
+                            {(info.contact || (info.phone && info.phone !== "—") || info.email) && (
                               <div style={{ marginBottom: 11 }}>
                                 <div
                                   style={{
@@ -3429,8 +3457,9 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                                   Contact
                                 </div>
                                 <div style={{ fontSize: 12.5, color: "#334155" }}>
-                                  {info.contact}
+                                  {info.contact || "Contact"}
                                   {info.phone && info.phone !== "—" && <span style={{ color: "#64748B" }}> · {info.phone}</span>}
+                                  {info.email && <span style={{ color: "#64748B" }}> · {info.email}</span>}
                                 </div>
                               </div>
                             )}
@@ -3498,9 +3527,16 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                         </div>
                         <div style={{ color: "#fff", fontSize: 19, fontWeight: 700, marginBottom: 6 }}>{currentInfo.name}</div>
                         <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 12.5, display: "flex", flexWrap: "wrap", gap: 18 }}>
-                          <span>📍 {currentInfo.location}</span>
+                          {currentInfo.mapUrl ? (
+                            <a href={currentInfo.mapUrl} target="_blank" rel="noreferrer" style={{ color: "inherit" }}>
+                              📍 {currentInfo.location}
+                            </a>
+                          ) : (
+                            <span>📍 {currentInfo.location}</span>
+                          )}
                           {currentInfo.phone && currentInfo.phone !== "—" && <span>📞 {currentInfo.phone}</span>}
-                          <span>👤 {currentInfo.contact}</span>
+                          {currentInfo.email && <span>✉ {currentInfo.email}</span>}
+                          {currentInfo.contact && <span>👤 {currentInfo.contact}</span>}
                           <span>🏥 Est. {currentInfo.founded}</span>
                         </div>
                       </div>

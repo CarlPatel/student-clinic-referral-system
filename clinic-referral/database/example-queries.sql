@@ -24,6 +24,15 @@ SELECT
 SELECT
     s.display_name AS service_name,
     c.name AS clinic_name,
+    COALESCE(cs.location_label, c.location_label) AS location_label,
+    COALESCE(cs.address, c.address) AS address,
+    COALESCE(cs.city, c.city) AS city,
+    COALESCE(cs.state, c.state) AS state,
+    COALESCE(cs.zip, c.zip) AS zip,
+    COALESCE(cs.map_url, c.map_url) AS map_url,
+    COALESCE(cs.phone, c.phone) AS phone,
+    COALESCE(cs.contact_person, c.contact_person) AS contact_person,
+    COALESCE(cs.email, c.email) AS email,
     cs.status,
     cs.accepting_referrals,
     cs.notes
