@@ -46,6 +46,7 @@ type DbClinicServiceRow = {
   phone: string | null;
   contact_person: string | null;
   email: string | null;
+  hours: string | null;
   notes: string | null;
   accepting_referrals: boolean | null;
   status: string | null;
@@ -275,6 +276,7 @@ export async function getAppData(): Promise<{
     contact: string;
     email: string | null;
     mapUrl: string | null;
+    hours: string | null;
     founded: string;
     tags: string[];
     website: string | null;
@@ -297,6 +299,7 @@ export async function getAppData(): Promise<{
       phone: string;
       contactPerson: string;
       email: string | null;
+      hours: string | null;
       location: string;
       contact: string;
       status: string;
@@ -356,6 +359,7 @@ export async function getAppData(): Promise<{
           COALESCE(cs.phone, c.phone) AS phone,
           COALESCE(cs.contact_person, c.contact_person) AS contact_person,
           COALESCE(cs.email, c.email) AS email,
+          c.hours,
           cs.notes,
           cs.accepting_referrals,
           cs.status,
@@ -396,6 +400,7 @@ export async function getAppData(): Promise<{
         contact: row.contact_person ?? "",
         email: row.email,
         mapUrl: row.map_url,
+        hours: row.hours,
         founded: formatDbDate(row.founded) ?? "",
         tags: row.tags ?? [],
         website: row.website ?? null
@@ -457,6 +462,7 @@ export async function getAppData(): Promise<{
             phone: row.phone ?? "-",
             contactPerson: row.contact_person ?? "",
             email: row.email,
+            hours: row.hours,
             location: row.location_label ?? row.address ?? "Location not listed",
             contact: row.contact_person ?? "",
             status: row.status ?? "active",

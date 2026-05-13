@@ -16,6 +16,7 @@ type ClinicInfo = {
   contact: string;
   email: string | null;
   mapUrl: string | null;
+  hours: string | null;
   founded: string;
   tags: string[];
   website: string | null;
@@ -35,6 +36,7 @@ type ClinicEntry = {
   phone: string;
   contactPerson: string;
   email: string | null;
+  hours: string | null;
   location: string;
   contact: string;
   status: string;
@@ -77,8 +79,33 @@ function clinicInfoForEntry(clinics: Record<string, ClinicInfo>, entry: ClinicEn
     phone: entry.phone,
     contact: entry.contact,
     email: entry.email,
-    mapUrl: entry.mapUrl
+    mapUrl: entry.mapUrl,
+    hours: entry.hours
   };
+}
+
+function StatusBadge({ status }: { status?: string | null }) {
+  const normalized = status?.trim().toLowerCase();
+  if (normalized !== "active" && normalized !== "inactive") return null;
+
+  const isActive = normalized === "active";
+
+  return (
+    <span
+      style={{
+        background: isActive ? "#DCFCE7" : "#FEE2E2",
+        color: isActive ? "#166534" : "#991B1B",
+        fontSize: 10.5,
+        fontWeight: 700,
+        padding: "3px 9px",
+        borderRadius: 20,
+        whiteSpace: "nowrap",
+        flexShrink: 0
+      }}
+    >
+      {isActive ? "Active" : "Inactive"}
+    </span>
+  );
 }
 
 // ─── SERVER SIDE PROPS ──────────────────────────────────────────────────────
@@ -3410,20 +3437,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                                   {info.location}
                                 </div>
                               </div>
-                              <div
-                                style={{
-                                  background: "#F0F9FF",
-                                  color: "#0369A1",
-                                  fontSize: 10.5,
-                                  fontWeight: 600,
-                                  padding: "3px 9px",
-                                  borderRadius: 20,
-                                  whiteSpace: "nowrap",
-                                  flexShrink: 0
-                                }}
-                              >
-                                Est. {info.founded}
-                              </div>
+                              <StatusBadge status={entry.status} />
                             </div>
                             <div style={{ borderTop: "1px solid #F1F5F9", paddingTop: 11, marginBottom: 11 }}>
                               <div
@@ -3439,7 +3453,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                                 {activeService} schedule
                               </div>
                               <div style={{ fontSize: 12.5, color: "#334155", fontWeight: 500 }}>
-                                {entry.notes || entry.status}
+                                {entry.hours || "Hours not listed"}
                               </div>
                             </div>
                             {(info.contact || (info.phone && info.phone !== "—") || info.email) && (
@@ -3537,7 +3551,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                           {currentInfo.phone && currentInfo.phone !== "—" && <span>📞 {currentInfo.phone}</span>}
                           {currentInfo.email && <span>✉ {currentInfo.email}</span>}
                           {currentInfo.contact && <span>👤 {currentInfo.contact}</span>}
-                          <span>🏥 Est. {currentInfo.founded}</span>
+                          <StatusBadge status={currentEntry.status} />
                         </div>
                       </div>
                       <div
