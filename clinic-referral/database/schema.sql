@@ -47,8 +47,8 @@ CREATE TABLE clinics (
     last_verified_at DATE,
 
     -- Merged legacy repeatable fields
-    tags TEXT[] NOT NULL DEFAULT '{}',
-    referral_methods TEXT[] NOT NULL DEFAULT '{}',
+    tags TEXT[] DEFAULT '{}',
+    referral_methods TEXT[] DEFAULT '{}',
 
     -- System
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

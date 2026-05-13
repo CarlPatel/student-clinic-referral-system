@@ -180,7 +180,8 @@ export async function getClinics(): Promise<Clinic[]> {
     id: clinic.clinic_id,
     name: clinic.name,
     serviceIds: serviceIdsByClinicId.get(clinic.clinic_id) ?? [],
-    tags: clinic.tags ?? [],
+    tags: clinic.tags,
+    referralMethods: clinic.referral_methods,
     location: {
       address: clinic.address ?? clinic.location_label ?? undefined,
       city: clinic.city ?? undefined,
@@ -196,7 +197,7 @@ export async function getClinics(): Promise<Clinic[]> {
     hours: clinic.hours ?? undefined,
     referral: {
       acceptingReferrals: clinic.accepting_referrals ?? undefined,
-      howToRefer: clinic.referral_methods ?? [],
+      howToRefer: clinic.referral_methods,
       notes: clinic.referral_notes ?? undefined
     },
     lastVerifiedAt: formatDbDate(clinic.last_verified_at)
@@ -244,7 +245,8 @@ export async function getClinicsByService(serviceId: string): Promise<Clinic[]> 
     id: clinic.clinic_id,
     name: clinic.name,
     serviceIds: [serviceId],
-    tags: clinic.tags ?? [],
+    tags: clinic.tags,
+    referralMethods: clinic.referral_methods,
     location: {
       address: clinic.address ?? clinic.location_label ?? undefined,
       city: clinic.city ?? undefined,
@@ -260,7 +262,7 @@ export async function getClinicsByService(serviceId: string): Promise<Clinic[]> 
     hours: clinic.hours ?? undefined,
     referral: {
       acceptingReferrals: clinic.accepting_referrals ?? undefined,
-      howToRefer: clinic.referral_methods ?? [],
+      howToRefer: clinic.referral_methods,
       notes: clinic.referral_notes ?? undefined
     },
     lastVerifiedAt: formatDbDate(clinic.last_verified_at)
@@ -278,7 +280,7 @@ export async function getAppData(): Promise<{
     mapUrl: string | null;
     hours: string | null;
     founded: string;
-    tags: string[];
+    tags: string[] | null;
     website: string | null;
   }>;
   servicesData: Record<string, {
@@ -402,7 +404,7 @@ export async function getAppData(): Promise<{
         mapUrl: row.map_url,
         hours: row.hours,
         founded: formatDbDate(row.founded) ?? "",
-        tags: row.tags ?? [],
+        tags: row.tags,
         website: row.website ?? null
       }
     ])

@@ -51,7 +51,8 @@ export type Clinic = {
   id: string;
   name: string;
   serviceIds: string[];
-  tags: string[];
+  tags?: string[] | null;
+  referralMethods?: string[] | null;
 
   location?: {
     address?: string;
@@ -71,7 +72,7 @@ export type Clinic = {
 
   referral?: {
     acceptingReferrals?: boolean;
-    howToRefer?: string[];
+    howToRefer?: string[] | null;
     notes?: string;
   };
 

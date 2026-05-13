@@ -18,7 +18,7 @@ type ClinicInfo = {
   mapUrl: string | null;
   hours: string | null;
   founded: string;
-  tags: string[];
+  tags: string[] | null;
   website: string | null;
 };
 
@@ -3517,23 +3517,29 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                                 </div>
                               </div>
                             )}
-                            <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 14 }}>
-                              {info.tags.slice(0, 2).map((t) => (
-                                <span
-                                  key={t}
-                                  style={{
-                                    background: "#F8FAFC",
-                                    border: "1px solid #E2E8F0",
-                                    color: "#64748B",
-                                    fontSize: 10.5,
-                                    padding: "2px 8px",
-                                    borderRadius: 10
-                                  }}
-                                >
-                                  {t}
-                                </span>
-                              ))}
-                            </div>
+                            {(() => {
+                              const visibleTags = (info.tags ?? []).map((tag) => tag.trim()).filter(Boolean);
+
+                              return visibleTags.length ? (
+                              <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 14 }}>
+                                {visibleTags.slice(0, 2).map((t) => (
+                                  <span
+                                    key={t}
+                                    style={{
+                                      background: "#F8FAFC",
+                                      border: "1px solid #E2E8F0",
+                                      color: "#64748B",
+                                      fontSize: 10.5,
+                                      padding: "2px 8px",
+                                      borderRadius: 10
+                                    }}
+                                  >
+                                    {t}
+                                  </span>
+                                ))}
+                              </div>
+                              ) : null;
+                            })()}
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                               <div style={{ color: "#94A3B8", fontSize: 11.5 }}>{entry.docs.length} docs required</div>
                               <div style={{ color: "#0EA5E9", fontSize: 12.5, fontWeight: 600, display: "flex", alignItems: "center", gap: 3 }}>

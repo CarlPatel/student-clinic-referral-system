@@ -410,7 +410,7 @@ function parseDateLike(value, columnName, type) {
 
 function normalizeValue(value, columnName, columnType, config) {
   if (columnType === "array") {
-    return parseArray(value ?? "");
+    return value == null || value.trim() === "" ? null : parseArray(value);
   }
 
   if (value == null || value.trim() === "") {
@@ -458,6 +458,14 @@ function normalizeRecord(record, config) {
 
     const value = normalizeValue(rawValue, columnName, columnType, config);
     normalized[columnName] = value;
+  }
+
+  if (config.tableName === "clinics") {
+    for (const columnName of ["tags", "referral_methods"]) {
+      if (!(columnName in normalized)) {
+        normalized[columnName] = null;
+      }
+    }
   }
 
   if (config.tableName === "clinic_service_documents") {
