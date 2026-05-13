@@ -885,6 +885,86 @@ export async function updateClinicDocument(input: {
   return mapClinicDocumentRow(rows[0]);
 }
 
+export async function deleteClinicServiceDocument(input: { id: number; clinicServiceId: string }) {
+  const pool = getPool();
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const deleteResult = await client.query<{ id: number }>(
+      `
+        DELETE FROM clinic_service_documents
+        WHERE id = $1::integer AND clinic_service_id = $2::text
+        RETURNING id
+      `,
+      [input.id, input.clinicServiceId]
+    );
+
+    if (deleteResult.rows.length === 0) {
+      throw new Error("Document not found for the selected clinic service.");
+    }
+
+    const remainingResult = await client.query<{ id: number }>(
+      `
+        SELECT id
+        FROM clinic_service_documents
+        WHERE clinic_service_id = $1::text
+        ORDER BY sort_order ASC NULLS LAST, doc_name ASC
+      `,
+      [input.clinicServiceId]
+    );
+    await rewriteDocumentSortOrder(client, input.clinicServiceId, remainingResult.rows.map((row) => row.id));
+
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+export async function deleteClinicDocument(input: { id: number; clinicId: string }) {
+  const pool = getPool();
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const deleteResult = await client.query<{ id: number }>(
+      `
+        DELETE FROM clinic_documents
+        WHERE id = $1::integer AND clinic_id = $2::text
+        RETURNING id
+      `,
+      [input.id, input.clinicId]
+    );
+
+    if (deleteResult.rows.length === 0) {
+      throw new Error("Document not found for the selected clinic.");
+    }
+
+    const remainingResult = await client.query<{ id: number }>(
+      `
+        SELECT id
+        FROM clinic_documents
+        WHERE clinic_id = $1::text
+        ORDER BY sort_order ASC NULLS LAST, doc_name ASC
+      `,
+      [input.clinicId]
+    );
+    await rewriteClinicDocumentSortOrder(client, input.clinicId, remainingResult.rows.map((row) => row.id));
+
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 export async function saveClinicServiceDocumentOrder(clinicServiceId: string, orderedDocumentIds: number[]) {
   const pool = getPool();
   const client = await pool.connect();

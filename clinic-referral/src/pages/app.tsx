@@ -2479,6 +2479,41 @@ function FormEditor() {
     }
   };
 
+  const deleteDocument = async () => {
+    if (!selectedScopeId || editingDocument?.id == null) return;
+    const confirmed = window.confirm("Are you sure you want to delete this form? This cannot be undone.");
+    if (!confirmed) return;
+
+    setIsSaving(true);
+    setFormError("");
+
+    try {
+      const response = await fetch("/api/clinic-service-documents", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scope,
+          clinicId: scope === "clinic" ? selectedClinicId : undefined,
+          clinicServiceId: scope === "clinic_service" ? selectedClinicServiceId : undefined,
+          documentId: editingDocument.id
+        })
+      });
+      const payload = (await response.json()) as { ok: boolean; message?: string };
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.message ?? "Unable to delete form.");
+      }
+
+      await loadDocuments(scope, selectedScopeId);
+      closeModal();
+    } catch (deleteError) {
+      console.error(deleteError);
+      setFormError(deleteError instanceof Error ? deleteError.message : "Unable to delete form.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div>
       <section
@@ -2775,41 +2810,66 @@ function FormEditor() {
                 {formError}
               </div>
             ) : null}
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 20 }}>
-              <button
-                onClick={() => {
-                  closeModal();
-                }}
-                style={{
-                  padding: "10px 14px",
-                  borderRadius: 10,
-                  border: "1px solid #CBD5E1",
-                  background: "#fff",
-                  color: "#334155",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: "pointer"
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => void submitForm()}
-                disabled={isSaving}
-                style={{
-                  padding: "10px 14px",
-                  borderRadius: 10,
-                  border: "none",
-                  background: "#0F172A",
-                  color: "#fff",
-                  fontSize: 13,
-                  fontWeight: 700,
-                  cursor: isSaving ? "not-allowed" : "pointer",
-                  opacity: isSaving ? 0.6 : 1
-                }}
-              >
-                {isSaving ? "Saving..." : editingDocument ? "Save Changes" : "Add Form"}
-              </button>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 10, marginTop: 20 }}>
+              <div>
+                {editingDocument ? (
+                  <button
+                    onClick={() => void deleteDocument()}
+                    disabled={isSaving}
+                    style={{
+                      padding: "10px 14px",
+                      borderRadius: 10,
+                      border: "1px solid #FCA5A5",
+                      background: "#FEF2F2",
+                      color: "#B91C1C",
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: isSaving ? "not-allowed" : "pointer",
+                      opacity: isSaving ? 0.6 : 1
+                    }}
+                  >
+                    Delete
+                  </button>
+                ) : null}
+              </div>
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+                <button
+                  onClick={() => {
+                    closeModal();
+                  }}
+                  disabled={isSaving}
+                  style={{
+                    padding: "10px 14px",
+                    borderRadius: 10,
+                    border: "1px solid #CBD5E1",
+                    background: "#fff",
+                    color: "#334155",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: isSaving ? "not-allowed" : "pointer",
+                    opacity: isSaving ? 0.6 : 1
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => void submitForm()}
+                  disabled={isSaving}
+                  style={{
+                    padding: "10px 14px",
+                    borderRadius: 10,
+                    border: "none",
+                    background: "#0F172A",
+                    color: "#fff",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: isSaving ? "not-allowed" : "pointer",
+                    opacity: isSaving ? 0.6 : 1
+                  }}
+                >
+                  {isSaving ? "Saving..." : editingDocument ? "Save Changes" : "Add Form"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
