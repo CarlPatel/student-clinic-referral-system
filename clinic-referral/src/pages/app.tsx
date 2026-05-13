@@ -1550,26 +1550,6 @@ function ReferralTracker({
           <div style={{ fontSize: 40, marginBottom: 14 }}>📋</div>
           <h3 style={{ margin: "0 0 8px", fontSize: 17, fontWeight: 700, color: "#0F172A" }}>No referrals yet</h3>
           <p style={{ color: "#64748B", fontSize: 13.5, margin: "0 0 22px" }}>Start logging referrals to track cross-clinic patient transfers.</p>
-          <button
-            onClick={() => {
-              setForm(EMPTY_FORM);
-              setStep(0);
-              setErrors({});
-              setView("form");
-            }}
-            style={{
-              padding: "10px 22px",
-              background: "#0F172A",
-              border: "none",
-              borderRadius: 10,
-              color: "#fff",
-              fontSize: 13.5,
-              fontWeight: 600,
-              cursor: "pointer"
-            }}
-          >
-            Log Your First Referral
-          </button>
         </div>
       )}
 
