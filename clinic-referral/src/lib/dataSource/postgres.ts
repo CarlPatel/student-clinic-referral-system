@@ -37,6 +37,16 @@ type DbClinicServiceRow = {
   clinic_service_id: string;
   clinic_id: string;
   service_id: string;
+  location_label: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  zip: string | null;
+  map_url: string | null;
+  phone: string | null;
+  contact_person: string | null;
+  email: string | null;
+  hours: string | null;
   notes: string | null;
   accepting_referrals: boolean | null;
   status: string | null;
@@ -199,8 +209,62 @@ export async function getClinicById(id: string): Promise<Clinic | null> {
 }
 
 export async function getClinicsByService(serviceId: string): Promise<Clinic[]> {
-  const clinics = await getClinics();
-  return clinics.filter((clinic) => clinic.serviceIds.includes(serviceId));
+  const rows = await query<DbClinicRow>(
+    `
+      SELECT
+        c.clinic_id,
+        c.clinic_key,
+        c.name,
+        COALESCE(cs.location_label, c.location_label) AS location_label,
+        COALESCE(cs.address, c.address) AS address,
+        COALESCE(cs.city, c.city) AS city,
+        COALESCE(cs.state, c.state) AS state,
+        COALESCE(cs.zip, c.zip) AS zip,
+        COALESCE(cs.map_url, c.map_url) AS map_url,
+        COALESCE(cs.phone, c.phone) AS phone,
+        COALESCE(cs.contact_person, c.contact_person) AS contact_person,
+        COALESCE(cs.email, c.email) AS email,
+        c.founded,
+        c.website,
+        c.hours,
+        c.accepting_referrals,
+        c.referral_notes,
+        c.last_verified_at,
+        c.tags,
+        c.referral_methods
+      FROM clinic_services cs
+      JOIN clinics c ON c.clinic_id = cs.clinic_id
+      WHERE cs.service_id = $1::text
+      ORDER BY c.name ASC
+    `,
+    [serviceId]
+  );
+
+  return rows.map((clinic) => ({
+    id: clinic.clinic_id,
+    name: clinic.name,
+    serviceIds: [serviceId],
+    tags: clinic.tags ?? [],
+    location: {
+      address: clinic.address ?? clinic.location_label ?? undefined,
+      city: clinic.city ?? undefined,
+      state: clinic.state ?? undefined,
+      zip: clinic.zip ?? undefined,
+      mapUrl: clinic.map_url ?? undefined
+    },
+    contact: {
+      email: clinic.email ?? undefined,
+      phone: clinic.phone ?? undefined,
+      website: clinic.website ?? undefined
+    },
+    hours: clinic.hours ?? undefined,
+    referral: {
+      acceptingReferrals: clinic.accepting_referrals ?? undefined,
+      howToRefer: clinic.referral_methods ?? [],
+      notes: clinic.referral_notes ?? undefined
+    },
+    lastVerifiedAt: formatDbDate(clinic.last_verified_at)
+  }));
 }
 
 export async function getAppData(): Promise<{
@@ -210,6 +274,9 @@ export async function getAppData(): Promise<{
     location: string;
     phone: string;
     contact: string;
+    email: string | null;
+    mapUrl: string | null;
+    hours: string | null;
     founded: string;
     tags: string[];
     website: string | null;
@@ -223,6 +290,18 @@ export async function getAppData(): Promise<{
       serviceId: string;
       clinicId: string;
       clinicKey: string;
+      locationLabel: string | null;
+      address: string | null;
+      city: string | null;
+      state: string | null;
+      zip: string | null;
+      mapUrl: string | null;
+      phone: string;
+      contactPerson: string;
+      email: string | null;
+      hours: string | null;
+      location: string;
+      contact: string;
       status: string;
       notes: string;
       acceptingReferrals: boolean;
@@ -267,8 +346,26 @@ export async function getAppData(): Promise<{
     ),
     query<DbClinicServiceRow>(
       `
-        SELECT clinic_service_id, clinic_id, service_id, notes, accepting_referrals, status, last_verified_at
-        FROM clinic_services
+        SELECT
+          cs.clinic_service_id,
+          cs.clinic_id,
+          cs.service_id,
+          COALESCE(cs.location_label, c.location_label) AS location_label,
+          COALESCE(cs.address, c.address) AS address,
+          COALESCE(cs.city, c.city) AS city,
+          COALESCE(cs.state, c.state) AS state,
+          COALESCE(cs.zip, c.zip) AS zip,
+          COALESCE(cs.map_url, c.map_url) AS map_url,
+          COALESCE(cs.phone, c.phone) AS phone,
+          COALESCE(cs.contact_person, c.contact_person) AS contact_person,
+          COALESCE(cs.email, c.email) AS email,
+          c.hours,
+          cs.notes,
+          cs.accepting_referrals,
+          cs.status,
+          cs.last_verified_at
+        FROM clinic_services cs
+        JOIN clinics c ON c.clinic_id = cs.clinic_id
       `
     ),
     query<DbClinicServiceDocumentRow>(
@@ -301,6 +398,9 @@ export async function getAppData(): Promise<{
         location: row.location_label ?? row.address ?? "Location not listed",
         phone: row.phone ?? "-",
         contact: row.contact_person ?? "",
+        email: row.email,
+        mapUrl: row.map_url,
+        hours: row.hours,
         founded: formatDbDate(row.founded) ?? "",
         tags: row.tags ?? [],
         website: row.website ?? null
@@ -353,6 +453,18 @@ export async function getAppData(): Promise<{
             serviceId: row.service_id,
             clinicId: row.clinic_id,
             clinicKey,
+            locationLabel: row.location_label,
+            address: row.address,
+            city: row.city,
+            state: row.state,
+            zip: row.zip,
+            mapUrl: row.map_url,
+            phone: row.phone ?? "-",
+            contactPerson: row.contact_person ?? "",
+            email: row.email,
+            hours: row.hours,
+            location: row.location_label ?? row.address ?? "Location not listed",
+            contact: row.contact_person ?? "",
             status: row.status ?? "active",
             notes: row.notes ?? "",
             acceptingReferrals: row.accepting_referrals ?? true,
@@ -771,6 +883,86 @@ export async function updateClinicDocument(input: {
   }
 
   return mapClinicDocumentRow(rows[0]);
+}
+
+export async function deleteClinicServiceDocument(input: { id: number; clinicServiceId: string }) {
+  const pool = getPool();
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const deleteResult = await client.query<{ id: number }>(
+      `
+        DELETE FROM clinic_service_documents
+        WHERE id = $1::integer AND clinic_service_id = $2::text
+        RETURNING id
+      `,
+      [input.id, input.clinicServiceId]
+    );
+
+    if (deleteResult.rows.length === 0) {
+      throw new Error("Document not found for the selected clinic service.");
+    }
+
+    const remainingResult = await client.query<{ id: number }>(
+      `
+        SELECT id
+        FROM clinic_service_documents
+        WHERE clinic_service_id = $1::text
+        ORDER BY sort_order ASC NULLS LAST, doc_name ASC
+      `,
+      [input.clinicServiceId]
+    );
+    await rewriteDocumentSortOrder(client, input.clinicServiceId, remainingResult.rows.map((row) => row.id));
+
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+export async function deleteClinicDocument(input: { id: number; clinicId: string }) {
+  const pool = getPool();
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const deleteResult = await client.query<{ id: number }>(
+      `
+        DELETE FROM clinic_documents
+        WHERE id = $1::integer AND clinic_id = $2::text
+        RETURNING id
+      `,
+      [input.id, input.clinicId]
+    );
+
+    if (deleteResult.rows.length === 0) {
+      throw new Error("Document not found for the selected clinic.");
+    }
+
+    const remainingResult = await client.query<{ id: number }>(
+      `
+        SELECT id
+        FROM clinic_documents
+        WHERE clinic_id = $1::text
+        ORDER BY sort_order ASC NULLS LAST, doc_name ASC
+      `,
+      [input.clinicId]
+    );
+    await rewriteClinicDocumentSortOrder(client, input.clinicId, remainingResult.rows.map((row) => row.id));
+
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 export async function saveClinicServiceDocumentOrder(clinicServiceId: string, orderedDocumentIds: number[]) {

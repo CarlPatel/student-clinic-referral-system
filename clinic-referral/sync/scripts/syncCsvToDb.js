@@ -126,6 +126,15 @@ const TABLES = [
       clinic_service_id: "text",
       clinic_id: "text",
       service_id: "text",
+      location_label: "text",
+      address: "text",
+      city: "text",
+      state: "text",
+      zip: "text",
+      map_url: "text",
+      phone: "text",
+      contact_person: "text",
+      email: "text",
       notes: "text",
       accepting_referrals: "boolean",
       status: "text",
@@ -259,12 +268,7 @@ async function ensureSyncDirectories() {
 function matchesConfiguredFile(actualFileName, expectedFileName) {
   if (actualFileName === expectedFileName) return true;
 
-  if (!actualFileName.toLowerCase().endsWith(expectedFileName.toLowerCase())) {
-    return false;
-  }
-
-  const prefix = actualFileName.slice(0, actualFileName.length - expectedFileName.length);
-  return prefix.trim().length > 0;
+  return actualFileName.toLowerCase().endsWith(` - ${expectedFileName.toLowerCase()}`);
 }
 
 function getPool() {
@@ -381,6 +385,14 @@ function parseArray(value) {
     return parsed.map((item) => String(item).trim()).filter(Boolean);
   }
 
+  if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+    return trimmed
+      .slice(1, -1)
+      .split(",")
+      .map((item) => item.trim().replace(/^"(.*)"$/, "$1"))
+      .filter(Boolean);
+  }
+
   return trimmed.split(",").map((item) => item.trim()).filter(Boolean);
 }
 
@@ -396,16 +408,29 @@ function parseDateLike(value, columnName, type) {
   return type === "date" ? parsed.toISOString().slice(0, 10) : parsed.toISOString();
 }
 
-function normalizeValue(value, columnName, columnType) {
+function normalizeValue(value, columnName, columnType, config) {
+  if (columnType === "array") {
+    return parseArray(value ?? "");
+  }
+
   if (value == null || value.trim() === "") {
+    if (
+      columnName === "accepting_referrals" &&
+      (config.tableName === "clinics" || config.tableName === "clinic_services")
+    ) {
+      return true;
+    }
+
+    if (config.tableName === "clinic_services" && columnName === "status") {
+      return "active";
+    }
+
     return null;
   }
 
   switch (columnType) {
     case "boolean":
       return parseBoolean(value, columnName);
-    case "array":
-      return parseArray(value);
     case "date":
     case "timestamp":
       return parseDateLike(value, columnName, columnType);
@@ -431,7 +456,7 @@ function normalizeRecord(record, config) {
     if (!columnType) continue;
     if (config.generatedColumns?.has(columnName)) continue;
 
-    const value = normalizeValue(rawValue, columnName, columnType);
+    const value = normalizeValue(rawValue, columnName, columnType, config);
     normalized[columnName] = value;
   }
 

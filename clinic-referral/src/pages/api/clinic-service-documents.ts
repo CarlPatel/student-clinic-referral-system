@@ -8,6 +8,8 @@ import {
   canManageClinicService,
   createClinicDocument,
   createClinicServiceDocument,
+  deleteClinicDocument,
+  deleteClinicServiceDocument,
   listClinicDocuments,
   listClinicServiceDocuments,
   listManageableClinics,
@@ -306,7 +308,42 @@ async function handler(req: NextApiRequest, res: NextApiResponse<DocumentsRespon
       return res.status(200).json({ ok: true, documents });
     }
 
-    res.setHeader("Allow", "GET,POST,PATCH");
+    if (req.method === "DELETE") {
+      const body = (req.body ?? {}) as {
+        scope?: DocumentScope;
+        clinicId?: string;
+        clinicServiceId?: string;
+        documentId?: number | string;
+      };
+      const scope = parseScope(body.scope);
+      const documentId = typeof body.documentId === "number" ? body.documentId : Number.parseInt(String(body.documentId), 10);
+
+      if (!Number.isInteger(documentId)) {
+        return res.status(400).json({ ok: false, message: "Document ID is required." });
+      }
+
+      if (scope === "clinic") {
+        const access = await requireClinicAccess(body.clinicId, role, req.session.clinicKey);
+        if (!access.ok) {
+          return res.status(access.status).json({ ok: false, message: access.message });
+        }
+
+        await deleteClinicDocument({ id: documentId, clinicId: access.clinicId });
+        const documents = await listClinicDocuments(access.clinicId);
+        return res.status(200).json({ ok: true, documents });
+      }
+
+      const access = await requireClinicServiceAccess(body.clinicServiceId, role, req.session.clinicKey);
+      if (!access.ok) {
+        return res.status(access.status).json({ ok: false, message: access.message });
+      }
+
+      await deleteClinicServiceDocument({ id: documentId, clinicServiceId: access.clinicServiceId });
+      const documents = await listClinicServiceDocuments(access.clinicServiceId);
+      return res.status(200).json({ ok: true, documents });
+    }
+
+    res.setHeader("Allow", "GET,POST,PATCH,DELETE");
     return res.status(405).json({ ok: false, message: "Method not allowed" });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Server error";

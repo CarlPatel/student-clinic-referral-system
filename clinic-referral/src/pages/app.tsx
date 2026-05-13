@@ -14,6 +14,9 @@ type ClinicInfo = {
   location: string;
   phone: string;
   contact: string;
+  email: string | null;
+  mapUrl: string | null;
+  hours: string | null;
   founded: string;
   tags: string[];
   website: string | null;
@@ -24,6 +27,18 @@ type ClinicEntry = {
   serviceId: string;
   clinicId: string;
   clinicKey: string;
+  locationLabel: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  zip: string | null;
+  mapUrl: string | null;
+  phone: string;
+  contactPerson: string;
+  email: string | null;
+  hours: string | null;
+  location: string;
+  contact: string;
   status: string;
   notes: string;
   acceptingReferrals: boolean;
@@ -53,6 +68,45 @@ type ReferralFormDraft = {
   receivingClinic?: string;
   service?: string;
 };
+
+function clinicInfoForEntry(clinics: Record<string, ClinicInfo>, entry: ClinicEntry): ClinicInfo | null {
+  const clinic = clinics[entry.clinicKey];
+  if (!clinic) return null;
+
+  return {
+    ...clinic,
+    location: entry.location,
+    phone: entry.phone,
+    contact: entry.contact,
+    email: entry.email,
+    mapUrl: entry.mapUrl,
+    hours: entry.hours
+  };
+}
+
+function StatusBadge({ status }: { status?: string | null }) {
+  const normalized = status?.trim().toLowerCase();
+  if (normalized !== "active" && normalized !== "inactive") return null;
+
+  const isActive = normalized === "active";
+
+  return (
+    <span
+      style={{
+        background: isActive ? "#DCFCE7" : "#FEE2E2",
+        color: isActive ? "#166534" : "#991B1B",
+        fontSize: 10.5,
+        fontWeight: 700,
+        padding: "3px 9px",
+        borderRadius: 20,
+        whiteSpace: "nowrap",
+        flexShrink: 0
+      }}
+    >
+      {isActive ? "Active" : "Inactive"}
+    </span>
+  );
+}
 
 // ─── SERVER SIDE PROPS ──────────────────────────────────────────────────────
 export const getServerSideProps = withIronSessionSsr<AppPageProps>(
@@ -2425,6 +2479,41 @@ function FormEditor() {
     }
   };
 
+  const deleteDocument = async () => {
+    if (!selectedScopeId || editingDocument?.id == null) return;
+    const confirmed = window.confirm("Are you sure you want to delete this form? This cannot be undone.");
+    if (!confirmed) return;
+
+    setIsSaving(true);
+    setFormError("");
+
+    try {
+      const response = await fetch("/api/clinic-service-documents", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scope,
+          clinicId: scope === "clinic" ? selectedClinicId : undefined,
+          clinicServiceId: scope === "clinic_service" ? selectedClinicServiceId : undefined,
+          documentId: editingDocument.id
+        })
+      });
+      const payload = (await response.json()) as { ok: boolean; message?: string };
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.message ?? "Unable to delete form.");
+      }
+
+      await loadDocuments(scope, selectedScopeId);
+      closeModal();
+    } catch (deleteError) {
+      console.error(deleteError);
+      setFormError(deleteError instanceof Error ? deleteError.message : "Unable to delete form.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div>
       <section
@@ -2721,41 +2810,66 @@ function FormEditor() {
                 {formError}
               </div>
             ) : null}
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 20 }}>
-              <button
-                onClick={() => {
-                  closeModal();
-                }}
-                style={{
-                  padding: "10px 14px",
-                  borderRadius: 10,
-                  border: "1px solid #CBD5E1",
-                  background: "#fff",
-                  color: "#334155",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: "pointer"
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => void submitForm()}
-                disabled={isSaving}
-                style={{
-                  padding: "10px 14px",
-                  borderRadius: 10,
-                  border: "none",
-                  background: "#0F172A",
-                  color: "#fff",
-                  fontSize: 13,
-                  fontWeight: 700,
-                  cursor: isSaving ? "not-allowed" : "pointer",
-                  opacity: isSaving ? 0.6 : 1
-                }}
-              >
-                {isSaving ? "Saving..." : editingDocument ? "Save Changes" : "Add Form"}
-              </button>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 10, marginTop: 20 }}>
+              <div>
+                {editingDocument ? (
+                  <button
+                    onClick={() => void deleteDocument()}
+                    disabled={isSaving}
+                    style={{
+                      padding: "10px 14px",
+                      borderRadius: 10,
+                      border: "1px solid #FCA5A5",
+                      background: "#FEF2F2",
+                      color: "#B91C1C",
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: isSaving ? "not-allowed" : "pointer",
+                      opacity: isSaving ? 0.6 : 1
+                    }}
+                  >
+                    Delete
+                  </button>
+                ) : null}
+              </div>
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+                <button
+                  onClick={() => {
+                    closeModal();
+                  }}
+                  disabled={isSaving}
+                  style={{
+                    padding: "10px 14px",
+                    borderRadius: 10,
+                    border: "1px solid #CBD5E1",
+                    background: "#fff",
+                    color: "#334155",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: isSaving ? "not-allowed" : "pointer",
+                    opacity: isSaving ? 0.6 : 1
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => void submitForm()}
+                  disabled={isSaving}
+                  style={{
+                    padding: "10px 14px",
+                    borderRadius: 10,
+                    border: "none",
+                    background: "#0F172A",
+                    color: "#fff",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: isSaving ? "not-allowed" : "pointer",
+                    opacity: isSaving ? 0.6 : 1
+                  }}
+                >
+                  {isSaving ? "Saving..." : editingDocument ? "Save Changes" : "Add Form"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -2785,7 +2899,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
   const filtered = services.filter((s) => s.toLowerCase().includes(search.toLowerCase()));
   const currentEntries = (SERVICES_DATA as Record<string, ServiceData>)[activeService]?.clinics || [];
   const currentEntry = selectedEntry ? currentEntries.find((e) => e.id === selectedEntry) : null;
-  const currentInfo: ClinicInfo | null = currentEntry ? (CLINICS as Record<string, ClinicInfo>)[currentEntry.clinicKey] : null;
+  const currentInfo = currentEntry ? clinicInfoForEntry(CLINICS, currentEntry) : null;
 
   const handleService = (s: string) => {
     setActiveService(s);
@@ -3340,7 +3454,8 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                     </p>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(295px, 1fr))", gap: 18 }}>
                       {currentEntries.map((entry) => {
-                        const info = (CLINICS as Record<string, ClinicInfo>)[entry.clinicKey];
+                        const info = clinicInfoForEntry(CLINICS, entry);
+                        if (!info) return null;
                         return (
                           <button
                             key={entry.id}
@@ -3382,20 +3497,7 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                                   {info.location}
                                 </div>
                               </div>
-                              <div
-                                style={{
-                                  background: "#F0F9FF",
-                                  color: "#0369A1",
-                                  fontSize: 10.5,
-                                  fontWeight: 600,
-                                  padding: "3px 9px",
-                                  borderRadius: 20,
-                                  whiteSpace: "nowrap",
-                                  flexShrink: 0
-                                }}
-                              >
-                                Est. {info.founded}
-                              </div>
+                              <StatusBadge status={entry.status} />
                             </div>
                             <div style={{ borderTop: "1px solid #F1F5F9", paddingTop: 11, marginBottom: 11 }}>
                               <div
@@ -3411,10 +3513,10 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                                 {activeService} schedule
                               </div>
                               <div style={{ fontSize: 12.5, color: "#334155", fontWeight: 500 }}>
-                                {entry.notes || entry.status}
+                                {entry.hours || "Hours not listed"}
                               </div>
                             </div>
-                            {info.contact && (
+                            {(info.contact || (info.phone && info.phone !== "—") || info.email) && (
                               <div style={{ marginBottom: 11 }}>
                                 <div
                                   style={{
@@ -3429,8 +3531,9 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                                   Contact
                                 </div>
                                 <div style={{ fontSize: 12.5, color: "#334155" }}>
-                                  {info.contact}
+                                  {info.contact || "Contact"}
                                   {info.phone && info.phone !== "—" && <span style={{ color: "#64748B" }}> · {info.phone}</span>}
+                                  {info.email && <span style={{ color: "#64748B" }}> · {info.email}</span>}
                                 </div>
                               </div>
                             )}
@@ -3498,10 +3601,17 @@ export default function ClinicReferralApp({ username, userId, role, clinicKey, c
                         </div>
                         <div style={{ color: "#fff", fontSize: 19, fontWeight: 700, marginBottom: 6 }}>{currentInfo.name}</div>
                         <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 12.5, display: "flex", flexWrap: "wrap", gap: 18 }}>
-                          <span>📍 {currentInfo.location}</span>
+                          {currentInfo.mapUrl ? (
+                            <a href={currentInfo.mapUrl} target="_blank" rel="noreferrer" style={{ color: "inherit" }}>
+                              📍 {currentInfo.location}
+                            </a>
+                          ) : (
+                            <span>📍 {currentInfo.location}</span>
+                          )}
                           {currentInfo.phone && currentInfo.phone !== "—" && <span>📞 {currentInfo.phone}</span>}
-                          <span>👤 {currentInfo.contact}</span>
-                          <span>🏥 Est. {currentInfo.founded}</span>
+                          {currentInfo.email && <span>✉ {currentInfo.email}</span>}
+                          {currentInfo.contact && <span>👤 {currentInfo.contact}</span>}
+                          <StatusBadge status={currentEntry.status} />
                         </div>
                       </div>
                       <div
